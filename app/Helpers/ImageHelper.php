@@ -1,0 +1,150 @@
+<?php
+namespace Helpers;
+
+class ImageHelper {
+
+    /**
+     * Upload, rename, resize and generate thumb for a single uploaded file.
+     *
+     * @param array  $file       $_FILES['field'] element
+     * @param string $uploadDir  Absolute path to base upload dir (no trailing slash)
+     * @param int    $maxWidth   Max width for full image (px)
+     * @param int    $maxHeight  Max height for full image (px)
+     * @param int    $quality    JPEG quality 0-100 for full image
+     * @param int    $thumbSize  Square thumb side length (px)
+     * @param int    $thumbQuality JPEG quality for thumbnail
+     * @return array ['full' => relative_url, 'thumb' => relative_url] | ['error' => msg]
+     */
+    public static function processUpload(
+        array  $file,
+        string $uploadDir,
+        int    $maxWidth       = 1200,
+        int    $maxHeight      = 1200,
+        int    $quality        = 85,
+        int    $thumbSize      = 300,
+        int    $thumbQuality   = 80
+    ): array {
+
+        // 1. Basic validation
+        if ($file['error'] !== UPLOAD_ERR_OK) {
+            return ['error' => 'Upload error code: ' . $file['error']];
+        }
+
+        $allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+        $mime    = mime_content_type($file['tmp_name']);
+        if (!in_array($mime, $allowed)) {
+            return ['error' => 'File type not allowed: ' . $mime];
+        }
+
+        // 2. Ensure directories exist
+        $fullDir  = $uploadDir . '/full';
+        $thumbDir = $uploadDir . '/thumb';
+        foreach ([$fullDir, $thumbDir] as $dir) {
+            if (!is_dir($dir)) {
+                mkdir($dir, 0755, true);
+            }
+        }
+
+        // 3. Generate unique filename
+        $uid      = bin2hex(random_bytes(10)); // 20-hex unique ID
+        $ext      = 'jpg'; // always save as JPEG for uniformity & compression
+        $filename = $uid . '.' . $ext;
+
+        // 4. Load image into GD
+        $src = self::loadImage($file['tmp_name'], $mime);
+        if (!$src) {
+            return ['error' => 'Could not read image. GD extension may be missing.'];
+        }
+
+        // 5. Resize full image (preserving aspect ratio)
+        $srcW = imagesx($src);
+        $srcH = imagesy($src);
+        [$newW, $newH] = self::calcDimensions($srcW, $srcH, $maxWidth, $maxHeight);
+
+        $full = imagecreatetruecolor($newW, $newH);
+        self::preserveTransparency($full, $mime);
+        imagecopyresampled($full, $src, 0, 0, 0, 0, $newW, $newH, $srcW, $srcH);
+
+        // 6. Save full image
+        $fullPath = $fullDir . '/' . $filename;
+        imagejpeg($full, $fullPath, $quality);
+        imagedestroy($full);
+
+        // 7. Generate square thumbnail (crop centre)
+        $thumb = self::cropSquare($src, $srcW, $srcH, $thumbSize);
+        $thumbPath = $thumbDir . '/' . $filename;
+        imagejpeg($thumb, $thumbPath, $thumbQuality);
+        imagedestroy($thumb);
+        imagedestroy($src);
+
+        // 8. Build relative URLs (relative to web root / DOCUMENT_ROOT)
+        $docRoot    = rtrim($_SERVER['DOCUMENT_ROOT'], '/\\');
+        $relFull    = '/' . ltrim(str_replace('\\', '/', substr($fullPath,  strlen($docRoot))), '/');
+        $relThumb   = '/' . ltrim(str_replace('\\', '/', substr($thumbPath, strlen($docRoot))), '/');
+
+        return ['full' => $relFull, 'thumb' => $relThumb];
+    }
+
+    /**
+     * Delete full + thumb files for a given relative URL pair.
+     */
+    public static function deleteFiles(string $fullUrl, string $thumbUrl): void {
+        $docRoot = rtrim($_SERVER['DOCUMENT_ROOT'], '/\\');
+        foreach ([$fullUrl, $thumbUrl] as $url) {
+            if (empty($url)) continue;
+            $path = $docRoot . '/' . ltrim(str_replace('/', DIRECTORY_SEPARATOR, $url), '/\\');
+            if (file_exists($path)) {
+                @unlink($path);
+            }
+        }
+    }
+
+    // ─── private helpers ──────────────────────────────────────────────────────
+
+    private static function loadImage(string $path, string $mime) {
+        switch ($mime) {
+            case 'image/jpeg': return @imagecreatefromjpeg($path);
+            case 'image/png':  return @imagecreatefrompng($path);
+            case 'image/webp': return @imagecreatefromwebp($path);
+            case 'image/gif':  return @imagecreatefromgif($path);
+        }
+        return false;
+    }
+
+    private static function calcDimensions(int $srcW, int $srcH, int $maxW, int $maxH): array {
+        if ($srcW <= $maxW && $srcH <= $maxH) {
+            return [$srcW, $srcH]; // already small enough
+        }
+        $ratio = min($maxW / $srcW, $maxH / $srcH);
+        return [(int)round($srcW * $ratio), (int)round($srcH * $ratio)];
+    }
+
+    private static function preserveTransparency($img, string $mime): void {
+        imagealphablending($img, false);
+        imagesavealpha($img, true);
+        $transparent = imagecolorallocatealpha($img, 255, 255, 255, 127);
+        imagefilledrectangle($img, 0, 0, imagesx($img), imagesy($img), $transparent);
+    }
+
+    /**
+     * Crop-and-resize to a centred square thumbnail.
+     */
+    private static function cropSquare($src, int $srcW, int $srcH, int $size) {
+        // Determine crop rect
+        if ($srcW > $srcH) {
+            $cropX = (int)(($srcW - $srcH) / 2);
+            $cropY = 0;
+            $cropS = $srcH;
+        } else {
+            $cropX = 0;
+            $cropY = (int)(($srcH - $srcW) / 2);
+            $cropS = $srcW;
+        }
+
+        $thumb = imagecreatetruecolor($size, $size);
+        // white background (for transparent images)
+        imagefilledrectangle($thumb, 0, 0, $size, $size, imagecolorallocate($thumb, 255, 255, 255));
+        imagecopyresampled($thumb, $src, 0, 0, $cropX, $cropY, $size, $size, $cropS, $cropS);
+        return $thumb;
+    }
+}

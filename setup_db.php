@@ -70,6 +70,7 @@ try {
         'bank2_owner' => 'VARCHAR(255)',
         'bank2_name'  => 'VARCHAR(100)',
         'bank2_acc'   => 'VARCHAR(100)',
+        'music_url'   => 'VARCHAR(500)',
     ];
     foreach ($toAdd as $col => $type) {
         if (!in_array($col, $cols)) {
@@ -111,11 +112,20 @@ try {
     $sql_gallery = "CREATE TABLE IF NOT EXISTS gallery (
         id INT AUTO_INCREMENT PRIMARY KEY,
         wedding_id INT NOT NULL,
-        image_url VARCHAR(255) NOT NULL,
+        image_url VARCHAR(500) NOT NULL,
+        thumb_url VARCHAR(500) NOT NULL DEFAULT '',
         caption VARCHAR(255),
+        sort_order INT DEFAULT 0,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         INDEX (wedding_id)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4";
     $pdo->exec($sql_gallery);
+
+    // Migrate existing gallery table — add thumb_url and sort_order if missing
+    $galCols = $pdo->query("SHOW COLUMNS FROM gallery")->fetchAll(PDO::FETCH_COLUMN);
+    if (!in_array('thumb_url',   $galCols)) $pdo->exec("ALTER TABLE gallery ADD COLUMN thumb_url VARCHAR(500) NOT NULL DEFAULT '' AFTER image_url");
+    if (!in_array('sort_order',  $galCols)) $pdo->exec("ALTER TABLE gallery ADD COLUMN sort_order INT DEFAULT 0 AFTER thumb_url");
+    if (!in_array('created_at',  $galCols)) $pdo->exec("ALTER TABLE gallery ADD COLUMN created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP");
 
     // Invitation Categories
     $pdo->exec("CREATE TABLE IF NOT EXISTS invitation_categories (
@@ -133,6 +143,19 @@ try {
         name VARCHAR(255) NOT NULL,
         INDEX (wedding_id),
         INDEX (category_id)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+
+    // Love Stories Table
+    $pdo->exec("CREATE TABLE IF NOT EXISTS love_stories (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        wedding_id INT NOT NULL,
+        title VARCHAR(255) NOT NULL,
+        story_date DATE NOT NULL,
+        content TEXT NOT NULL,
+        image_url VARCHAR(500) DEFAULT '',
+        sort_order INT DEFAULT 0,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        INDEX (wedding_id)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
 
     echo "Database structure initialized/updated successfully!\n";

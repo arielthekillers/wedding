@@ -103,19 +103,56 @@ class Wedding {
     public static function setGallery($wedding_id, $urls) {
         $db = getDB();
         $db->prepare("DELETE FROM gallery WHERE wedding_id = ?")->execute([$wedding_id]);
-        $stmt = $db->prepare("INSERT INTO gallery (wedding_id, image_url) VALUES (?, ?)");
+        $stmt = $db->prepare("INSERT INTO gallery (wedding_id, image_url, thumb_url) VALUES (?, ?, '')");
         foreach ($urls as $url) {
-            if (!empty(trim($url))) {
-                $stmt->execute([$wedding_id, trim($url)]);
+            $url = trim($url);
+            if (!empty($url)) {
+                $stmt->execute([$wedding_id, $url]);
             }
         }
     }
 
-    public static function getGallery($wedding_id) {
+    /**
+     * Add a single uploaded image (with thumb) to the gallery.
+     */
+    public static function addGalleryImage($wedding_id, string $imageUrl, string $thumbUrl, int $sortOrder = 0): bool {
+        $db = getDB();
+        $stmt = $db->prepare("INSERT INTO gallery (wedding_id, image_url, thumb_url, sort_order) VALUES (?, ?, ?, ?)");
+        return $stmt->execute([$wedding_id, $imageUrl, $thumbUrl, $sortOrder]);
+    }
+
+    /**
+     * Get all gallery rows (full row, including id and thumb_url).
+     */
+    public static function getGallery($wedding_id): array {
+        $db = getDB();
+        $stmt = $db->prepare("SELECT * FROM gallery WHERE wedding_id = ? ORDER BY sort_order ASC, id ASC");
+        $stmt->execute([$wedding_id]);
+        return $stmt->fetchAll();
+    }
+
+    /**
+     * Get only image_url strings (legacy compat used by theme).
+     */
+    public static function getGalleryUrls($wedding_id): array {
         $db = getDB();
         $stmt = $db->prepare("SELECT image_url FROM gallery WHERE wedding_id = ?");
         $stmt->execute([$wedding_id]);
-        return $stmt->fetchAll(PDO::FETCH_COLUMN);
+        return $stmt->fetchAll(\PDO::FETCH_COLUMN);
+    }
+
+    /**
+     * Delete a single gallery image by its row ID.
+     * Returns ['image_url'=>..., 'thumb_url'=>...] so caller can delete files.
+     */
+    public static function deleteGalleryImage(int $id): ?array {
+        $db = getDB();
+        $stmt = $db->prepare("SELECT image_url, thumb_url FROM gallery WHERE id = ?");
+        $stmt->execute([$id]);
+        $row = $stmt->fetch();
+        if (!$row) return null;
+        $db->prepare("DELETE FROM gallery WHERE id = ?")->execute([$id]);
+        return $row;
     }
 
     public static function slugExists($slug, $excludeId = 0) {
@@ -140,25 +177,56 @@ class Wedding {
         return $categories;
     }
 
-    public static function saveGuestList($wedding_id, $categories) {
+    // ── GUEST CRUD METHODS ──
+
+    public static function addCategory($wedding_id, $name) {
         $db = getDB();
-        // Clear existing
-        $db->prepare("DELETE FROM invitation_guests WHERE wedding_id = ?")->execute([$wedding_id]);
-        $db->prepare("DELETE FROM invitation_categories WHERE wedding_id = ?")->execute([$wedding_id]);
+        $stmt = $db->prepare("INSERT INTO invitation_categories (wedding_id, name) VALUES (?, ?)");
+        return $stmt->execute([$wedding_id, trim($name)]);
+    }
 
-        $catStmt   = $db->prepare("INSERT INTO invitation_categories (wedding_id, name) VALUES (?,?)");
-        $guestStmt = $db->prepare("INSERT INTO invitation_guests (category_id, wedding_id, name) VALUES (?,?,?)");
+    public static function deleteCategory($id) {
+        $db = getDB();
+        $db->prepare("DELETE FROM invitation_guests WHERE category_id = ?")->execute([$id]);
+        $stmt = $db->prepare("DELETE FROM invitation_categories WHERE id = ?");
+        return $stmt->execute([$id]);
+    }
 
-        foreach ($categories as $catName => $names) {
-            $catName = trim($catName);
-            if (empty($catName)) continue;
-            $catStmt->execute([$wedding_id, $catName]);
-            $catId = $db->lastInsertId();
-            foreach ($names as $name) {
-                $name = trim($name);
-                if ($name !== '') $guestStmt->execute([$catId, $wedding_id, $name]);
-            }
-        }
+    public static function addGuest($wedding_id, $category_id, $name) {
+        $db = getDB();
+        $stmt = $db->prepare("INSERT INTO invitation_guests (wedding_id, category_id, name) VALUES (?, ?, ?)");
+        return $stmt->execute([$wedding_id, $category_id, trim($name)]);
+    }
+
+    public static function updateGuest($id, $category_id, $name) {
+        $db = getDB();
+        $stmt = $db->prepare("UPDATE invitation_guests SET category_id = ?, name = ? WHERE id = ?");
+        return $stmt->execute([$category_id, trim($name), $id]);
+    }
+
+    public static function deleteGuest($id) {
+        $db = getDB();
+        $stmt = $db->prepare("DELETE FROM invitation_guests WHERE id = ?");
+        return $stmt->execute([$id]);
+    }
+
+    public static function getGuestStats($wedding_id) {
+        $db = getDB();
+        $stmt = $db->prepare("SELECT COUNT(*) FROM invitation_guests WHERE wedding_id = ?");
+        $stmt->execute([$wedding_id]);
+        $total = $stmt->fetchColumn();
+
+        $stmt = $db->prepare("
+            SELECT c.id, c.name as category_name, COUNT(g.id) as total
+            FROM invitation_categories c
+            LEFT JOIN invitation_guests g ON c.id = g.category_id
+            WHERE c.wedding_id = ?
+            GROUP BY c.id
+        ");
+        $stmt->execute([$wedding_id]);
+        $by_category = $stmt->fetchAll();
+
+        return ['total' => $total, 'by_category' => $by_category];
     }
 
     public static function getAllGuests($wedding_id) {
@@ -172,5 +240,52 @@ class Wedding {
         ");
         $stmt->execute([$wedding_id]);
         return $stmt->fetchAll();
+    }
+
+    // ---- Love Story Methods ----
+    public static function getLoveStories($wedding_id) {
+        $db = getDB();
+        $stmt = $db->prepare("SELECT * FROM love_stories WHERE wedding_id = ? ORDER BY story_date ASC, id ASC");
+        $stmt->execute([$wedding_id]);
+        return $stmt->fetchAll();
+    }
+
+    public static function getLoveStory($id) {
+        $db = getDB();
+        $stmt = $db->prepare("SELECT * FROM love_stories WHERE id = ?");
+        $stmt->execute([$id]);
+        return $stmt->fetch();
+    }
+
+    public static function addLoveStory($data) {
+        $db = getDB();
+        $stmt = $db->prepare("INSERT INTO love_stories (wedding_id, title, story_date, content, image_url, sort_order) VALUES (?, ?, ?, ?, ?, ?)");
+        return $stmt->execute([
+            $data['wedding_id'],
+            $data['title'],
+            $data['story_date'],
+            $data['content'],
+            $data['image_url'] ?? '',
+            $data['sort_order'] ?? 0,
+        ]);
+    }
+
+    public static function updateLoveStory($id, $data) {
+        $db = getDB();
+        $stmt = $db->prepare("UPDATE love_stories SET title=?, story_date=?, content=?, image_url=?, sort_order=? WHERE id=?");
+        return $stmt->execute([
+            $data['title'],
+            $data['story_date'],
+            $data['content'],
+            $data['image_url'] ?? '',
+            $data['sort_order'] ?? 0,
+            $id,
+        ]);
+    }
+
+    public static function deleteLoveStory($id) {
+        $db = getDB();
+        $stmt = $db->prepare("DELETE FROM love_stories WHERE id = ?");
+        return $stmt->execute([$id]);
     }
 }

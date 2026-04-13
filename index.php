@@ -2,6 +2,7 @@
 require_once __DIR__ . '/config/config.php';
 
 use Models\Wedding;
+use Helpers\ImageHelper;
 
 // Base path: e.g. "/wedding/" for http://localhost/wedding/
 $base = rtrim(str_replace('index.php', '', $_SERVER['SCRIPT_NAME']), '/') . '/';
@@ -14,6 +15,23 @@ $parts = explode('/', $url);
 if ($parts[0] === 'admin') {
     $action = $parts[1] ?? 'index';
     handleAdmin($action, $parts);
+    exit;
+}
+
+// API: Check slug availability (AJAX)
+if ($parts[0] === 'api' && ($parts[1] ?? '') === 'check-slug') {
+    header('Content-Type: application/json');
+    $slug = trim($_GET['slug'] ?? '');
+    $excludeId = (int)($_GET['exclude'] ?? 0);
+    if (empty($slug)) {
+        echo json_encode(['available' => false, 'message' => 'Slug tidak boleh kosong']);
+    } elseif (!preg_match('/^[a-z0-9\-]+$/', $slug)) {
+        echo json_encode(['available' => false, 'message' => 'Hanya huruf kecil, angka, dan tanda minus']);
+    } elseif (Models\Wedding::slugExists($slug, $excludeId)) {
+        echo json_encode(['available' => false, 'message' => 'Slug sudah dipakai']);
+    } else {
+        echo json_encode(['available' => true, 'message' => 'Slug tersedia']);
+    }
     exit;
 }
 
@@ -91,103 +109,260 @@ if (!empty($url)) {
 header('Location: ' . $base . 'admin');
 exit;
 
-// Handle Admin Actions
+// ═══════════════════════════════════════════════════════════════════
+// ADMIN HANDLER
+// ═══════════════════════════════════════════════════════════════════
+
 function handleAdmin($action, $parts) {
     switch ($action) {
+
+        // ── DASHBOARD ──────────────────────────────────────────────────
         case 'index':
-            $weddings = Wedding::getAll();
+            $weddings = Models\Wedding::getAll();
             include 'app/Views/admin_dashboard.php';
             break;
+
+        // ── CREATE NEW WEDDING ─────────────────────────────────────────
         case 'create':
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $data = filterInput($_POST);
-                if (Wedding::slugExists($data['slug'])) {
+                if (Models\Wedding::slugExists($data['slug'])) {
                     $error = "Slug already exists. Choose another.";
                     include 'app/Views/wedding_form.php';
                 } else {
-                    $urls = explode("\n", $data['gallery_urls'] ?? '');
                     unset($data['gallery_urls']);
-                    $id = Wedding::create($data);
-                    if ($id) Wedding::setGallery($id, $urls);
-                    header('Location: ' . $GLOBALS['base'] . 'admin');
+                    $id = Models\Wedding::create($data);
+                    header('Location: ' . $GLOBALS['base'] . 'admin/detail/' . $id . '/settings?saved=1');
                 }
             } else {
                 include 'app/Views/wedding_form.php';
             }
             break;
-        case 'edit':
-            $id = $parts[2] ?? 0;
-            $wedding = null;
-            if ($id) {
-                // Fetch wedding by ID
-                $db = getDB();
-                $stmt = $db->prepare("SELECT * FROM weddings WHERE id = ?");
-                $stmt->execute([$id]);
-                $wedding = $stmt->fetch();
-            }
-            if (!$wedding) die("Wedding not found.");
 
-            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-                $data = filterInput($_POST);
-                if (Wedding::slugExists($data['slug'], $id)) {
-                    $error = "Slug already exists.";
-                    include 'app/Views/wedding_form.php';
-                } else {
-                    $urls = explode("\n", $data['gallery_urls'] ?? '');
-                    unset($data['gallery_urls']);
-                    Wedding::update($id, $data);
-                    Wedding::setGallery($id, $urls);
-                    header('Location: ' . $GLOBALS['base'] . 'admin');
-                }
-            } else {
-                include 'app/Views/wedding_form.php';
-            }
-            break;
-        case 'delete':
-            $id = $parts[2] ?? 0;
-            if ($id) Wedding::delete($id);
-            header('Location: ' . $GLOBALS['base'] . 'admin');
+        // ── LEGACY REDIRECTS ───────────────────────────────────────────
+        case 'edit':
+            $id = (int)($parts[2] ?? 0);
+            header('Location: ' . $GLOBALS['base'] . 'admin/detail/' . $id . '/settings');
             break;
         case 'guests':
+            $id = (int)($parts[2] ?? 0);
+            header('Location: ' . $GLOBALS['base'] . 'admin/detail/' . $id . '/guests');
+            break;
+        case 'love_story':
+            $id = (int)($parts[2] ?? 0);
+            header('Location: ' . $GLOBALS['base'] . 'admin/detail/' . $id . '/story');
+            break;
+        case 'gallery':
+            $id = (int)($parts[2] ?? 0);
+            header('Location: ' . $GLOBALS['base'] . 'admin/detail/' . $id . '/gallery');
+            break;
+
+        // ── DELETE WEDDING ─────────────────────────────────────────────
+        case 'delete':
             $id = $parts[2] ?? 0;
+            if ($id) Models\Wedding::delete($id);
+            header('Location: ' . $GLOBALS['base'] . 'admin');
+            break;
+
+        // ── DETAIL HUB (all management tabs) ─────────────────────────
+        case 'detail':
+            $id  = (int)($parts[2] ?? 0);
+            $tab = $parts[3] ?? 'settings';
             if (!$id) { header('Location: ' . $GLOBALS['base'] . 'admin'); exit; }
-            $db = getDB();
+
+            $db   = getDB();
             $stmt = $db->prepare("SELECT * FROM weddings WHERE id = ?");
             $stmt->execute([$id]);
             $wedding = $stmt->fetch();
             if (!$wedding) die("Wedding not found.");
 
-            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-                $catNames  = $_POST['cat_name']  ?? [];
-                $catGuests = $_POST['cat_guests'] ?? [];
-                $toSave = [];
-                foreach ($catNames as $i => $catName) {
-                    $names = explode(',', $catGuests[$i] ?? '');
-                    $toSave[$catName] = $names;
-                }
-                Wedding::saveGuestList($id, $toSave);
-                header('Location: ' . $GLOBALS['base'] . 'admin/guests/' . $id . '?saved=1');
-                exit;
-            }
-            $categories = Wedding::getGuestCategories($id);
-            include 'app/Views/guest_list.php';
-            break;
-        case 'guestbook':
-            // Handle guestbook delete: /admin/guestbook/delete/{id}
-            if (($parts[2] ?? '') === 'delete') {
-                $msgId = (int)($parts[3] ?? 0);
-                if ($msgId) Wedding::deleteMessage($msgId);
-            }
-            $ref = $_SERVER['HTTP_REFERER'] ?? $GLOBALS['base'] . 'admin';
-            header("Location: $ref");
-            break;
-        default:
-            die("Admin action not found.");
+            $detailBase = $GLOBALS['base'] . 'admin/detail/' . $id . '/';
 
+            switch ($tab) {
+
+                // ── Settings ───────────────────────────────────────────
+                case 'settings':
+                    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                        $data = filterInput($_POST);
+                        if (Models\Wedding::slugExists($data['slug'], $id)) {
+                            header('Location: ' . $detailBase . 'settings?error=' . urlencode('Slug sudah dipakai.'));
+                        } else {
+                            Models\Wedding::update($id, $data);
+                            header('Location: ' . $detailBase . 'settings?saved=1');
+                        }
+                        exit;
+                    }
+                    include 'app/Views/wedding_settings.php';
+                    break;
+
+                // ── Profile ────────────────────────────────────────────
+                case 'profile':
+                    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                        $fields = ['bride_name','bride_nickname','bride_order','bride_father','bride_mother',
+                                   'groom_name','groom_nickname','groom_order','groom_father','groom_mother'];
+                        $data = [];
+                        foreach ($fields as $f) $data[$f] = htmlspecialchars(trim($_POST[$f] ?? ''));
+                        Models\Wedding::update($id, $data);
+                        header('Location: ' . $detailBase . 'profile?saved=1');
+                        exit;
+                    }
+                    include 'app/Views/wedding_profile.php';
+                    break;
+
+                // ── Event ──────────────────────────────────────────────
+                case 'event':
+                    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                        $fields = ['akad_date','akad_time','akad_place',
+                                   'reception_date','reception_time','reception_place','reception_map_link'];
+                        $data = [];
+                        foreach ($fields as $f) $data[$f] = htmlspecialchars(trim($_POST[$f] ?? ''));
+                        Models\Wedding::update($id, $data);
+                        header('Location: ' . $detailBase . 'event?saved=1');
+                        exit;
+                    }
+                    include 'app/Views/wedding_event.php';
+                    break;
+
+                // ── Gift ───────────────────────────────────────────────
+                case 'gift':
+                    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                        $fields = ['bank1_owner','bank1_name','bank1_acc','bank2_owner','bank2_name','bank2_acc'];
+                        $data = [];
+                        foreach ($fields as $f) $data[$f] = htmlspecialchars(trim($_POST[$f] ?? ''));
+                        Models\Wedding::update($id, $data);
+                        header('Location: ' . $detailBase . 'gift?saved=1');
+                        exit;
+                    }
+                    include 'app/Views/wedding_gift.php';
+                    break;
+
+                // ── Gallery ────────────────────────────────────────────
+                case 'gallery':
+                    $uploadDir = __DIR__ . '/uploads/gallery/' . $id;
+
+                    if (isset($_GET['action']) && $_GET['action'] === 'delete') {
+                        $imgId = (int)($_GET['img_id'] ?? 0);
+                        if ($imgId) {
+                            $row = Models\Wedding::deleteGalleryImage($imgId);
+                            if ($row) Helpers\ImageHelper::deleteFiles($row['image_url'], $row['thumb_url']);
+                        }
+                        header('Location: ' . $detailBase . 'gallery?deleted=1');
+                        exit;
+                    }
+
+                    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['photos'])) {
+                        $files = $_FILES['photos'];
+                        $count = count($files['name']);
+                        $maxSort = $db->prepare("SELECT COALESCE(MAX(sort_order),0) FROM gallery WHERE wedding_id = ?");
+                        $maxSort->execute([$id]);
+                        $nextSort = (int)$maxSort->fetchColumn() + 1;
+                        $uploadSuccess = 0;
+                        for ($i = 0; $i < $count; $i++) {
+                            if ($files['error'][$i] === UPLOAD_ERR_NO_FILE) continue;
+                            $file = [
+                                'name'     => $files['name'][$i],
+                                'type'     => $files['type'][$i],
+                                'tmp_name' => $files['tmp_name'][$i],
+                                'error'    => $files['error'][$i],
+                                'size'     => $files['size'][$i],
+                            ];
+                            $result = Helpers\ImageHelper::processUpload($file, $uploadDir);
+                            if (!isset($result['error'])) {
+                                Models\Wedding::addGalleryImage($id, $result['full'], $result['thumb'], $nextSort++);
+                                $uploadSuccess++;
+                            }
+                        }
+                        $qs = $uploadSuccess > 0 ? '?uploaded=' . $uploadSuccess : '?error=1';
+                        header('Location: ' . $detailBase . 'gallery' . $qs);
+                        exit;
+                    }
+
+                    $galleryItems = Models\Wedding::getGallery($id);
+                    include 'app/Views/gallery_admin.php';
+                    break;
+
+                // ── Love Story ─────────────────────────────────────────
+                case 'story':
+                    if (isset($_GET['action']) && $_GET['action'] === 'delete') {
+                        $storyId = (int)($_GET['story_id'] ?? 0);
+                        if ($storyId) Models\Wedding::deleteLoveStory($storyId);
+                        header('Location: ' . $detailBase . 'story?deleted=1');
+                        exit;
+                    }
+                    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                        $storyId = (int)($_POST['story_id'] ?? 0);
+                        $data = [
+                            'wedding_id' => $id,
+                            'title'      => htmlspecialchars(trim($_POST['title'] ?? '')),
+                            'story_date' => $_POST['story_date'] ?? date('Y-m-d'),
+                            'content'    => htmlspecialchars(trim($_POST['content'] ?? '')),
+                            'image_url'  => htmlspecialchars(trim($_POST['image_url'] ?? '')),
+                            'sort_order' => (int)($_POST['sort_order'] ?? 0),
+                        ];
+                        $storyId ? Models\Wedding::updateLoveStory($storyId, $data) : Models\Wedding::addLoveStory($data);
+                        header('Location: ' . $detailBase . 'story?saved=1');
+                        exit;
+                    }
+                    $stories = Models\Wedding::getLoveStories($id);
+                    include 'app/Views/love_story.php';
+                    break;
+
+                // ── Guests ─────────────────────────────────────────────
+                case 'guests':
+                    $actionType = $_GET['action'] ?? ($_POST['action'] ?? '');
+
+                    if ($actionType === 'add_cat' && !empty($_POST['cat_name'])) {
+                        Models\Wedding::addCategory($id, $_POST['cat_name']);
+                        header('Location: ' . $detailBase . 'guests?saved=1'); exit;
+                    }
+                    if ($actionType === 'delete_cat' && !empty($_GET['cat_id'])) {
+                        Models\Wedding::deleteCategory($_GET['cat_id']);
+                        header('Location: ' . $detailBase . 'guests?deleted=1'); exit;
+                    }
+                    if ($actionType === 'add_guest' && !empty($_POST['guest_name']) && !empty($_POST['category_id'])) {
+                        Models\Wedding::addGuest($id, $_POST['category_id'], $_POST['guest_name']);
+                        header('Location: ' . $detailBase . 'guests?saved=1'); exit;
+                    }
+                    if ($actionType === 'edit_guest' && !empty($_POST['guest_id']) && !empty($_POST['guest_name'])) {
+                        Models\Wedding::updateGuest($_POST['guest_id'], $_POST['category_id'], $_POST['guest_name']);
+                        header('Location: ' . $detailBase . 'guests?saved=1'); exit;
+                    }
+                    if ($actionType === 'delete_guest' && !empty($_GET['guest_id'])) {
+                        Models\Wedding::deleteGuest($_GET['guest_id']);
+                        header('Location: ' . $detailBase . 'guests?deleted=1'); exit;
+                    }
+
+                    $stats = Models\Wedding::getGuestStats($id);
+                    $allGuests = Models\Wedding::getAllGuests($id);
+                    $categories = Models\Wedding::getGuestCategories($id);
+                    include 'app/Views/guest_list.php';
+                    break;
+
+                // ── Guestbook ──────────────────────────────────────────
+                case 'guestbook':
+                    if (isset($_GET['action']) && $_GET['action'] === 'deletemsg') {
+                        $msgId = (int)($_GET['msg_id'] ?? 0);
+                        if ($msgId) Models\Wedding::deleteMessage($msgId);
+                        header('Location: ' . $detailBase . 'guestbook?deleted=1');
+                        exit;
+                    }
+                    include 'app/Views/wedding_guestbook.php';
+                    break;
+
+                default:
+                    header('Location: ' . $detailBase . 'settings');
+            }
+            break;
+
+        default:
+            header('Location: ' . $GLOBALS['base'] . 'admin');
     }
 }
 
-// Render Wedding with selected theme
+// ═══════════════════════════════════════════════════════════════════
+// RENDER THEME
+// ═══════════════════════════════════════════════════════════════════
+
 function renderWedding($wedding) {
     global $base;
     $theme = $wedding['theme_path'];
@@ -199,13 +374,15 @@ function renderWedding($wedding) {
     }
 }
 
-// Basic input filtering
+// ═══════════════════════════════════════════════════════════════════
+// INPUT FILTERING
+// ═══════════════════════════════════════════════════════════════════
+
 function filterInput($post) {
     $data = [];
     foreach ($post as $key => $val) {
-        $data[$key] = htmlspecialchars(trim($val));
+        $data[$key] = is_array($val) ? $val : htmlspecialchars(trim($val));
     }
-    // Handle checkbox
     $data['is_enabled'] = isset($post['is_enabled']) ? 1 : 0;
     return $data;
 }

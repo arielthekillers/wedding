@@ -103,7 +103,12 @@
                 </div>
                 <div class="form-group">
                     <label>URL Slug (e.g. billyandjane)</label>
-                    <input type="text" name="slug" value="<?= $wedding['slug'] ?? '' ?>" required>
+                    <input type="text" name="slug" id="slug-input" value="<?= $wedding['slug'] ?? '' ?>" required
+                           pattern="[a-z0-9\-]+" title="Hanya huruf kecil, angka, dan tanda minus">
+                    <div id="slug-status" style="font-size: 0.75rem; min-height: 1em; margin-top: 4px; font-weight: 600;"></div>
+                    <div style="font-size: 0.8rem; color: #64748b; margin-top: 8px;">
+                        URL Preview: <span style="color: var(--primary); font-weight: 600;"><?= $_SERVER['HTTP_HOST'] . (rtrim(str_replace('index.php', '', $_SERVER['SCRIPT_NAME']), '/') . '/') ?></span><span id="slug-preview-text" style="color: var(--primary); font-weight: 600;"><?= $wedding['slug'] ?? '' ?></span>
+                    </div>
                 </div>
             </div>
 
@@ -264,11 +269,13 @@
 
             <div class="section-title">🖼️ GALERI FOTO</div>
             <div class="form-group">
-                <label>Image URLs (one per line)</label>
-                <textarea name="gallery_urls" rows="6" placeholder="https://example.com/photo1.jpg"><?php 
+                <label>Image URLs (one per line) <small style="font-weight:400;color:#94a3b8;">— atau kelola foto via tombol "🖼️ Galeri" di dashboard</small></label>
+                <textarea name="gallery_urls" rows="5" placeholder="https://example.com/photo1.jpg"><?php 
                     if (isset($id)) {
-                        $gallery = Models\Wedding::getGallery($id);
-                        echo implode("\n", $gallery);
+                        $gallery = Models\Wedding::getGalleryUrls($id);
+                        // Only show external URLs (uploaded ones managed separately)
+                        $extUrls = array_filter($gallery, fn($u) => str_starts_with($u, 'http'));
+                        echo implode("\n", $extUrls);
                     }
                 ?></textarea>
             </div>
@@ -319,5 +326,49 @@
             </div>
         </form>
     </div>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const slugInput = document.getElementById('slug-input');
+        const slugStatus = document.getElementById('slug-status');
+        const previewText = document.getElementById('slug-preview-text');
+        const weddingId = <?= (int)($id ?? 0) ?>;
+        // In this file, we can't easily get $base unless we re-calculate it or hope it's global
+        const baseUrl = '<?= rtrim(str_replace('index.php', '', $_SERVER['SCRIPT_NAME']), '/') . '/' ?>';
+        
+        let debounceTimer;
+
+        slugInput.addEventListener('input', function() {
+            const rawVal = this.value.toLowerCase()
+                .replace(/\s+/g, '-')
+                .replace(/[^a-z0-9\-]/g, '');
+            
+            // Update Preview
+            previewText.textContent = rawVal;
+
+            // Clear status if empty
+            if (rawVal.length === 0) {
+                slugStatus.textContent = '';
+                return;
+            }
+
+            // Debounce API call
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => {
+                fetch(`${baseUrl}api/check-slug?slug=${rawVal}&exclude=${weddingId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.available) {
+                            slugStatus.textContent = '✅ ' + data.message;
+                            slugStatus.style.color = '#10b981';
+                        } else {
+                            slugStatus.textContent = '❌ ' + data.message;
+                            slugStatus.style.color = '#ef4444';
+                        }
+                    })
+                    .catch(err => console.error('Error:', err));
+            }, 500);
+        });
+    });
+    </script>
 </body>
 </html>
