@@ -16,9 +16,28 @@ try {
     $pdo->exec("CREATE DATABASE IF NOT EXISTS wedding_db");
     $pdo->exec("USE wedding_db");
 
+    // Create Users Table
+    $sql_users = "CREATE TABLE IF NOT EXISTS users (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        username VARCHAR(255) NOT NULL UNIQUE,
+        password VARCHAR(255) NOT NULL,
+        role ENUM('admin', 'client') DEFAULT 'client',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4";
+    $pdo->exec($sql_users);
+
+    // Insert Default Admin (if none exists)
+    $stmt = $pdo->query("SELECT COUNT(*) FROM users");
+    if ($stmt->fetchColumn() == 0) {
+        $hash = password_hash('admin', PASSWORD_DEFAULT);
+        $pdo->exec("INSERT INTO users (username, password, role) VALUES ('admin', '$hash', 'admin')");
+        echo "Default admin user created (admin/admin).\n";
+    }
+
     // Create Weddings Table with Bank Info
     $sql_weddings = "CREATE TABLE IF NOT EXISTS weddings (
         id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id INT DEFAULT NULL,
         slug VARCHAR(255) NOT NULL UNIQUE,
         title VARCHAR(255) NOT NULL,
         is_enabled TINYINT(1) DEFAULT 1,
@@ -56,12 +75,19 @@ try {
         groom_bank_name VARCHAR(100),
         groom_bank_acc VARCHAR(100),
         
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4";
     $pdo->exec($sql_weddings);
 
-    // Add/update bank columns
+    // Add/update missing columns for existing installs
     $cols = $pdo->query("SHOW COLUMNS FROM weddings")->fetchAll(PDO::FETCH_COLUMN);
+
+    if (!in_array('user_id', $cols)) {
+        $pdo->exec("ALTER TABLE weddings ADD COLUMN user_id INT DEFAULT NULL AFTER id");
+        $pdo->exec("ALTER TABLE weddings ADD CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL");
+        echo "Column user_id added to weddings.\n";
+    }
 
     $toAdd = [
         'bank1_owner' => 'VARCHAR(255)',

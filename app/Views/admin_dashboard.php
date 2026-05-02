@@ -113,8 +113,14 @@
 <body>
     <!-- ── TOPBAR ── -->
     <div class="dashboard-topbar">
-        <h1>🎊 Wedding <span>Manager</span></h1>
-        <a href="admin/create" class="btn-new">+ Buat Undangan</a>
+        <h1>Palovite <span><?= $_SESSION['role'] === 'admin' ? 'Admin' : 'Client' ?></span></h1>
+        <div style="display:flex; gap:12px; align-items:center;">
+            <?php if ($_SESSION['role'] === 'admin'): ?>
+                <a href="admin/users" class="btn-new" style="background:transparent; border-color:transparent;">👥 Manage Users</a>
+                <a href="admin/create" class="btn-new">+ Buat Undangan</a>
+            <?php endif; ?>
+            <a href="<?= $GLOBALS['base'] ?>logout" class="btn-new" style="background:transparent;">Logout</a>
+        </div>
     </div>
 
     <div class="container">
@@ -154,8 +160,12 @@
             <div class="empty-state">
                 <div class="icon">💍</div>
                 <h3 style="margin:0 0 8px;">Belum ada undangan</h3>
-                <p>Buat undangan digital pertama Anda sekarang!</p>
-                <a href="admin/create" class="btn-create-big">+ Buat Undangan Pertama</a>
+                <?php if ($_SESSION['role'] === 'admin'): ?>
+                    <p>Buat undangan digital pertama Anda sekarang!</p>
+                    <a href="admin/create" class="btn-create-big">+ Buat Undangan Pertama</a>
+                <?php else: ?>
+                    <p>Anda belum memiliki undangan yang terhubung dengan akun ini. Silakan hubungi admin.</p>
+                <?php endif; ?>
             </div>
             <?php else: ?>
             <?php foreach ($weddings as $w): ?>
@@ -177,8 +187,10 @@
                 <div class="card-actions">
                     <a href="admin/detail/<?= $w['id'] ?>" class="btn-manage">⚙️ Kelola</a>
                     <a href="<?= $w['slug'] ?>" target="_blank" class="btn-preview">🌐 Preview</a>
+                    <?php if ($_SESSION['role'] === 'admin'): ?>
                     <a href="admin/delete/<?= $w['id'] ?>" class="btn-del"
                        onclick="return confirm('Hapus undangan <?= htmlspecialchars(addslashes($w['title'])) ?>? Semua data akan dihapus.')">🗑️</a>
+                    <?php endif; ?>
                 </div>
             </div>
             <?php endforeach; ?>

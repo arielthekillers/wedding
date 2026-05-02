@@ -4,10 +4,16 @@ namespace Models;
 use PDO;
 
 class Wedding {
-    public static function getAll() {
+    public static function getAll($user_id = null) {
         $db = getDB();
-        $stmt = $db->query("SELECT * FROM weddings ORDER BY created_at DESC");
-        return $stmt->fetchAll();
+        if ($user_id) {
+            $stmt = $db->prepare("SELECT * FROM weddings WHERE user_id = ? ORDER BY created_at DESC");
+            $stmt->execute([$user_id]);
+            return $stmt->fetchAll();
+        } else {
+            $stmt = $db->query("SELECT * FROM weddings ORDER BY created_at DESC");
+            return $stmt->fetchAll();
+        }
     }
 
     public static function getBySlug($slug) {

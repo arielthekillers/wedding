@@ -59,6 +59,20 @@ include __DIR__ . '/partials/wedding_nav.php';
                     ?>
                 </select>
             </div>
+            
+            <?php if ($_SESSION['role'] === 'admin'): ?>
+            <div class="form-group">
+                <label class="form-label">Pemilik (Client)</label>
+                <select name="user_id" class="form-control">
+                    <option value="">-- Tidak ada (Admin saja) --</option>
+                    <?php foreach ($all_users as $u): ?>
+                        <option value="<?= $u['id'] ?>" <?= ($wedding['user_id'] == $u['id']) ? 'selected' : '' ?>>
+                            <?= htmlspecialchars($u['username']) ?> (<?= $u['role'] ?>)
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <?php endif; ?>
         </div>
 
         <div class="form-group" style="margin-top:16px;">
