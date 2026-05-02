@@ -14,7 +14,38 @@ $parts = explode('/', $url);
 // Admin Routing
 if ($parts[0] === 'admin') {
     $action = $parts[1] ?? 'index';
+    requireAuth();
     handleAdmin($action, $parts);
+    exit;
+}
+
+// Auth Routing
+if ($parts[0] === 'login') {
+    if (isset($_SESSION['user_id'])) {
+        header('Location: ' . $base . 'admin');
+        exit;
+    }
+    $error = '';
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $username = trim($_POST['username'] ?? '');
+        $password = trim($_POST['password'] ?? '');
+        $user = \Models\User::authenticate($username, $password);
+        if ($user) {
+            $_SESSION['user_id'] = $user['id'];
+            $_SESSION['role'] = $user['role'];
+            header('Location: ' . $base . 'admin');
+            exit;
+        } else {
+            $error = 'Username atau password salah.';
+        }
+    }
+    include 'app/Views/login.php';
+    exit;
+}
+
+if ($parts[0] === 'logout') {
+    session_destroy();
+    header('Location: ' . $base . 'login');
     exit;
 }
 
@@ -105,9 +136,27 @@ if (!empty($url)) {
     }
 }
 
-// Default Landing — redirect to admin dashboard
-header('Location: ' . $base . 'admin');
+// Default Landing — show Palovite promotional page
+include 'app/Views/landing.php';
 exit;
+
+// ═══════════════════════════════════════════════════════════════════
+// AUTH MIDDLEWARE
+// ═══════════════════════════════════════════════════════════════════
+function requireAuth() {
+    global $base;
+    if (!isset($_SESSION['user_id'])) {
+        header('Location: ' . $base . 'login');
+        exit;
+    }
+}
+
+function requireAdmin() {
+    global $base;
+    if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
+        die("Akses ditolak. Halaman ini hanya untuk admin.");
+    }
+}
 
 // ═══════════════════════════════════════════════════════════════════
 // ADMIN HANDLER
@@ -118,12 +167,44 @@ function handleAdmin($action, $parts) {
 
         // ── DASHBOARD ──────────────────────────────────────────────────
         case 'index':
-            $weddings = Models\Wedding::getAll();
+            $weddings = ($_SESSION['role'] === 'admin') 
+                ? Models\Wedding::getAll() 
+                : Models\Wedding::getAll($_SESSION['user_id']);
             include 'app/Views/admin_dashboard.php';
+            break;
+
+        // ── USERS (Admin Only) ─────────────────────────────────────────
+        case 'users':
+            requireAdmin();
+            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                $act = $_POST['action'] ?? '';
+                if ($act === 'create') {
+                    $u = trim($_POST['username'] ?? '');
+                    $p = trim($_POST['password'] ?? '');
+                    $r = $_POST['role'] ?? 'client';
+                    if (\Models\User::exists($u)) {
+                        header('Location: ' . $GLOBALS['base'] . 'admin/users?error=Username sudah ada');
+                        exit;
+                    }
+                    \Models\User::create($u, $p, $r);
+                    header('Location: ' . $GLOBALS['base'] . 'admin/users?success=1');
+                    exit;
+                }
+            } elseif (isset($_GET['action']) && $_GET['action'] === 'delete') {
+                $id = (int)$_GET['id'];
+                if ($id !== $_SESSION['user_id']) {
+                    \Models\User::delete($id);
+                }
+                header('Location: ' . $GLOBALS['base'] . 'admin/users?success=1');
+                exit;
+            }
+            $users = \Models\User::getAll();
+            include 'app/Views/users_list.php';
             break;
 
         // ── CREATE NEW WEDDING ─────────────────────────────────────────
         case 'create':
+            requireAdmin();
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $data = filterInput($_POST);
                 if (Models\Wedding::slugExists($data['slug'])) {
@@ -159,6 +240,7 @@ function handleAdmin($action, $parts) {
 
         // ── DELETE WEDDING ─────────────────────────────────────────────
         case 'delete':
+            requireAdmin();
             $id = $parts[2] ?? 0;
             if ($id) Models\Wedding::delete($id);
             header('Location: ' . $GLOBALS['base'] . 'admin');
@@ -175,15 +257,25 @@ function handleAdmin($action, $parts) {
             $stmt->execute([$id]);
             $wedding = $stmt->fetch();
             if (!$wedding) die("Wedding not found.");
+            
+            // RBAC check
+            if ($_SESSION['role'] !== 'admin' && $wedding['user_id'] !== $_SESSION['user_id']) {
+                die("Akses ditolak. Anda tidak memiliki izin untuk mengelola undangan ini.");
+            }
 
             $detailBase = $GLOBALS['base'] . 'admin/detail/' . $id . '/';
 
             switch ($tab) {
 
-                // ── Settings ───────────────────────────────────────────
                 case 'settings':
                     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $data = filterInput($_POST);
+                        if ($_SESSION['role'] === 'admin' && isset($_POST['user_id'])) {
+                            $data['user_id'] = empty($_POST['user_id']) ? null : (int)$_POST['user_id'];
+                        } else {
+                            // Prevent clients from changing the owner
+                            unset($data['user_id']);
+                        }
                         if (Models\Wedding::slugExists($data['slug'], $id)) {
                             header('Location: ' . $detailBase . 'settings?error=' . urlencode('Slug sudah dipakai.'));
                         } else {
@@ -192,6 +284,7 @@ function handleAdmin($action, $parts) {
                         }
                         exit;
                     }
+                    $all_users = ($_SESSION['role'] === 'admin') ? Models\User::getAll() : [];
                     include 'app/Views/wedding_settings.php';
                     break;
 
