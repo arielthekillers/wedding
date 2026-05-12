@@ -245,7 +245,7 @@ $tabs = [
         </span>
     </div>
     <div class="actions">
-        <a href="<?= $base . $slug ?>" target="_blank" class="topbar-btn tb-preview">🌐 Preview</a>
+        <a href="<?= $base ?>preview/<?= $slug ?>" target="_blank" class="topbar-btn tb-preview">🌐 Preview</a>
         <a href="<?= $base ?>admin" class="topbar-btn tb-back">← Dashboard</a>
     </div>
 </div>

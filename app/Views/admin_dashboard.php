@@ -186,7 +186,7 @@
                 </div>
                 <div class="card-actions">
                     <a href="admin/detail/<?= $w['id'] ?>" class="btn-manage">⚙️ Kelola</a>
-                    <a href="<?= $w['slug'] ?>" target="_blank" class="btn-preview">🌐 Preview</a>
+                    <a href="<?= $base ?>preview/<?= $w['slug'] ?>" target="_blank" class="btn-preview">🌐 Preview</a>
                     <?php if ($_SESSION['role'] === 'admin'): ?>
                     <a href="admin/delete/<?= $w['id'] ?>" class="btn-del"
                        onclick="return confirm('Hapus undangan <?= htmlspecialchars(addslashes($w['title'])) ?>? Semua data akan dihapus.')">🗑️</a>

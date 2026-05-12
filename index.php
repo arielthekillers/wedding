@@ -123,14 +123,67 @@ if ($parts[0] === 'api' && ($parts[1] ?? '') === 'guestbook') {
 }
 
 
+// Wedding Preview Routing
+if ($parts[0] === 'preview' && !empty($parts[1])) {
+    $slug = $parts[1];
+    $wedding = Wedding::getBySlug($slug);
+    if ($wedding) {
+        requireAuth();
+        if ($_SESSION['role'] !== 'admin' && $wedding['user_id'] !== $_SESSION['user_id']) {
+            die("Akses ditolak. Anda tidak memiliki izin untuk melihat preview ini.");
+        }
+        renderWedding($wedding);
+        exit;
+    }
+}
+
 // Wedding Slug Routing
 if (!empty($url)) {
     $wedding = Wedding::getBySlug($url);
     if ($wedding) {
-        if ($wedding['is_enabled'] || (isset($_GET['preview']) && $_GET['preview'] === '1')) {
+        if ($wedding['is_enabled']) {
             renderWedding($wedding);
         } else {
-            die("Sorry, this wedding invitation is currently disabled.");
+            $errorHtml = <<<HTML
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Undangan Tidak Aktif</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0; padding: 0; font-family: 'Outfit', sans-serif;
+            background-color: #f8fafc; color: #1e293b;
+            display: flex; align-items: center; justify-content: center; height: 100vh;
+        }
+        .container {
+            background: white; padding: 40px; border-radius: 20px;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
+            text-align: center; max-width: 450px; margin: 20px; border: 1px solid #e2e8f0;
+        }
+        .icon {
+            font-size: 4rem; margin-bottom: 15px;
+        }
+        h1 {
+            font-size: 1.5rem; margin: 0 0 10px; color: #1e293b; font-weight: 600;
+        }
+        p {
+            color: #64748b; margin: 0; line-height: 1.6; font-size: 0.95rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="icon">🚧</div>
+        <h1>Undangan Tidak Aktif</h1>
+        <p>Mohon maaf, halaman undangan pernikahan ini sedang dalam mode draf (tidak aktif) dan belum dapat diakses oleh publik.</p>
+    </div>
+</body>
+</html>
+HTML;
+            die($errorHtml);
         }
         exit;
     }
