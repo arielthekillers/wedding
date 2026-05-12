@@ -114,15 +114,18 @@ try {
         message TEXT NOT NULL,
         attendance TINYINT(1) DEFAULT 1,
         ip_address VARCHAR(45) DEFAULT NULL,
+        reply TEXT DEFAULT NULL,
+        replied_at TIMESTAMP NULL DEFAULT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         INDEX (wedding_id)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4";
     $pdo->exec($sql_guestbook);
 
-    // Add new guestbook columns if missing (for existing installs)
     $gbCols = $pdo->query("SHOW COLUMNS FROM guestbook")->fetchAll(PDO::FETCH_COLUMN);
     if (!in_array('email', $gbCols))      $pdo->exec("ALTER TABLE guestbook ADD COLUMN email VARCHAR(255) NOT NULL DEFAULT '' AFTER name");
     if (!in_array('ip_address', $gbCols)) $pdo->exec("ALTER TABLE guestbook ADD COLUMN ip_address VARCHAR(45) DEFAULT NULL AFTER attendance");
+    if (!in_array('reply', $gbCols))      $pdo->exec("ALTER TABLE guestbook ADD COLUMN reply TEXT DEFAULT NULL AFTER ip_address");
+    if (!in_array('replied_at', $gbCols)) $pdo->exec("ALTER TABLE guestbook ADD COLUMN replied_at TIMESTAMP NULL DEFAULT NULL AFTER reply");
 
     // Rate limit table: one record per IP per wedding per window
     $sql_ratelimit = "CREATE TABLE IF NOT EXISTS guestbook_rate_limit (

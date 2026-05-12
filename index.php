@@ -492,6 +492,15 @@ function handleAdmin($action, $parts) {
                         header('Location: ' . $detailBase . 'guestbook?deleted=1');
                         exit;
                     }
+                    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'replymsg') {
+                        $msgId = (int)($_POST['msg_id'] ?? 0);
+                        $reply = trim($_POST['reply'] ?? '');
+                        if ($msgId && $reply) {
+                            Models\Wedding::replyMessage($msgId, htmlspecialchars($reply));
+                            header('Location: ' . $detailBase . 'guestbook?replied=1');
+                            exit;
+                        }
+                    }
                     include 'app/Views/wedding_guestbook.php';
                     break;
 

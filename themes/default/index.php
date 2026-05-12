@@ -500,6 +500,16 @@
                             </div>
                         </div>
                         <p style="margin:6px 0 0; font-size:0.88rem; color:#555; line-height:1.5;"><?= $m['message'] ?></p>
+                        
+                        <?php if (!empty($m['reply'])): ?>
+                        <div style="margin-top:12px; background:#fef9f2; padding:10px 14px; border-radius:10px; border-left:3px solid var(--gold); display:flex; gap:10px; align-items:flex-start;">
+                            <div style="font-size:1.2rem; line-height:1;">✨</div>
+                            <div>
+                                <strong style="font-size:0.8rem; color:var(--gold); display:block; margin-bottom:2px;">Balasan Pengantin:</strong>
+                                <p style="margin:0; font-size:0.85rem; color:#666; line-height:1.5;"><?= nl2br(htmlspecialchars($m['reply'])) ?></p>
+                            </div>
+                        </div>
+                        <?php endif; ?>
                     </div>
                 </div>
                 <?php endforeach; ?>

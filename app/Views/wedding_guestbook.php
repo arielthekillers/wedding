@@ -9,6 +9,9 @@ $gbCount  = count($messages);
 <?php if (isset($_GET['deleted'])): ?>
 <div class="alert alert-success">🗑️ Pesan berhasil dihapus.</div>
 <?php endif; ?>
+<?php if (isset($_GET['replied'])): ?>
+<div class="alert alert-success">💬 Balasan berhasil disimpan.</div>
+<?php endif; ?>
 
 <div class="section-card">
     <div class="section-card-header" style="justify-content:space-between;">
@@ -41,9 +44,7 @@ $gbCount  = count($messages);
         ?>
         <div style="border:1px solid var(--border);border-radius:12px;padding:16px 18px;margin-top:14px;background:white;display:flex;gap:16px;align-items:flex-start;">
             <!-- Avatar -->
-            <div style="width:42px;height:42px;border-radius:50%;background:var(--grad);display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:1rem;flex-shrink:0;">
-                <?= mb_strtoupper(mb_substr($msg['name'], 0, 1)) ?>
-            </div>
+            <img src="<?= Models\Wedding::gravatarUrl($msg['email'] ?? '', 42) ?>" alt="avatar" width="42" height="42" style="border-radius:50%; flex-shrink:0; object-fit:cover; border:2px solid <?= $att['color'] ?>;">
             <!-- Content -->
             <div style="flex:1;min-width:0;">
                 <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px;">
@@ -59,18 +60,60 @@ $gbCount  = count($messages);
                 <div style="margin-top:6px;font-size:0.75rem;color:#94a3b8;">
                     <?= isset($msg['created_at']) ? date('d M Y, H:i', strtotime($msg['created_at'])) : '' ?>
                 </div>
+
+                <!-- Existing Reply -->
+                <?php if (!empty($msg['reply'])): ?>
+                <div style="margin-top:12px; background:#f4f6fb; padding:12px; border-radius:8px; border-left:3px solid var(--primary);">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <strong style="font-size:0.8rem; color:var(--primary);">Balasan Anda:</strong>
+                        <?php if (!empty($msg['replied_at'])): ?>
+                            <span style="font-size:0.7rem; color:#94a3b8;"><?= date('d M Y, H:i', strtotime($msg['replied_at'])) ?></span>
+                        <?php endif; ?>
+                    </div>
+                    <p style="margin:4px 0 0; font-size:0.85rem; color:#475569;"><?= nl2br(htmlspecialchars($msg['reply'])) ?></p>
+                </div>
+                <?php endif; ?>
+
+                <!-- Reply Form (Hidden by default) -->
+                <form method="POST" id="reply-form-<?= $msg['id'] ?>" style="display:none; margin-top:12px; width:100%;">
+                    <input type="hidden" name="action" value="replymsg">
+                    <input type="hidden" name="msg_id" value="<?= $msg['id'] ?>">
+                    <textarea name="reply" class="form-control" placeholder="Tulis balasan Anda..." style="font-size:0.85rem; padding:10px; min-height:70px;" required><?= htmlspecialchars($msg['reply'] ?? '') ?></textarea>
+                    <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:8px;">
+                        <button type="button" class="btn btn-sm btn-ghost" onclick="toggleReplyForm(<?= $msg['id'] ?>)">Batal</button>
+                        <button type="submit" class="btn btn-sm btn-primary">Kirim Balasan</button>
+                    </div>
+                </form>
             </div>
-            <!-- Delete -->
-            <a href="?action=deletemsg&msg_id=<?= $msg['id'] ?>"
-               onclick="return confirm('Hapus pesan dari <?= htmlspecialchars(addslashes($msg['name'])) ?>?')"
-               style="color:#dc2626;font-size:0.78rem;font-weight:600;text-decoration:none;padding:5px 10px;border-radius:7px;background:#fee2e2;white-space:nowrap;flex-shrink:0;">
-                🗑️ Hapus
-            </a>
+            <!-- Actions -->
+            <div style="display:flex; flex-direction:column; gap:8px; align-items:flex-end; flex-shrink:0;">
+                <a href="?action=deletemsg&msg_id=<?= $msg['id'] ?>"
+                   onclick="return confirm('Hapus pesan dari <?= htmlspecialchars(addslashes($msg['name'])) ?>?')"
+                   style="color:#dc2626;font-size:0.78rem;font-weight:600;text-decoration:none;padding:5px 10px;border-radius:7px;background:#fee2e2;white-space:nowrap;width:100%;text-align:center;">
+                    🗑️ Hapus
+                </a>
+                <button type="button" onclick="toggleReplyForm(<?= $msg['id'] ?>)"
+                        style="color:var(--primary);font-size:0.78rem;font-weight:600;border:none;cursor:pointer;padding:5px 10px;border-radius:7px;background:#ede9fe;white-space:nowrap;width:100%;">
+                    💬 Balas
+                </button>
+            </div>
         </div>
         <?php endforeach; ?>
     </div>
     <?php endif; ?>
 </div>
+
+<script>
+function toggleReplyForm(id) {
+    const form = document.getElementById('reply-form-' + id);
+    if (form.style.display === 'none') {
+        form.style.display = 'block';
+        form.querySelector('textarea').focus();
+    } else {
+        form.style.display = 'none';
+    }
+}
+</script>
 
 </div><!-- /.mgmt-content -->
 </body>

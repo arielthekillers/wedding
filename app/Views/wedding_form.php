@@ -312,7 +312,13 @@
                                     </div>
                                 </div>
                                 <p style="margin:4px 0 0; font-size:0.82rem; color:#475569;"><?= $m['message'] ?></p>
-                                <small style="color:#cbd5e1; font-size:0.7rem;"><?= $m['created_at'] ?> — IP: <?= $m['ip_address'] ?></small>
+                                <?php if (!empty($m['reply'])): ?>
+                                <div style="margin-top:8px; background:#fef9f2; padding:8px 10px; border-radius:6px; border-left:2px solid var(--primary);">
+                                    <strong style="font-size:0.75rem; color:var(--primary); display:block;">Balasan Anda:</strong>
+                                    <p style="margin:2px 0 0; font-size:0.8rem; color:#64748b;"><?= nl2br(htmlspecialchars($m['reply'])) ?></p>
+                                </div>
+                                <?php endif; ?>
+                                <small style="color:#cbd5e1; font-size:0.7rem; display:block; margin-top:6px;"><?= $m['created_at'] ?> — IP: <?= $m['ip_address'] ?></small>
                             </div>
                         </div>
                     <?php endforeach; ?>

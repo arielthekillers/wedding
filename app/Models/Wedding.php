@@ -80,6 +80,12 @@ class Wedding {
         return $stmt->execute([$id]);
     }
 
+    public static function replyMessage($id, $replyText) {
+        $db = getDB();
+        $stmt = $db->prepare("UPDATE guestbook SET reply = ?, replied_at = CURRENT_TIMESTAMP WHERE id = ?");
+        return $stmt->execute([$replyText, $id]);
+    }
+
     public static function isRateLimited($wedding_id, $ip, $seconds = 300) {
         $db = getDB();
         $stmt = $db->prepare("SELECT last_submitted FROM guestbook_rate_limit WHERE wedding_id = ? AND ip_address = ?");
