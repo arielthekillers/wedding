@@ -27,6 +27,7 @@
             justify-content: center;
             align-items: center;
             background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&q=80&w=2070') no-repeat center center/cover;
+            background-attachment: fixed;
             color: white;
             padding: 20px;
         }
@@ -41,22 +42,95 @@
         }
         .hero p { font-size: clamp(0.8rem, 4vw, 1.2rem); letter-spacing: 4px; text-transform: uppercase; margin: 10px 0; }
         
-        section { 
-            padding: 40px 20px 80px; 
-            max-width: 800px; 
-            margin: auto; 
-            scroll-margin-top: 40px; 
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            scroll-snap-type: y mandatory;
+            scroll-behavior: smooth;
+            overflow-x: hidden;
         }
-        h3 { font-family: 'Alex Brush', cursive; font-size: 3.5rem; color: var(--gold); margin-top: 0; margin-bottom: 30px; }
+        section { 
+            height: 100vh;
+            width: 100%;
+            scroll-snap-align: start;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        /* Optimized Parallax Backgrounds */
+        section::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: var(--section-bg);
+            background-attachment: fixed;
+            background-size: cover;
+            background-position: center;
+            opacity: 0.08;
+            z-index: 1;
+            pointer-events: none;
+            filter: grayscale(50%);
+        }
+        .section-inner {
+            max-width: 900px;
+            width: 100%;
+            margin: auto;
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+        }
         
-        .couple { display: flex; justify-content: space-around; align-items: center; margin-top: 40px; flex-wrap: wrap; gap: 20px; }
-        .person { flex: 1; min-width: 300px; padding: 20px; }
-        .person-img {
-            width: 220px;
+        /* Nuances */
+        #couple { background-color: #fcfaf7; }
+        #love-story { background-color: #fff9fb; }
+        #events { background-color: #ffffff; }
+        #gallery { background-color: #111; color: white; }
+        #gallery h3 { color: #fff; }
+        #gifts { background-color: #fbf8f3; }
+        #guestbook { background-color: #f8f8f8; }
+
+        h3 { font-family: 'Alex Brush', cursive; font-size: clamp(1.8rem, 6vw, 2.8rem); color: var(--gold); margin-top: 0; margin-bottom: 15px; position: relative; }
+
+        /* Horizontal Slider for Gallery */
+        .gallery-slider {
+            display: flex;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            gap: 15px;
+            padding-bottom: 10px;
+            width: 100%;
+        }
+        .gallery-slider img {
+            flex: 0 0 70%;
             height: 280px;
-            border-radius: 120px 120px 20px 20px; /* Elegant premium arch shape */
             object-fit: cover;
-            margin-bottom: 25px;
+            scroll-snap-align: center;
+            border-radius: 15px;
+            border: 2px solid #333;
+        }
+
+        /* Horizontal Slider for Guestbook */
+        .comment-slider {
+            display: flex;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            gap: 15px;
+            padding: 10px 0;
+            width: 100%;
+        }
+        .comment-item {
+            flex: 0 0 85%;
+            scroll-snap-align: center;
+            margin-bottom: 0 !important;
             border: 8px solid white;
             box-shadow: 0 15px 45px rgba(0,0,0,0.08);
             outline: 1px solid var(--gold);
@@ -64,141 +138,301 @@
             transition: all 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
             background: #f8f8f8;
         }
-        .person:hover .person-img {
-            transform: translateY(-15px);
-            box-shadow: 0 30px 60px rgba(197, 160, 89, 0.15);
-            outline-offset: 12px;
+        .couple { display: flex; justify-content: center; align-items: center; gap: 20px; width: 100%; margin-top: 10px; flex-wrap: nowrap; }
+        .person { text-align: center; flex: 1; }
+        .person-img { 
+            width: 120px; height: 160px; 
+            border-radius: 70px 70px 15px 15px; 
+            object-fit: cover; 
+            border: 4px solid white; 
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            margin-bottom: 10px;
+            transition: transform 0.3s;
         }
-        .person h4 { 
-            font-family: 'Playfair Display', serif;
-            font-size: 2rem; 
-            margin: 15px 0 10px; 
-            color: var(--dark);
-            font-weight: 700;
-        }
-        .person p { color: #666; line-height: 1.7; font-size: 0.95rem; }
+        .person h4 { font-family: 'Playfair Display', serif; font-size: 1.1rem; margin: 0 0 5px; color: var(--dark); }
+        .person p { font-size: 0.7rem; line-height: 1.4; color: #666; margin: 0; }
         
-        .event-wrapper {
-            max-width: 900px;
-            margin: 60px auto 0;
+        /* Story Slider */
+        .story-slider {
             display: flex;
-            flex-direction: column;
-            gap: 100px;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            gap: 15px;
+            width: 100%;
+            padding: 10px 0;
+            scrollbar-width: none;
         }
-        .event-item-block { text-align: center; position: relative; }
-        .event-item-block h4 {
-            font-family: 'Playfair Display', serif;
-            font-size: 2.5rem;
-            color: var(--dark);
-            text-transform: uppercase;
-            letter-spacing: 4px;
-            margin-bottom: 40px;
-            font-weight: 700;
-        }
-        .event-item-block h4::after {
-            content: ''; display: block; width: 50px; height: 1px;
-            background: var(--gold); margin: 20px auto 0;
-        }
-        .event-details-flex {
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            gap: 60px;
-            flex-wrap: wrap;
-            margin-top: 50px;
+        .story-slider::-webkit-scrollbar { display: none; }
+        .story-card {
+            flex: 0 0 80%;
+            scroll-snap-align: center;
+            background: white;
+            padding: 15px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
             text-align: left;
+            display: flex;
+            gap: 12px;
+            align-items: center;
         }
-        .event-col {
-            flex: 1;
-            min-width: 300px;
+        .story-card img { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+        .story-card h4 { font-family: 'Playfair Display', serif; font-size: 1.1rem; margin: 0 0 5px; }
+        .story-card p { font-size: 0.75rem; color: #666; line-height: 1.4; margin: 0; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+
+        .event-wrapper {
             display: flex;
             flex-direction: column;
-            gap: 40px;
-            max-width: 400px;
+            gap: 15px;
+            width: 100%;
+            max-width: 500px;
+            margin-top: 5px;
         }
-        .detail-box {
-            display: flex;
-            gap: 20px;
-            align-items: flex-start;
+        .event-item-block {
+            padding: 15px 20px;
+            border-radius: 20px;
+            background: rgba(255,255,255,0.85);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+            text-align: center;
         }
-        .detail-box i {
-            display: flex;
-            width: 50px;
-            height: 50px;
+        .event-item-block h4 { font-size: 1rem; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 2px; color: var(--gold); border-bottom: 1px solid #f1f5f9; padding-bottom: 8px; display: inline-block; }
+        .detail-box { display: flex; flex-direction: column; align-items: center; gap: 5px; margin-bottom: 12px; }
+        .detail-box i { width: 20px; height: 20px; color: var(--gold); margin-bottom: 2px; }
+        .detail-box i svg { width: 20px; height: 20px; display: block; }
+        .detail-info b { font-size: 0.6rem; display: block; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; }
+        .detail-info span { font-size: 0.8rem; font-weight: 700; color: var(--dark); line-height: 1.3; }
+        .btn-map-bottom { 
+            display: inline-flex; align-items: center; gap: 8px; 
+            padding: 8px 20px; font-size: 0.75rem; 
+            background: white; border: 1px solid var(--gold); 
+            color: var(--gold); border-radius: 50px; 
+            text-decoration: none; font-weight: 700; 
+            margin-top: 5px; transition: 0.3s;
+        }
+        .btn-map-bottom:hover { background: var(--gold); color: white; }
+        .btn-map-bottom svg { width: 14px; height: 14px; }
+        
+        .gift-container { display: flex; gap: 15px; width: 100%; overflow-x: auto; scroll-snap-type: x mandatory; padding: 10px 0; scrollbar-width: none; }
+        .gift-container::-webkit-scrollbar { display: none; }
+        .gift-card { flex: 0 0 80%; scroll-snap-align: center; padding: 15px; background: white; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); text-align: center; }
+        .gift-card:hover { transform: translateY(-5px); }
+        .bank-badge {
+            display: inline-block;
+            padding: 6px 20px;
             background: #fffaf0;
-            border-radius: 50%;
+            border: 1px solid #fdf2d8;
+            border-radius: 50px;
+            color: var(--gold);
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 30px;
+        }
+        .acc-number {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--dark);
+            letter-spacing: 5px;
+            margin: 15px 0;
+            display: block;
+        }
+        .acc-owner {
+            font-size: 1rem;
+            font-weight: 500;
+            color: #64748b;
+            margin-bottom: 35px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .btn-copy {
+            background: var(--dark);
+            color: white;
+            border: none;
+            padding: 14px 25px;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+            display: flex;
             align-items: center;
             justify-content: center;
-            color: var(--gold);
-            border: 1px solid #fdf2d8;
-            flex-shrink: 0;
-            margin: 0;
+            gap: 10px;
+            border: 1px solid var(--dark);
         }
-        .detail-info {
-            flex: 1;
+        .btn-copy:hover {
+            background: transparent;
+            color: var(--dark);
         }
-        .detail-box b {
+        .btn-copy svg { width: 18px; height: 18px; }
+
+        /* Map Button Styling */
+        .btn-map {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 12px 24px;
+            background: #ffffff;
+            color: var(--dark);
+            text-decoration: none;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s;
+            border: 2px solid var(--dark);
+            margin-top: 20px;
+        }
+        .btn-map:hover {
+            background: var(--dark);
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+        .btn-map svg { width: 18px; height: 18px; }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #1e293b;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            z-index: 10001;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .toast.show { transform: translateX(-50%) translateY(0); }
+        
+        .footer { padding: 40px; font-size: 0.9rem; color: #999; }
+
+        /* Guestbook & RSVP Redesign */
+        .form-card {
+            background: #ffffff;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 15px 45px rgba(0,0,0,0.05);
+            max-width: 700px;
+            margin: auto;
+            text-align: left;
+            border: 1px solid #f1f5f9;
+            position: relative;
+        }
+        .form-group { margin-bottom: 25px; }
+        .form-group label {
             display: block;
-            font-size: 0.75rem;
+            font-weight: 700;
+            font-size: 0.7rem;
             text-transform: uppercase;
             letter-spacing: 2px;
             color: #94a3b8;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
         }
-        .detail-box span {
-            font-family: 'Playfair Display', serif;
-            font-size: 1.2rem;
+        .input-premium {
+            width: 100%;
+            padding: 15px 20px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 12px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+            background: #f8fafc;
             color: var(--dark);
-            line-height: 1.6;
-            font-weight: 500;
+            box-sizing: border-box;
         }
-        .btn-map {
-            display: inline-flex;
+        .input-premium:focus {
+            outline: none;
+            border-color: var(--gold);
+            background: #fff;
+            box-shadow: 0 0 0 4px rgba(197, 160, 89, 0.1);
+        }
+        .rsvp-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        @media (max-width: 600px) {
+            .rsvp-grid.form-inputs { grid-template-columns: 1fr; }
+        }
+        .rsvp-option {
+            position: relative;
+            cursor: pointer;
+        }
+        .rsvp-option input {
+            position: absolute;
+            opacity: 0;
+            width: 0; height: 0;
+        }
+        .rsvp-box {
+            padding: 15px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
             align-items: center;
+            justify-content: center;
             gap: 10px;
-            margin-top: 60px;
-            padding: 14px 32px;
-            background: var(--dark);
-            color: white;
-            text-decoration: none;
-            border-radius: 4px;
-            font-weight: 600;
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            transition: all 0.4s;
-            border: 1px solid var(--dark);
-        }
-        .btn-map:hover {
-            background: transparent;
-            color: var(--dark);
-            transform: translateY(-5px);
-        }
-        .btn-map {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            padding: 14px 30px;
-            margin-top: 35px;
-            background: var(--gold);
-            color: white;
-            text-decoration: none;
-            border-radius: 50px;
+            transition: all 0.3s;
+            background: #f8fafc;
+            font-size: 0.8rem;
             font-weight: 700;
-            font-size: 0.9rem;
+            color: #64748b;
             text-transform: uppercase;
             letter-spacing: 1px;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            box-shadow: 0 8px 20px rgba(212, 175, 55, 0.25);
         }
-        .btn-map:hover { 
-            background: var(--dark); 
-            transform: translateY(-3px) scale(1.02);
-            box-shadow: 0 12px 25px rgba(0,0,0,0.2);
+        .rsvp-option input:checked + .rsvp-box {
+            border-color: var(--gold);
+            background: #fffaf0;
+            color: var(--gold);
+            box-shadow: 0 5px 15px rgba(197, 160, 89, 0.1);
+        }
+        .rsvp-box svg { width: 24px; height: 24px; margin-bottom: 5px; opacity: 0.5; }
+        .rsvp-option input:checked + .rsvp-box svg { opacity: 1; stroke: var(--gold); }
+
+        .btn-submit {
+            background: var(--dark);
             color: white;
+            border: none;
+            padding: 18px;
+            width: 100%;
+            border-radius: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: all 0.4s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            font-size: 0.85rem;
         }
-        
-        .footer { padding: 40px; font-size: 0.9rem; color: #999; }
+        .btn-submit:hover {
+            background: var(--gold);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(197, 160, 89, 0.2);
+        }
+        @keyframes pulse-gold {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(197, 160, 89, 0.7); }
+            70% { transform: scale(1.05); box-shadow: 0 0 0 15px rgba(197, 160, 89, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(197, 160, 89, 0); }
+        }
+        body.locked { overflow: hidden; }
 
         /* Opening Overlay Styles */
         #openingOverlay {
@@ -237,12 +471,6 @@
             gap: 10px;
             animation: pulse-gold 2s infinite;
         }
-        @keyframes pulse-gold {
-            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(197, 160, 89, 0.7); }
-            70% { transform: scale(1.05); box-shadow: 0 0 0 15px rgba(197, 160, 89, 0); }
-            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(197, 160, 89, 0); }
-        }
-        body.locked { overflow: hidden; }
 
         /* Floating Navigation Bar */
         .floating-nav {
@@ -382,7 +610,7 @@
         </div>
     </div>
 
-    <div id="hero" class="hero">
+    <section id="hero" class="hero" style="scroll-snap-align: start;">
         <div data-reveal="zoom">
             <p>The Wedding of</p>
             <h2><?= $wedding['bride_nickname'] ?> & <?= $wedding['groom_nickname'] ?></h2>
@@ -409,390 +637,298 @@
             </div>
             <?php endif; ?>
         </div>
-    </div>
+    </section>
 
-    <section id="couple" data-reveal="up">
-        <h3>The Couple</h3>
-        <div class="couple">
-            <div class="person" data-reveal="left" data-reveal-delay="300">
-                <?php if (!empty($wedding['bride_image'])): ?>
-                    <img src="<?= $wedding['bride_image'] ?>" class="person-img" alt="Bride">
-                <?php endif; ?>
-                <h4><?= $wedding['bride_name'] ?></h4>
-                <p>Putri <?= $wedding['bride_order'] ?> dari pasangan<br><b>Bapak <?= $wedding['bride_father'] ?> & Ibu <?= $wedding['bride_mother'] ?></b></p>
-            </div>
-            <div style="font-family: 'Alex Brush', cursive; font-size: 3.5rem; color: #e5e7eb; margin: 20px 0;" data-reveal="zoom" data-reveal-delay="500">&</div>
-            <div class="person" data-reveal="right" data-reveal-delay="300">
-                <?php if (!empty($wedding['groom_image'])): ?>
-                    <img src="<?= $wedding['groom_image'] ?>" class="person-img" alt="Groom">
-                <?php endif; ?>
-                <h4><?= $wedding['groom_name'] ?></h4>
-                <p>Putra <?= $wedding['groom_order'] ?> dari pasangan<br><b>Bapak <?= $wedding['groom_father'] ?> & Ibu <?= $wedding['groom_mother'] ?></b></p>
+    <section id="couple" data-reveal="up" style="scroll-snap-align: start; --section-bg: url('https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&q=80&w=1000');">
+        <div class="section-inner">
+            <h3>The Happy Couple</h3>
+            <p>Maha suci Allah yang telah menciptakan mahluk-Nya berpasang-pasangan. Ya Allah, perkenankanlah kami merangkaikan kasih sayang yang Kau ciptakan dalam rumah tangga kami.</p>
+            <div class="couple">
+                <div class="person" data-reveal="left" data-reveal-delay="300">
+                    <?php if (!empty($wedding['bride_image'])): ?>
+                        <img src="<?= $wedding['bride_image'] ?>" class="person-img" alt="Bride">
+                    <?php endif; ?>
+                    <h4><?= $wedding['bride_name'] ?></h4>
+                    <p>Putri <?= $wedding['bride_order'] ?> dari pasangan<br><b>Bapak <?= $wedding['bride_father'] ?> & Ibu <?= $wedding['bride_mother'] ?></b></p>
+                </div>
+                <div style="font-family: 'Alex Brush', cursive; font-size: 3.5rem; color: #e5e7eb; margin: 20px 0;" data-reveal="zoom" data-reveal-delay="500">&</div>
+                <div class="person" data-reveal="right" data-reveal-delay="300">
+                    <?php if (!empty($wedding['groom_image'])): ?>
+                        <img src="<?= $wedding['groom_image'] ?>" class="person-img" alt="Groom">
+                    <?php endif; ?>
+                    <h4><?= $wedding['groom_name'] ?></h4>
+                    <p>Putra <?= $wedding['groom_order'] ?> dari pasangan<br><b>Bapak <?= $wedding['groom_father'] ?> & Ibu <?= $wedding['groom_mother'] ?></b></p>
+                </div>
             </div>
         </div>
     </section>
 
-    <?php 
-    $loveStories = Models\Wedding::getLoveStories($wedding['id']);
-    if (!empty($loveStories)): ?>
-    <section id="love-story" data-reveal="up" style="background-color: #fffefb;">
-        <h3>Cerita Cinta</h3>
-        <p style="margin-top:-20px; margin-bottom:40px; color:#888; font-size:0.95rem;">
-            Banyak cerita yang kami lalui sehingga akhirnya kami bisa bersatu, cerita akan akan menjadi kenangan selalu, dan cerita itu kami bagi untuk anda.
-        </p>
-
-        <div style="position:relative; max-width:700px; margin:auto; padding-left:30px;">
-            <!-- vertical line -->
-            <div style="position:absolute; left:14px; top:0; bottom:0; width:2px; background:linear-gradient(to bottom,#ddd6fe,#fce7f3);"></div>
-
-            <?php foreach ($loveStories as $ls): ?>
-            <div style="position:relative; display:flex; gap:18px; margin-bottom:36px; align-items:flex-start;">
-                <!-- dot -->
-                <div style="position:absolute; left:-24px; top:18px; width:14px; height:14px; border-radius:50%; background:linear-gradient(135deg,#8b5cf6,#ec4899); box-shadow:0 0 0 3px #fce7f3; flex-shrink:0;"></div>
-
-                <?php if (!empty($ls['image_url'])): ?>
-                <img src="<?= htmlspecialchars($ls['image_url']) ?>"
-                     alt="<?= htmlspecialchars($ls['title']) ?>"
-                     style="width:80px; height:80px; border-radius:50%; object-fit:cover; flex-shrink:0; border:3px solid #fce7f3;">
-                <?php else: ?>
-                <div style="width:80px; height:80px; border-radius:50%; background:linear-gradient(135deg,#ede9fe,#fce7f3); display:flex; align-items:center; justify-content:center; font-size:1.8rem; flex-shrink:0;">💕</div>
-                <?php endif; ?>
-
-                <div style="text-align:left; flex:1;">
-                    <div style="font-size:0.78rem; color:var(--gold); font-weight:600; letter-spacing:1px; text-transform:uppercase; margin-bottom:4px;">
-                        📅 <?= date('l, d F Y', strtotime($ls['story_date'])) ?>
+    <section id="love-story" data-reveal="up" style="scroll-snap-align: start; --section-bg: url('https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&q=80&w=1000');">
+        <div class="section-inner">
+            <h3>Our Love Story</h3>
+            <?php 
+            $loveStories = Models\Wedding::getLoveStories($wedding['id']);
+            if (!empty($loveStories)): ?>
+                <div class="story-slider">
+                    <?php foreach ($loveStories as $ls): ?>
+                    <div class="story-card">
+                        <?php if (!empty($ls['image_url'])): ?>
+                        <img src="<?= htmlspecialchars($ls['image_url']) ?>">
+                        <?php else: ?>
+                        <div style="width:60px; height:60px; border-radius:50%; background:#f3f4f6; display:flex; align-items:center; justify-content:center; font-size:1.2rem; flex-shrink:0;">💕</div>
+                        <?php endif; ?>
+                        <div>
+                            <div style="font-size:0.6rem; color:var(--gold); font-weight:700; text-transform:uppercase;"><?= date('M Y', strtotime($ls['story_date'])) ?></div>
+                            <h4><?= htmlspecialchars($ls['title']) ?></h4>
+                            <p><?= htmlspecialchars($ls['content']) ?></p>
+                        </div>
                     </div>
-                    <h4 style="font-family:'Alex Brush',cursive; font-size:1.7rem; margin:0 0 8px; color:#1a1a1a;"><?= htmlspecialchars($ls['title']) ?></h4>
-                    <p style="font-size:0.9rem; color:#666; line-height:1.7; margin:0;"><?= nl2br(htmlspecialchars($ls['content'])) ?></p>
+                    <?php endforeach; ?>
                 </div>
-            </div>
-            <?php endforeach; ?>
+            <?php endif; ?>
         </div>
-    <?php endif; ?>
+    </section>
 
-    <section id="events" data-reveal="up" style="background-color: #fff;">
-        <h3 style="font-family: 'Playfair Display', serif; font-weight: 700; font-style: italic;">Save the Date</h3>
-        
+    <section id="events" data-reveal="up" style="scroll-snap-align: start; --section-bg: url('https://images.unsplash.com/photo-1469334031218-e382a71b716b?auto=format&fit=crop&q=80&w=1000');">
+        <div class="section-inner">
+            <h3 style="font-family: 'Playfair Display', serif; font-weight: 700; font-style: italic;">Save the Date</h3>
             <div class="event-wrapper">
-                <!-- Akad Block -->
                 <div class="event-item-block" data-reveal="up">
                     <h4>Akad Nikah</h4>
-                    <div class="event-details-flex">
-                        <div class="event-col">
-                            <div class="detail-box">
-                                <i><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg></i>
-                                <div class="detail-info">
-                                    <b>Hari / Tanggal</b>
-                                    <span><?= $wedding['akad_date'] ?></span>
-                                </div>
-                            </div>
-                            <div class="detail-box">
-                                <i><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg></i>
-                                <div class="detail-info">
-                                    <b>Lokasi</b>
-                                    <span><?= $wedding['akad_place'] ?></span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="event-col">
-                            <div class="detail-box">
-                                <i><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></i>
-                                <div class="detail-info">
-                                    <b>Waktu</b>
-                                    <span><?= $wedding['akad_time'] ?></span>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="detail-box">
+                        <i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line></svg></i>
+                        <div class="detail-info"><b>Hari / Tanggal</b><span><?= $wedding['akad_date'] ?></span></div>
+                    </div>
+                    <div class="detail-box">
+                        <i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></i>
+                        <div class="detail-info"><b>Waktu</b><span><?= $wedding['akad_time'] ?></span></div>
+                    </div>
+                    <div class="detail-box">
+                        <i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path></svg></i>
+                        <div class="detail-info"><b>Lokasi</b><span><?= $wedding['akad_place'] ?></span></div>
                     </div>
                     <?php if (!empty($wedding['akad_map_link'])): ?>
-                        <a href="<?= $wedding['akad_map_link'] ?>" target="_blank" class="btn-map">
-                            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon><line x1="8" y1="2" x2="8" y2="18"></line><line x1="16" y1="6" x2="16" y2="22"></line></svg>
+                        <a href="<?= $wedding['akad_map_link'] ?>" target="_blank" class="btn-map-bottom">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
                             Buka Google Maps
                         </a>
                     <?php endif; ?>
                 </div>
 
-                <!-- Resepsi Block -->
                 <div class="event-item-block" data-reveal="up" data-reveal-delay="200">
-                    <h4>Resepsi Pernikahan</h4>
-                    <div class="event-details-flex">
-                        <div class="event-col">
-                            <div class="detail-box">
-                                <i><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg></i>
-                                <div class="detail-info">
-                                    <b>Hari / Tanggal</b>
-                                    <span><?= $wedding['reception_date'] ?></span>
-                                </div>
-                            </div>
-                            <div class="detail-box">
-                                <i><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg></i>
-                                <div class="detail-info">
-                                    <b>Lokasi</b>
-                                    <span><?= $wedding['reception_place'] ?></span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="event-col">
-                            <div class="detail-box">
-                                <i><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></i>
-                                <div class="detail-info">
-                                    <b>Waktu</b>
-                                    <span><?= $wedding['reception_time'] ?></span>
-                                </div>
-                            </div>
-                        </div>
+                    <h4>Resepsi</h4>
+                    <div class="detail-box">
+                        <i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line></svg></i>
+                        <div class="detail-info"><b>Hari / Tanggal</b><span><?= $wedding['reception_date'] ?></span></div>
+                    </div>
+                    <div class="detail-box">
+                        <i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></i>
+                        <div class="detail-info"><b>Waktu</b><span><?= $wedding['reception_time'] ?></span></div>
+                    </div>
+                    <div class="detail-box">
+                        <i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path></svg></i>
+                        <div class="detail-info"><b>Lokasi</b><span><?= $wedding['reception_place'] ?></span></div>
                     </div>
                     <?php if (!empty($wedding['reception_map_link'])): ?>
-                        <a href="<?= $wedding['reception_map_link'] ?>" target="_blank" class="btn-map">
-                            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon><line x1="8" y1="2" x2="8" y2="18"></line><line x1="16" y1="6" x2="16" y2="22"></line></svg>
+                        <a href="<?= $wedding['reception_map_link'] ?>" target="_blank" class="btn-map-bottom">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
                             Buka Google Maps
                         </a>
                     <?php endif; ?>
                 </div>
             </div>
+        </div>
     </section>
 
-    <section id="gallery" data-reveal="up">
-        <h3>Our Gallery</h3>
-        <?php 
-        $gallery = Models\Wedding::getGallery($wedding['id']);
-        if (!empty($gallery)): ?>
-        <div class="gallery-grid" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:12px; margin-top:30px;">
-            <?php foreach ($gallery as $i => $img):
-                $thumb = !empty($img['thumb_url']) ? $img['thumb_url'] : $img['image_url'];
-                $full  = $img['image_url'];
-                $delay = ($i % 4) * 150; // Stagger effect
-            ?>
-                <div style="aspect-ratio:1/1; overflow:hidden; border-radius:12px; cursor:pointer; position:relative;"
-                     data-reveal="zoom" data-reveal-delay="<?= $delay ?>"
-                     onclick="openLightbox(<?= $i ?>)">
-                    <img src="<?= htmlspecialchars($thumb) ?>"
-                         loading="lazy"
-                         style="width:100%; height:100%; object-fit:cover; transition:transform 0.35s, filter 0.35s;"
-                         onmouseover="this.style.transform='scale(1.08)'; this.style.filter='brightness(1.1)';"
-                         onmouseout="this.style.transform='scale(1)'; this.style.filter='none';">
+    <section id="gallery" data-reveal="up" style="scroll-snap-align: start; --section-bg: url('https://images.unsplash.com/photo-1465495910676-424343b01393?auto=format&fit=crop&q=80&w=1000');">
+        <div class="section-inner">
+            <h3>Our Gallery</h3>
+            <?php 
+            $gallery = Models\Wedding::getGallery($wedding['id']);
+            if (!empty($gallery)): ?>
+                <div class="gallery-slider">
+                <?php foreach ($gallery as $img): ?>
+                    <img src="<?= $img['image_url'] ?>" alt="Gallery" onclick="openLightbox('<?= $img['image_url'] ?>')">
+                <?php endforeach; ?>
                 </div>
-            <?php endforeach; ?>
-        </div>
 
-        <!-- Lightbox -->
-        <div id="lightbox" onclick="closeLightbox()"
-             style="display:none; position:fixed; inset:0; z-index:9999;
-                    background:rgba(0,0,0,0.92); align-items:center; justify-content:center;
-                    flex-direction:column; gap:16px; padding:20px;">
-            <button onclick="event.stopPropagation(); shiftLightbox(-1)"
-                    style="position:fixed; left:20px; top:50%; transform:translateY(-50%);
-                           background:rgba(255,255,255,0.15); border:none; color:white;
-                           width:48px; height:48px; border-radius:50%; font-size:1.4rem; cursor:pointer;">‹</button>
-            <img id="lbImg" src="" alt=""
-                 style="max-width:90vw; max-height:82vh; border-radius:12px; object-fit:contain;
-                        box-shadow:0 20px 60px rgba(0,0,0,0.5);">
-            <button onclick="event.stopPropagation(); shiftLightbox(1)"
-                    style="position:fixed; right:20px; top:50%; transform:translateY(-50%);
-                           background:rgba(255,255,255,0.15); border:none; color:white;
-                           width:48px; height:48px; border-radius:50%; font-size:1.4rem; cursor:pointer;">›</button>
-            <button onclick="closeLightbox()"
-                    style="position:fixed; top:16px; right:20px; background:rgba(255,255,255,0.15);
-                           border:none; color:white; width:38px; height:38px; border-radius:50%;
-                           font-size:1.1rem; cursor:pointer;">✕</button>
-            <p id="lbCounter" style="color:rgba(255,255,255,0.5); font-size:0.8rem; margin:0;"></p>
-        </div>
+                <!-- Lightbox -->
+            <div id="lightbox" onclick="closeLightbox()"
+                 style="display:none; position:fixed; inset:0; z-index:9999;
+                        background:rgba(0,0,0,0.92); align-items:center; justify-content:center;
+                        flex-direction:column; gap:16px; padding:20px;">
+                <img id="lbImg" src="" alt=""
+                     style="max-width:90vw; max-height:82vh; border-radius:12px; object-fit:contain;
+                            box-shadow:0 20px 60px rgba(0,0,0,0.5);">
+                <button onclick="closeLightbox()"
+                        style="position:fixed; top:16px; right:20px; background:rgba(255,255,255,0.15);
+                               border:none; color:white; width:38px; height:38px; border-radius:50%;
+                               font-size:1.1rem; cursor:pointer;">✕</button>
+            </div>
 
-        <script>
-        const lbImages = [<?php echo implode(',', array_map(fn($g) => json_encode($g['image_url']), $gallery)); ?>];
-        let lbIdx = 0;
-        function openLightbox(i) {
-            lbIdx = i;
-            document.getElementById('lbImg').src = lbImages[i];
-            document.getElementById('lbCounter').textContent = (i+1) + ' / ' + lbImages.length;
-            const lb = document.getElementById('lightbox');
-            lb.style.display = 'flex';
-            document.body.style.overflow = 'hidden';
-        }
-        function closeLightbox() {
-            document.getElementById('lightbox').style.display = 'none';
-            document.body.style.overflow = '';
-        }
-        function shiftLightbox(dir) {
-            lbIdx = (lbIdx + dir + lbImages.length) % lbImages.length;
-            document.getElementById('lbImg').src = lbImages[lbIdx];
-            document.getElementById('lbCounter').textContent = (lbIdx+1) + ' / ' + lbImages.length;
-        }
-        document.addEventListener('keydown', e => {
-            if (document.getElementById('lightbox').style.display === 'flex') {
-                if (e.key === 'Escape') closeLightbox();
-                if (e.key === 'ArrowLeft')  shiftLightbox(-1);
-                if (e.key === 'ArrowRight') shiftLightbox(1);
+            <script>
+            function openLightbox(url) {
+                const img = document.getElementById('lbImg');
+                img.src = url;
+                const lb = document.getElementById('lightbox');
+                lb.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
             }
-        });
-        </script>
-        <?php endif; ?>
-    </section>
-
-    <section id="gifts" data-reveal="up" style="background-color: #fcf9f5;">
-        <h3>Wedding Gift</h3>
-        <p style="margin-bottom: 40px;">Bagi keluarga dan kerabat yang ingin mengirimkan hadiah, dapat melalui nomor rekening berikut:</p>
-        
-        <div class="couple" style="align-items: flex-start; justify-content: center; gap: 40px; margin-top: 40px;">
-            <?php if (!empty($wedding['bank1_acc'])): ?>
-            <div data-reveal="up" style="flex: 1; min-width: 280px; max-width: 350px; text-align: center; padding: 40px 20px; background: #fff; border-bottom: 2px solid var(--gold);">
-                <p style="font-weight: 700; font-size: 1.1rem; margin: 0 0 8px; color: var(--dark); letter-spacing: 1px; text-transform: uppercase;"><?= $wedding['bank1_owner'] ?></p>
-                <p style="color: var(--gold); font-weight: 600; margin: 0 0 10px; font-size: 0.95rem;"><?= $wedding['bank1_name'] ?></p>
-                <p style="font-size: 1.5rem; font-weight: 700; letter-spacing: 3px; margin: 0 0 25px; color: var(--dark); font-family: 'Playfair Display', serif;"><?= $wedding['bank1_acc'] ?></p>
-                <button onclick="copyToClipboard('<?= $wedding['bank1_acc'] ?>', this)" class="btn-map" style="border: none; cursor: pointer; font-size: 0.8rem; padding: 10px 24px;">Salin Rekening</button>
-            </div>
-            <?php endif; ?>
-
-            <?php if (!empty($wedding['bank2_acc'])): ?>
-            <div data-reveal="up" data-reveal-delay="200" style="flex: 1; min-width: 280px; max-width: 350px; text-align: center; padding: 40px 20px; background: #fff; border-bottom: 2px solid var(--gold);">
-                <p style="font-weight: 700; font-size: 1.1rem; margin: 0 0 8px; color: var(--dark); letter-spacing: 1px; text-transform: uppercase;"><?= $wedding['bank2_owner'] ?></p>
-                <p style="color: var(--gold); font-weight: 600; margin: 0 0 10px; font-size: 0.95rem;"><?= $wedding['bank2_name'] ?></p>
-                <p style="font-size: 1.5rem; font-weight: 700; letter-spacing: 3px; margin: 0 0 25px; color: var(--dark); font-family: 'Playfair Display', serif;"><?= $wedding['bank2_acc'] ?></p>
-                <button onclick="copyToClipboard('<?= $wedding['bank2_acc'] ?>', this)" class="btn-map" style="border: none; cursor: pointer; font-size: 0.8rem; padding: 10px 24px;">Salin Rekening</button>
-            </div>
-            <?php endif; ?>
+            function closeLightbox() {
+                document.getElementById('lightbox').style.display = 'none';
+                document.body.style.overflow = '';
+            }
+            </script>
+<?php endif; ?>
         </div>
     </section>
 
-    <section id="guestbook" data-reveal="up">
-        <h3>Guestbook & RSVP</h3>
+    <section id="gifts" data-reveal="up" style="--section-bg: url('https://images.unsplash.com/photo-1513519245088-0e12902e35ca?auto=format&fit=crop&q=80&w=1000');">
+        <div class="section-inner">
+            <h3>Wedding Gift</h3>
+            <p style="margin-bottom: 40px; color: #64748b;">Doa restu Anda merupakan hadiah terindah bagi kami. Namun jika Anda ingin memberikan hadiah, silakan melalui saluran berikut:</p>
+            
+            <div class="gift-container">
+                <?php if (!empty($wedding['bank1_acc'])): ?>
+                <div class="gift-card" data-reveal="up">
+                    <span class="bank-badge"><?= $wedding['bank1_name'] ?></span>
+                    <span class="acc-number"><?= $wedding['bank1_acc'] ?></span>
+                    <p class="acc-owner">A.N <?= $wedding['bank1_owner'] ?></p>
+                    <button onclick="copyToClipboard('<?= $wedding['bank1_acc'] ?>')" class="btn-copy">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                        Salin Rekening
+                    </button>
+                </div>
+                <?php endif; ?>
 
-        <?php 
-        $msg    = $_GET['msg'] ?? '';
-        $reason = $_GET['reason'] ?? '';
-        $errorTexts = [
-            'ratelimit' => 'Kamu sudah mengirim pesan. Tunggu 5 menit sebelum mengirim lagi.',
-            'name'      => 'Nama tidak valid. Minimal 2 karakter.',
-            'email'     => 'Alamat email tidak valid.',
-            'message'   => 'Pesan terlalu pendek (min 5 karakter) atau terlalu panjang (maks 500).',
-        ];
-        ?>
-
-        <?php if ($msg === 'sent'): ?>
-        <div style="background:#dcfce7; color:#166534; padding:14px 20px; border-radius:10px; max-width:600px; margin:0 auto 20px; font-weight:600; font-size:0.9rem;">
-            ✅ Ucapan kamu berhasil terkirim! Terima kasih 💐
+                <?php if (!empty($wedding['bank2_acc'])): ?>
+                <div class="gift-card" data-reveal="up" data-reveal-delay="200">
+                    <span class="bank-badge"><?= $wedding['bank2_name'] ?></span>
+                    <span class="acc-number"><?= $wedding['bank2_acc'] ?></span>
+                    <p class="acc-owner">A.N <?= $wedding['bank2_owner'] ?></p>
+                    <button onclick="copyToClipboard('<?= $wedding['bank2_acc'] ?>')" class="btn-copy">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                        Salin Rekening
+                    </button>
+                </div>
+                <?php endif; ?>
+            </div>
         </div>
-        <?php elseif ($msg === 'error'): ?>
-        <div style="background:#fee2e2; color:#991b1b; padding:14px 20px; border-radius:10px; max-width:600px; margin:0 auto 20px; font-weight:600; font-size:0.9rem;">
-            ⚠️ <?= $errorTexts[$reason] ?? 'Terjadi kesalahan. Coba lagi.' ?>
-        </div>
-        <?php endif; ?>
+    </section>
 
-        <div style="text-align: left; max-width: 700px; margin: auto; padding: 40px; background: #fffaf5; border-radius: 4px;">
-            <form action="<?= $base ?>api/guestbook" method="POST" id="guestbookForm">
-                <input type="hidden" name="wedding_id" value="<?= $wedding['id'] ?>">
-                <input type="hidden" name="slug" value="<?= $wedding['slug'] ?>">
-                
-                <!-- Honeypot: hidden from humans, bots fill this -->
-                <div style="position:absolute; left:-9999px; top:-9999px;" aria-hidden="true">
-                    <input type="text" name="website" tabindex="-1" autocomplete="off">
-                </div>
+    <section id="guestbook" data-reveal="up" style="--section-bg: url('https://images.unsplash.com/photo-1522673607200-1648835ede57?auto=format&fit=crop&q=80&w=1000');">
+        <div class="section-inner">
+            <h3>Guestbook & Reservation</h3>
+            <?php 
+            $msg    = $_GET['msg'] ?? '';
+            $reason = $_GET['reason'] ?? '';
+            $errorTexts = [
+                'ratelimit' => 'Kamu sudah mengirim pesan. Tunggu 5 menit sebelum mengirim lagi.',
+                'name'      => 'Nama tidak valid. Minimal 2 karakter.',
+                'email'     => 'Alamat email tidak valid.',
+                'message'   => 'Pesan terlalu pendek (min 5 karakter) atau terlalu panjang (maks 500).',
+            ];
+            ?>
 
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-bottom:15px;">
-                    <div>
-                        <label style="display:block; margin-bottom:5px; font-weight:600; font-size:0.85rem;">Nama Tamu *</label>
-                        <input type="text" name="name" required minlength="2" maxlength="100"
-                            style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px; box-sizing:border-box; font-family:inherit;">
+            <?php if ($msg === 'sent'): ?>
+            <div style="background:#dcfce7; color:#166534; padding:14px 20px; border-radius:10px; max-width:600px; margin:0 auto 20px; font-weight:600; font-size:0.9rem;">
+                ✅ Ucapan kamu berhasil terkirim! Terima kasih 💐
+            </div>
+            <?php elseif ($msg === 'error'): ?>
+            <div style="background:#fee2e2; color:#991b1b; padding:14px 20px; border-radius:10px; max-width:600px; margin:0 auto 20px; font-weight:600; font-size:0.9rem;">
+                ⚠️ <?= $errorTexts[$reason] ?? 'Terjadi kesalahan. Coba lagi.' ?>
+            </div>
+            <?php endif; ?>
+
+            <div class="form-card">
+                <form action="<?= $base ?>api/guestbook" method="POST" id="guestbookForm">
+                    <input type="hidden" name="wedding_id" value="<?= $wedding['id'] ?>">
+                    <input type="hidden" name="slug" value="<?= $wedding['slug'] ?>">
+                    
+                    <div style="position:absolute; left:-9999px; top:-9999px;" aria-hidden="true">
+                        <input type="text" name="website" tabindex="-1" autocomplete="off">
                     </div>
-                    <div>
-                        <label style="display:block; margin-bottom:5px; font-weight:600; font-size:0.85rem;">Email * <small style="color:#999; font-weight:400;">(untuk avatar, tidak ditampilkan)</small></label>
-                        <input type="email" name="email" required
-                            style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px; box-sizing:border-box; font-family:inherit;">
+
+                    <div class="rsvp-grid form-inputs" style="margin-bottom: 25px;">
+                        <div class="form-group">
+                            <label>Nama Tamu</label>
+                            <input type="text" name="name" class="input-premium" required minlength="2" maxlength="100" placeholder="Ketik nama Anda...">
+                        </div>
+                        <div class="form-group">
+                            <label>Email <small>(Avatar)</small></label>
+                            <input type="email" name="email" class="input-premium" required placeholder="email@example.com">
+                        </div>
                     </div>
-                </div>
 
-                <div style="margin-bottom:15px;">
-                    <label style="display:block; margin-bottom:5px; font-weight:600; font-size:0.85rem;">Konfirmasi Kehadiran</label>
-                    <div style="display:flex; gap:10px;">
-                        <label style="flex:1; padding:10px; border:2px solid #ddd; border-radius:8px; display:flex; align-items:center; gap:8px; cursor:pointer; transition:0.2s;" id="lbl-hadir">
-                            <input type="radio" name="attendance" value="1" checked onchange="highlightRsvp()"> 
-                            <span>✅ Akan Hadir</span>
-                        </label>
-                        <label style="flex:1; padding:10px; border:2px solid #ddd; border-radius:8px; display:flex; align-items:center; gap:8px; cursor:pointer; transition:0.2s;" id="lbl-tidak">
-                            <input type="radio" name="attendance" value="0" onchange="highlightRsvp()">
-                            <span>❌ Tidak Dapat Hadir</span>
-                        </label>
+                    <div class="form-group">
+                        <label>Konfirmasi Kehadiran (Reservation)</label>
+                        <div class="rsvp-grid">
+                            <label class="rsvp-option">
+                                <input type="radio" name="attendance" value="1" checked onchange="highlightRsvp()">
+                                <div class="rsvp-box" id="lbl-hadir">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"></path></svg>
+                                    <span>Hadir</span>
+                                </div>
+                            </label>
+                            <label class="rsvp-option">
+                                <input type="radio" name="attendance" value="0" onchange="highlightRsvp()">
+                                <div class="rsvp-box" id="lbl-tidak">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                                    <span>Absen</span>
+                                </div>
+                            </label>
+                        </div>
                     </div>
-                </div>
 
-                <div style="margin-bottom:20px;">
-                    <label style="display:block; margin-bottom:5px; font-weight:600; font-size:0.85rem;">Pesan / Doa Restu * <small id="charCount" style="color:#999; font-weight:400;">(0/500)</small></label>
-                    <textarea name="message" required minlength="5" maxlength="500" id="msgArea"
-                        style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px; height:100px; box-sizing:border-box; font-family:inherit; resize:vertical;"></textarea>
-                </div>
+                    <div class="form-group">
+                        <label>Pesan / Doa Restu <small id="charCount">(0/500)</small></label>
+                        <textarea name="message" class="input-premium" required minlength="5" maxlength="500" id="msgArea"
+                            style="height:120px; resize:none;" placeholder="Tulis ucapan selamat & doa restu..."></textarea>
+                    </div>
 
-                <button type="submit" class="btn-map" style="width:100%; border:none; cursor:pointer; font-size:1rem; padding:14px;">
-                    💌 Kirim Ucapan
-                </button>
-            </form>
-        </div>
+                    <button type="submit" class="btn-submit">
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13"></path><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                        Kirim Ucapan
+                    </button>
+                </form>
+            </div>
 
-        <!-- Comment List -->
-        <div style="margin-top:50px; max-width:600px; margin-left:auto; margin-right:auto;">
+        <!-- Comment List Slider -->
+        <div style="margin-top:40px; width:100%;">
             <?php 
             $messages = Models\Wedding::getMessages($wedding['id']);
             $total    = count($messages);
             if ($total === 0): ?>
                 <p style="text-align:center; color:#999;">Belum ada ucapan. Jadilah yang pertama! 🌸</p>
             <?php else: ?>
-                <p style="text-align:center; color:#aaa; font-size:0.82rem; margin-bottom:20px;">
-                    Menampilkan <span id="visibleCount">0</span> dari <?= $total ?> ucapan
+                <p style="text-align:center; color:#aaa; font-size:0.75rem; margin-bottom:15px; letter-spacing:1px; text-transform:uppercase;">
+                    Geser untuk melihat <?= $total ?> ucapan
                 </p>
 
-                <div id="commentList">
-                <?php foreach ($messages as $i => $m): 
+                <div id="commentList" class="comment-slider">
+                <?php foreach ($messages as $m): 
                     $avatar  = Models\Wedding::gravatarUrl($m['email'] ?? '', 60);
                     $isHadir = (bool)$m['attendance'];
                 ?>
-                <div class="comment-item" data-index="<?= $i ?>"
-                     style="display:none; flex-direction:row; gap:15px; background:white; padding:18px;
-                            border-radius:14px; margin-bottom:14px;
-                            box-shadow:0 2px 8px rgba(0,0,0,0.05); border:1px solid #f0f0f0;
-                            align-items:flex-start;">
-                    <img src="<?= $avatar ?>" alt="avatar" width="50" height="50"
-                         style="border-radius:50%; flex-shrink:0;
-                                border:2px solid <?= $isHadir ? '#bbf7d0' : '#fecaca' ?>;">
-                    <div style="flex:1; text-align:left;">
-                        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:5px;">
-                            <strong style="font-size:0.95rem;"><?= $m['name'] ?></strong>
-                            <div style="display:flex; gap:8px; align-items:center;">
-                                <span style="font-size:0.7rem; padding:3px 8px; border-radius:20px; font-weight:700;
-                                    background:<?= $isHadir ? '#dcfce7' : '#fee2e2' ?>;
-                                    color:<?= $isHadir ? '#166534' : '#991b1b' ?>;">
-                                    <?= $isHadir ? '✅ Hadir' : '❌ Tidak Hadir' ?>
-                                </span>
-                                <small style="color:#bbb; font-size:0.75rem;"><?= date('d M Y', strtotime($m['created_at'])) ?></small>
-                            </div>
+                <div class="comment-item" style="display: flex; flex-direction: row; gap: 15px; background: white; padding: 20px; border-radius: 15px; border: 1px solid #f0f0f0; align-items: flex-start; text-align: left;">
+                    <img src="<?= $avatar ?>" alt="avatar" width="45" height="45" style="border-radius: 50%; border: 2px solid <?= $isHadir ? '#dcfce7' : '#fee2e2' ?>;">
+                    <div style="flex: 1;">
+                        <div style="margin-bottom: 5px;">
+                            <strong style="font-size: 0.9rem; display: block;"><?= $m['name'] ?></strong>
+                            <span style="font-size: 0.65rem; padding: 2px 8px; border-radius: 10px; background: <?= $isHadir ? '#dcfce7' : '#fee2e2' ?>; color: <?= $isHadir ? '#166534' : '#991b1b' ?>; font-weight: 700;">
+                                <?= $isHadir ? 'HADIR' : 'ABSEN' ?>
+                            </span>
                         </div>
-                        <p style="margin:6px 0 0; font-size:0.88rem; color:#555; line-height:1.5;"><?= $m['message'] ?></p>
-                        
+                        <p style="font-size: 0.85rem; color: #555; line-height: 1.5; margin: 0;"><?= $m['message'] ?></p>
                         <?php if (!empty($m['reply'])): ?>
-                        <div style="margin-top:12px; background:#fef9f2; padding:10px 14px; border-radius:10px; border-left:3px solid var(--gold); display:flex; gap:10px; align-items:flex-start;">
-                            <div style="font-size:1.2rem; line-height:1;">✨</div>
-                            <div>
-                                <strong style="font-size:0.8rem; color:var(--gold); display:block; margin-bottom:2px;">Balasan Pengantin:</strong>
-                                <p style="margin:0; font-size:0.85rem; color:#666; line-height:1.5;"><?= nl2br(htmlspecialchars($m['reply'])) ?></p>
-                            </div>
+                        <div style="margin-top:10px; padding:10px; background:#fdf9f1; border-radius:8px; border-left:3px solid var(--gold);">
+                            <small style="color:var(--gold); font-weight:700; display:block; margin-bottom:2px;">Balasan:</small>
+                            <p style="margin:0; font-size:0.8rem; color:#666;"><?= nl2br(htmlspecialchars($m['reply'])) ?></p>
                         </div>
                         <?php endif; ?>
                     </div>
                 </div>
                 <?php endforeach; ?>
-                </div>
-
-                <!-- Show More Button -->
-                <div style="text-align:center; margin-top:10px;">
-                    <button id="showMoreBtn" onclick="showMoreComments()"
-                        style="background:transparent; border:2px solid var(--gold); color:var(--gold);
-                               padding:10px 30px; border-radius:30px; font-weight:700; cursor:pointer;
-                               font-family:inherit; font-size:0.9rem; transition:0.3s; display:none;"
-                        onmouseover="this.style.background='var(--gold)'; this.style.color='white';"
-                        onmouseout="this.style.background='transparent'; this.style.color='var(--gold)';">
-                        Tampilkan Lainnya
-                    </button>
-                    <p id="allShownMsg" style="color:#bbb; font-size:0.82rem; display:none;">
-                        Semua ucapan sudah ditampilkan 🌸
-                    </p>
                 </div>
             <?php endif; ?>
         </div>
@@ -815,34 +951,6 @@
             });
         }
         
-        // ---- Show More Comments ----
-        const PER_PAGE   = 5;
-        let shownCount   = 0;
-        const items      = document.querySelectorAll('.comment-item');
-        const btn        = document.getElementById('showMoreBtn');
-        const allMsg     = document.getElementById('allShownMsg');
-        const countLabel = document.getElementById('visibleCount');
-
-        function showMoreComments() {
-            const next = Math.min(shownCount + PER_PAGE, items.length);
-            for (let i = shownCount; i < next; i++) {
-                items[i].style.display = 'flex';
-            }
-            shownCount = next;
-            if (countLabel) countLabel.textContent = shownCount;
-
-            if (shownCount >= items.length) {
-                btn.style.display = 'none';
-                if (allMsg) allMsg.style.display = 'block';
-            } else {
-                btn.style.display = 'inline-block';
-            }
-        }
-
-        // Initial render — show first 5
-        if (items.length > 0) showMoreComments();
-
-
         function highlightRsvp() {
             const hadir = document.querySelector('input[name=attendance][value="1"]').checked;
             document.getElementById('lbl-hadir').style.borderColor = hadir ? '#166534' : '#ddd';
@@ -874,7 +982,7 @@
         <a href="#events" class="nav-item" title="Events"><i><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg></i></a>
         <a href="#gallery" class="nav-item" title="Gallery"><i><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg></i></a>
         <a href="#gifts" class="nav-item" title="Gifts"><i><svg viewBox="0 0 24 24"><polyline points="20 12 20 22 4 22 4 12"></polyline><rect x="2" y="7" width="20" height="5"></rect><line x1="12" y1="22" x2="12" y2="7"></line><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path></svg></i></a>
-        <a href="#guestbook" class="nav-item" title="Guestbook"><i><svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg></i></a>
+        <a href="#guestbook" class="nav-item" title="Reservation"><i><svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg></i></a>
     </nav>
 
     <?php if (!empty($wedding['music_url'])): 
@@ -886,7 +994,7 @@
     <!-- Background Music Player -->
     <div id="musicControls" style="position:fixed; bottom:20px; left:20px; z-index:9999;">
         <?php if ($yt_id): ?>
-            <div id="ytPlayer" style="position: absolute; left: -9999px; top: -9999px;"></div>
+            <div id="musicPlayerDiv" style="position: absolute; left: -9999px; top: -9999px;"></div>
         <?php else: ?>
             <audio id="bgMusic" loop preload="auto">
                 <source src="<?= htmlspecialchars($wedding['music_url']) ?>" type="audio/mpeg">
@@ -930,7 +1038,7 @@
             firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 
             function onYouTubeIframeAPIReady() {
-                ytPlayer = new YT.Player('ytPlayer', {
+                ytPlayer = new YT.Player('musicPlayerDiv', {
                     height: '0', width: '0',
                     videoId: '<?= $yt_id ?>',
                     playerVars: { 
@@ -938,6 +1046,9 @@
                         'origin': window.location.origin
                     },
                     events: {
+                        'onReady': (e) => {
+                            console.log('YT Player Ready');
+                        },
                         'onStateChange': (e) => {
                             if (e.data === YT.PlayerState.PLAYING) {
                                 musicBtn.classList.add('playing');
@@ -954,10 +1065,14 @@
 
         function toggleMusic() {
             if (isYT) {
-                if (!ytPlayer) return;
+                if (!ytPlayer || typeof ytPlayer.playVideo !== 'function') {
+                    console.log('YouTube Player not ready yet');
+                    return;
+                }
                 isPlaying ? ytPlayer.pauseVideo() : ytPlayer.playVideo();
             } else {
                 const bgMusic = document.getElementById('bgMusic');
+                if (!bgMusic) return;
                 if (isPlaying) {
                     bgMusic.pause();
                     musicBtn.classList.remove('playing');
@@ -992,29 +1107,13 @@
             if (!isPlaying && !document.getElementById('openingOverlay')) toggleMusic();
         }, { once: true });
 
-        // Custom Smooth Scroll
-        function smoothScrollTo(target, duration = 1000) {
-            const targetElement = document.querySelector(target);
-            if (!targetElement) return;
-            const targetPosition = targetElement.getBoundingClientRect().top + window.pageYOffset;
-            const startPosition = window.pageYOffset;
-            const distance = targetPosition - startPosition;
-            let startTime = null;
-            function animation(currentTime) {
-                if (startTime === null) startTime = currentTime;
-                const timeElapsed = currentTime - startTime;
-                const ease = t => 1 - Math.pow(1 - t, 4);
-                const scroll = ease(Math.min(timeElapsed / duration, 1)) * distance + startPosition;
-                window.scrollTo(0, scroll);
-                if (timeElapsed < duration) requestAnimationFrame(animation);
-            }
-            requestAnimationFrame(animation);
-        }
-
         document.querySelectorAll('.nav-item').forEach(link => {
             link.addEventListener('click', function(e) {
                 e.preventDefault();
-                smoothScrollTo(this.getAttribute('href'));
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
             });
         });
 
@@ -1060,7 +1159,23 @@
             setInterval(updateCountdown, 1000);
         })();
         <?php endif; ?>
+        function copyToClipboard(text) {
+            const el = document.createElement('textarea');
+            el.value = text;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+            
+            const toast = document.getElementById('copyToast');
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
     </script>
+
+    <div id="copyToast" class="toast">
+        <span>✅ Nomor rekening berhasil disalin!</span>
+    </div>
 
 </body>
 </html>
