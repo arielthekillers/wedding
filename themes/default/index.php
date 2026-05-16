@@ -179,6 +179,17 @@
         .story-card h4 { font-family: 'Playfair Display', serif; font-size: 1.1rem; margin: 0 0 5px; }
         .story-card p { font-size: 0.75rem; color: #666; line-height: 1.4; margin: 0; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 
+        .story-intro, .story-outro {
+            font-size: 0.8rem;
+            line-height: 1.6;
+            color: #64748b;
+            max-width: 85%;
+            margin: 0 auto;
+            font-style: italic;
+        }
+        .story-intro { margin-bottom: 20px; }
+        .story-outro { margin-top: 15px; }
+
         .event-wrapper {
             display: flex;
             flex-direction: column;
@@ -666,6 +677,11 @@
     <section id="love-story" data-reveal="up" style="scroll-snap-align: start; --section-bg: url('https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&q=80&w=1000');">
         <div class="section-inner">
             <h3>Our Love Story</h3>
+            
+            <?php if (!empty($wedding['story_intro'])): ?>
+                <p class="story-intro" data-reveal="up"><?= nl2br(htmlspecialchars($wedding['story_intro'])) ?></p>
+            <?php endif; ?>
+
             <?php 
             $loveStories = Models\Wedding::getLoveStories($wedding['id']);
             if (!empty($loveStories)): ?>
@@ -685,6 +701,10 @@
                     </div>
                     <?php endforeach; ?>
                 </div>
+            <?php endif; ?>
+
+            <?php if (!empty($wedding['story_outro'])): ?>
+                <p class="story-outro" data-reveal="up"><?= nl2br(htmlspecialchars($wedding['story_outro'])) ?></p>
             <?php endif; ?>
         </div>
     </section>

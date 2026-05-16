@@ -453,18 +453,28 @@ function handleAdmin($action, $parts) {
                         exit;
                     }
                     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-                        $storyId = (int)($_POST['story_id'] ?? 0);
-                        $data = [
-                            'wedding_id' => $id,
-                            'title'      => htmlspecialchars(trim($_POST['title'] ?? '')),
-                            'story_date' => $_POST['story_date'] ?? date('Y-m-d'),
-                            'content'    => htmlspecialchars(trim($_POST['content'] ?? '')),
-                            'image_url'  => htmlspecialchars(trim($_POST['image_url'] ?? '')),
-                            'sort_order' => (int)($_POST['sort_order'] ?? 0),
-                        ];
-                        $storyId ? Models\Wedding::updateLoveStory($storyId, $data) : Models\Wedding::addLoveStory($data);
-                        header('Location: ' . $detailBase . 'story?saved=1');
-                        exit;
+                        if (isset($_POST['action']) && $_POST['action'] === 'save_texts') {
+                            $data = [
+                                'story_intro' => trim($_POST['story_intro'] ?? ''),
+                                'story_outro' => trim($_POST['story_outro'] ?? ''),
+                            ];
+                            Models\Wedding::update($id, $data);
+                            header('Location: ' . $detailBase . 'story?saved=1');
+                            exit;
+                        } else {
+                            $storyId = (int)($_POST['story_id'] ?? 0);
+                            $data = [
+                                'wedding_id' => $id,
+                                'title'      => trim($_POST['title'] ?? ''),
+                                'story_date' => $_POST['story_date'] ?? date('Y-m-d'),
+                                'content'    => trim($_POST['content'] ?? ''),
+                                'image_url'  => trim($_POST['image_url'] ?? ''),
+                                'sort_order' => (int)($_POST['sort_order'] ?? 0),
+                            ];
+                            $storyId ? Models\Wedding::updateLoveStory($storyId, $data) : Models\Wedding::addLoveStory($data);
+                            header('Location: ' . $detailBase . 'story?saved=1');
+                            exit;
+                        }
                     }
                     $stories = Models\Wedding::getLoveStories($id);
                     include 'app/Views/love_story.php';

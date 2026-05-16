@@ -33,14 +33,43 @@ include __DIR__ . '/partials/wedding_nav.php';
 <div class="alert alert-info">🗑️ Cerita berhasil dihapus.</div>
 <?php endif; ?>
 
+<!-- ── INTRO & OUTRO TEXTS ── -->
+<div class="section-card" style="margin-bottom:24px;">
+    <div class="section-card-header">
+        <div class="icon">📝</div>
+        <div>
+            <h2>Teks Pembuka & Penutup</h2>
+            <p>Kata-kata tambahan sebelum dan sesudah timeline cerita</p>
+        </div>
+    </div>
+    <div class="section-card-body">
+        <form method="POST">
+            <input type="hidden" name="action" value="save_texts">
+            <div class="form-grid g2">
+                <div class="form-group">
+                    <label class="form-label">Teks Pembuka (Intro)</label>
+                    <textarea name="story_intro" class="form-control" rows="3" placeholder="Contoh: Ini adalah perjalanan cinta kami..."><?= htmlspecialchars($wedding['story_intro'] ?? '', ENT_QUOTES) ?></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Teks Penutup (Outro)</label>
+                    <textarea name="story_outro" class="form-control" rows="3" placeholder="Contoh: Dan kini kami memulai babak baru..."><?= htmlspecialchars($wedding['story_outro'] ?? '', ENT_QUOTES) ?></textarea>
+                </div>
+            </div>
+            <div style="margin-top:16px; text-align:right;">
+                <button type="submit" class="btn btn-primary">💾 Simpan Teks</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <!-- ── ACTION ROW ── -->
 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
     <div>
-        <strong style="font-size:1.05rem;">Perjalanan Cinta</strong>
+        <strong style="font-size:1.05rem;">Timeline Cerita</strong>
         <span style="background:#ede9fe;color:var(--primary);font-size:0.72rem;font-weight:700;padding:2px 10px;border-radius:20px;margin-left:8px;">
             <?= count($stories) ?> Cerita
         </span>
-        <p style="margin:4px 0 0;color:#94a3b8;font-size:0.82rem;">Kelola timeline kisah cinta yang ditampilkan di undangan</p>
+        <p style="margin:4px 0 0;color:#94a3b8;font-size:0.82rem;">Kelola momen-momen perjalanan cinta Anda</p>
     </div>
     <button class="btn btn-primary" onclick="openModal()">✨ Tambah Cerita</button>
 </div>
