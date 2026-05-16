@@ -348,6 +348,23 @@ function handleAdmin($action, $parts) {
                                    'groom_name','groom_nickname','groom_order','groom_father','groom_mother'];
                         $data = [];
                         foreach ($fields as $f) $data[$f] = htmlspecialchars(trim($_POST[$f] ?? ''));
+                        // Handle Photo Uploads
+                        $uploadDir = __DIR__ . '/uploads/profile/' . $id;
+                        if (isset($_FILES['bride_image']) && $_FILES['bride_image']['error'] !== UPLOAD_ERR_NO_FILE) {
+                            $res = Helpers\ImageHelper::processUpload($_FILES['bride_image'], $uploadDir);
+                            if (!isset($res['error'])) {
+                                if (!empty($wedding['bride_image'])) Helpers\ImageHelper::deleteFiles($wedding['bride_image'], '');
+                                $data['bride_image'] = $res['full'];
+                            }
+                        }
+                        if (isset($_FILES['groom_image']) && $_FILES['groom_image']['error'] !== UPLOAD_ERR_NO_FILE) {
+                            $res = Helpers\ImageHelper::processUpload($_FILES['groom_image'], $uploadDir);
+                            if (!isset($res['error'])) {
+                                if (!empty($wedding['groom_image'])) Helpers\ImageHelper::deleteFiles($wedding['groom_image'], '');
+                                $data['groom_image'] = $res['full'];
+                            }
+                        }
+
                         Models\Wedding::update($id, $data);
                         header('Location: ' . $detailBase . 'profile?saved=1');
                         exit;
