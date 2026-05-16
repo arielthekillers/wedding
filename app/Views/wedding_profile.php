@@ -7,7 +7,7 @@ include __DIR__ . '/partials/wedding_nav.php';
 <div class="alert alert-success">✅ Profil pengantin berhasil disimpan!</div>
 <?php endif; ?>
 
-<form method="POST">
+<form method="POST" enctype="multipart/form-data">
 <div class="form-grid g2">
 
     <!-- ── BRIDE CARD ── -->
@@ -20,6 +20,16 @@ include __DIR__ . '/partials/wedding_nav.php';
             </div>
         </div>
         <div class="section-card-body">
+            <div class="form-group" style="margin-bottom:18px;">
+                <label class="form-label">Foto Pengantin Wanita</label>
+                <?php if (!empty($wedding['bride_image'])): ?>
+                    <div style="margin-bottom:10px;">
+                        <img src="<?= $wedding['bride_image'] ?>" style="width:80px; height:80px; object-fit:cover; border-radius:10px; border:1px solid var(--border);">
+                    </div>
+                <?php endif; ?>
+                <input type="file" name="bride_image" class="form-control" accept="image/*">
+                <small style="color:#64748b; font-size:0.75rem; margin-top:4px; display:block;">Disarankan foto portrait (JPG/PNG/WEBP)</small>
+            </div>
             <div class="form-group">
                 <label class="form-label">Nama Lengkap</label>
                 <input type="text" name="bride_name" class="form-control"
@@ -68,6 +78,16 @@ include __DIR__ . '/partials/wedding_nav.php';
             </div>
         </div>
         <div class="section-card-body">
+            <div class="form-group" style="margin-bottom:18px;">
+                <label class="form-label">Foto Pengantin Pria</label>
+                <?php if (!empty($wedding['groom_image'])): ?>
+                    <div style="margin-bottom:10px;">
+                        <img src="<?= $wedding['groom_image'] ?>" style="width:80px; height:80px; object-fit:cover; border-radius:10px; border:1px solid var(--border);">
+                    </div>
+                <?php endif; ?>
+                <input type="file" name="groom_image" class="form-control" accept="image/*">
+                <small style="color:#64748b; font-size:0.75rem; margin-top:4px; display:block;">Disarankan foto portrait (JPG/PNG/WEBP)</small>
+            </div>
             <div class="form-group">
                 <label class="form-label">Nama Lengkap</label>
                 <input type="text" name="groom_name" class="form-control"
