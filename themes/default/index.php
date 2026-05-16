@@ -182,6 +182,48 @@
             opacity: 1;
             transform: translateY(0);
         }
+
+        /* Countdown Styles */
+        .countdown-container {
+            display: flex;
+            gap: 12px;
+            margin-top: 35px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .countdown-item {
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            padding: 12px 10px;
+            border-radius: 16px;
+            min-width: 75px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .countdown-item span {
+            display: block;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--white);
+            line-height: 1.2;
+        }
+        .countdown-item label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: rgba(255, 255, 255, 0.85);
+            margin-top: 4px;
+            font-weight: 600;
+        }
+        @media (max-width: 480px) {
+            .countdown-item { min-width: 65px; padding: 10px 8px; }
+            .countdown-item span { font-size: 1.4rem; }
+            .countdown-item label { font-size: 0.6rem; }
+        }
     </style>
 </head>
 <body class="locked">
@@ -206,6 +248,27 @@
             <p>The Wedding of</p>
             <h2><?= $wedding['bride_nickname'] ?> & <?= $wedding['groom_nickname'] ?></h2>
             <p><?= $wedding['akad_date'] ?></p>
+
+            <?php if (!empty($wedding['start_date'])): ?>
+            <div id="countdown" class="countdown-container">
+                <div class="countdown-item">
+                    <span id="days">00</span>
+                    <label>Hari</label>
+                </div>
+                <div class="countdown-item">
+                    <span id="hours">00</span>
+                    <label>Jam</label>
+                </div>
+                <div class="countdown-item">
+                    <span id="minutes">00</span>
+                    <label>Menit</label>
+                </div>
+                <div class="countdown-item">
+                    <span id="seconds">00</span>
+                    <label>Detik</label>
+                </div>
+            </div>
+            <?php endif; ?>
         </div>
     </div>
 
@@ -780,6 +843,43 @@
 
             document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
         });
+
+        // Countdown Timer Logic
+        <?php if (!empty($wedding['start_date'])): ?>
+        (function() {
+            const targetDate = new Date("<?= $wedding['start_date'] ?>").getTime();
+            const daysEl = document.getElementById('days');
+            const hoursEl = document.getElementById('hours');
+            const minsEl = document.getElementById('minutes');
+            const secsEl = document.getElementById('seconds');
+            const countdownContainer = document.getElementById('countdown');
+
+            function updateCountdown() {
+                const now = new Date().getTime();
+                const distance = targetDate - now;
+
+                if (distance < 0) {
+                    if (countdownContainer) {
+                        countdownContainer.innerHTML = '<div style="font-weight:700; letter-spacing:2px; text-shadow: 2px 2px 10px rgba(0,0,0,0.3);">HARI BAHAGIA TELAH TIBA! 🌸</div>';
+                    }
+                    return;
+                }
+
+                const d = Math.floor(distance / (1000 * 60 * 60 * 24));
+                const h = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const m = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const s = Math.floor((distance % (1000 * 60)) / 1000);
+
+                if (daysEl) daysEl.textContent = d.toString().padStart(2, '0');
+                if (hoursEl) hoursEl.textContent = h.toString().padStart(2, '0');
+                if (minsEl) minsEl.textContent = m.toString().padStart(2, '0');
+                if (secsEl) secsEl.textContent = s.toString().padStart(2, '0');
+            }
+
+            updateCountdown();
+            setInterval(updateCountdown, 1000);
+        })();
+        <?php endif; ?>
     </script>
     <?php endif; ?>
 
