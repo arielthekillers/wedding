@@ -78,72 +78,101 @@
         }
         .person p { color: #666; line-height: 1.7; font-size: 0.95rem; }
         
-        .event-card {
-            background: white;
-            padding: 50px 30px;
-            border-radius: 25px;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.04);
-            margin-bottom: 50px;
-            border: 1px solid rgba(212, 175, 55, 0.15);
-            position: relative;
-            overflow: hidden;
-            background: linear-gradient(145deg, #ffffff, #fffcf9);
-        }
-        .event-card::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 50%; transform: translateX(-50%);
-            width: 80px; height: 3px;
-            background: var(--gold);
-            border-radius: 0 0 10px 10px;
-        }
-        .event-card h4 { 
-            font-family: 'Playfair Display', serif;
-            font-size: 2rem; 
-            color: #1a1a1a; 
-            margin-top: 0; 
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            position: relative;
-            display: inline-block;
-            margin-bottom: 35px;
-        }
-        .event-card h4::after {
-            content: '';
-            position: absolute;
-            bottom: -10px; left: 50%; transform: translateX(-50%);
-            width: 40px; height: 1px;
-            background: var(--gold);
-        }
-        .event-info { 
-            margin: 0; 
+        .event-wrapper {
+            max-width: 900px;
+            margin: 60px auto 0;
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 100px;
         }
-        .event-item {
+        .event-item-block { text-align: center; position: relative; }
+        .event-item-block h4 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            color: var(--dark);
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            margin-bottom: 40px;
+            font-weight: 700;
+        }
+        .event-item-block h4::after {
+            content: ''; display: block; width: 50px; height: 1px;
+            background: var(--gold); margin: 20px auto 0;
+        }
+        .event-details-flex {
             display: flex;
-            align-items: center;
-            gap: 15px;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 60px;
+            flex-wrap: wrap;
+            margin-top: 50px;
             text-align: left;
-            padding: 0 10px;
         }
-        .event-item i {
-            width: 40px;
-            height: 40px;
-            background: rgba(212, 175, 55, 0.08);
-            border-radius: 50%;
+        .event-col {
+            flex: 1;
+            min-width: 300px;
             display: flex;
+            flex-direction: column;
+            gap: 40px;
+            max-width: 400px;
+        }
+        .detail-box {
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+        }
+        .detail-box i {
+            display: flex;
+            width: 50px;
+            height: 50px;
+            background: #fffaf0;
+            border-radius: 50%;
             align-items: center;
             justify-content: center;
             color: var(--gold);
+            border: 1px solid #fdf2d8;
             flex-shrink: 0;
+            margin: 0;
         }
-        .event-item i svg { width: 18px; height: 18px; }
-        .event-text {
-            font-size: 1.05rem;
-            color: #444;
-            line-height: 1.5;
+        .detail-info {
+            flex: 1;
+        }
+        .detail-box b {
+            display: block;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #94a3b8;
+            margin-bottom: 8px;
+        }
+        .detail-box span {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.2rem;
+            color: var(--dark);
+            line-height: 1.6;
+            font-weight: 500;
+        }
+        .btn-map {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 60px;
+            padding: 14px 32px;
+            background: var(--dark);
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: all 0.4s;
+            border: 1px solid var(--dark);
+        }
+        .btn-map:hover {
+            background: transparent;
+            color: var(--dark);
+            transform: translateY(-5px);
         }
         .btn-map {
             display: inline-flex;
@@ -441,56 +470,86 @@
         </div>
     <?php endif; ?>
 
-    <section id="events" data-reveal="up" style="background-color: #fffefb;">
+    <section id="events" data-reveal="up" style="background-color: #fff;">
         <h3 style="font-family: 'Playfair Display', serif; font-weight: 700; font-style: italic;">Save the Date</h3>
         
-        <div class="event-card" data-reveal="left" data-reveal-delay="200">
-            <h4>Akad Nikah</h4>
-            <div class="event-info">
-                <div class="event-item">
-                    <i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg></i>
-                    <div class="event-text"><b>Hari/Tanggal:</b><br><?= $wedding['akad_date'] ?></div>
+            <div class="event-wrapper">
+                <!-- Akad Block -->
+                <div class="event-item-block" data-reveal="up">
+                    <h4>Akad Nikah</h4>
+                    <div class="event-details-flex">
+                        <div class="event-col">
+                            <div class="detail-box">
+                                <i><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg></i>
+                                <div class="detail-info">
+                                    <b>Hari / Tanggal</b>
+                                    <span><?= $wedding['akad_date'] ?></span>
+                                </div>
+                            </div>
+                            <div class="detail-box">
+                                <i><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg></i>
+                                <div class="detail-info">
+                                    <b>Lokasi</b>
+                                    <span><?= $wedding['akad_place'] ?></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="event-col">
+                            <div class="detail-box">
+                                <i><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></i>
+                                <div class="detail-info">
+                                    <b>Waktu</b>
+                                    <span><?= $wedding['akad_time'] ?></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <?php if (!empty($wedding['akad_map_link'])): ?>
+                        <a href="<?= $wedding['akad_map_link'] ?>" target="_blank" class="btn-map">
+                            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon><line x1="8" y1="2" x2="8" y2="18"></line><line x1="16" y1="6" x2="16" y2="22"></line></svg>
+                            Buka Google Maps
+                        </a>
+                    <?php endif; ?>
                 </div>
-                <div class="event-item">
-                    <i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></i>
-                    <div class="event-text"><b>Waktu:</b><br><?= $wedding['akad_time'] ?></div>
-                </div>
-                <div class="event-item">
-                    <i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg></i>
-                    <div class="event-text"><b>Lokasi:</b><br><?= $wedding['akad_place'] ?></div>
-                </div>
-            </div>
-            <?php if (!empty($wedding['akad_map_link'])): ?>
-                <a href="<?= $wedding['akad_map_link'] ?>" target="_blank" class="btn-map">
-                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon><line x1="8" y1="2" x2="8" y2="18"></line><line x1="16" y1="6" x2="16" y2="22"></line></svg>
-                    Buka Google Maps
-                </a>
-            <?php endif; ?>
-        </div>
 
-        <div class="event-card" data-reveal="right" data-reveal-delay="400">
-            <h4>Resepsi</h4>
-            <div class="event-info">
-                <div class="event-item">
-                    <i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg></i>
-                    <div class="event-text"><b>Hari/Tanggal:</b><br><?= $wedding['reception_date'] ?></div>
-                </div>
-                <div class="event-item">
-                    <i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></i>
-                    <div class="event-text"><b>Waktu:</b><br><?= $wedding['reception_time'] ?></div>
-                </div>
-                <div class="event-item">
-                    <i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg></i>
-                    <div class="event-text"><b>Lokasi:</b><br><?= $wedding['reception_place'] ?></div>
+                <!-- Resepsi Block -->
+                <div class="event-item-block" data-reveal="up" data-reveal-delay="200">
+                    <h4>Resepsi Pernikahan</h4>
+                    <div class="event-details-flex">
+                        <div class="event-col">
+                            <div class="detail-box">
+                                <i><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg></i>
+                                <div class="detail-info">
+                                    <b>Hari / Tanggal</b>
+                                    <span><?= $wedding['reception_date'] ?></span>
+                                </div>
+                            </div>
+                            <div class="detail-box">
+                                <i><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg></i>
+                                <div class="detail-info">
+                                    <b>Lokasi</b>
+                                    <span><?= $wedding['reception_place'] ?></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="event-col">
+                            <div class="detail-box">
+                                <i><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></i>
+                                <div class="detail-info">
+                                    <b>Waktu</b>
+                                    <span><?= $wedding['reception_time'] ?></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <?php if (!empty($wedding['reception_map_link'])): ?>
+                        <a href="<?= $wedding['reception_map_link'] ?>" target="_blank" class="btn-map">
+                            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon><line x1="8" y1="2" x2="8" y2="18"></line><line x1="16" y1="6" x2="16" y2="22"></line></svg>
+                            Buka Google Maps
+                        </a>
+                    <?php endif; ?>
                 </div>
             </div>
-            <?php if (!empty($wedding['reception_map_link'])): ?>
-                <a href="<?= $wedding['reception_map_link'] ?>" target="_blank" class="btn-map">
-                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon><line x1="8" y1="2" x2="8" y2="18"></line><line x1="16" y1="6" x2="16" y2="22"></line></svg>
-                    Buka Google Maps
-                </a>
-            <?php endif; ?>
-        </div>
     </section>
 
     <section id="gallery" data-reveal="up">
@@ -574,22 +633,22 @@
         <h3>Wedding Gift</h3>
         <p style="margin-bottom: 40px;">Bagi keluarga dan kerabat yang ingin mengirimkan hadiah, dapat melalui nomor rekening berikut:</p>
         
-        <div class="couple" style="align-items: flex-start; justify-content: center; gap: 30px;">
+        <div class="couple" style="align-items: flex-start; justify-content: center; gap: 40px; margin-top: 40px;">
             <?php if (!empty($wedding['bank1_acc'])): ?>
-            <div class="event-card" data-reveal="left" data-reveal-delay="200" style="flex: 1; min-width: 240px; max-width: 320px; text-align: center;">
-                <p style="font-weight: 700; font-size: 1rem; margin: 0 0 6px; color: var(--dark); letter-spacing: 0.5px;"><?= $wedding['bank1_owner'] ?></p>
-                <p style="color: var(--gold); font-weight: 600; margin: 0 0 4px; font-size: 0.9rem;"><?= $wedding['bank1_name'] ?></p>
-                <p style="font-size: 1.3rem; font-weight: 700; letter-spacing: 2px; margin: 0 0 16px; color: var(--dark);"><?= $wedding['bank1_acc'] ?></p>
-                <button onclick="copyToClipboard('<?= $wedding['bank1_acc'] ?>', this)" class="btn-map" style="border: none; cursor: pointer; font-size: 0.85rem;">Salin Rekening</button>
+            <div data-reveal="up" style="flex: 1; min-width: 280px; max-width: 350px; text-align: center; padding: 40px 20px; background: #fff; border-bottom: 2px solid var(--gold);">
+                <p style="font-weight: 700; font-size: 1.1rem; margin: 0 0 8px; color: var(--dark); letter-spacing: 1px; text-transform: uppercase;"><?= $wedding['bank1_owner'] ?></p>
+                <p style="color: var(--gold); font-weight: 600; margin: 0 0 10px; font-size: 0.95rem;"><?= $wedding['bank1_name'] ?></p>
+                <p style="font-size: 1.5rem; font-weight: 700; letter-spacing: 3px; margin: 0 0 25px; color: var(--dark); font-family: 'Playfair Display', serif;"><?= $wedding['bank1_acc'] ?></p>
+                <button onclick="copyToClipboard('<?= $wedding['bank1_acc'] ?>', this)" class="btn-map" style="border: none; cursor: pointer; font-size: 0.8rem; padding: 10px 24px;">Salin Rekening</button>
             </div>
             <?php endif; ?>
 
             <?php if (!empty($wedding['bank2_acc'])): ?>
-            <div class="event-card" data-reveal="right" data-reveal-delay="400" style="flex: 1; min-width: 240px; max-width: 320px; text-align: center;">
-                <p style="font-weight: 700; font-size: 1rem; margin: 0 0 6px; color: var(--dark); letter-spacing: 0.5px;"><?= $wedding['bank2_owner'] ?></p>
-                <p style="color: var(--gold); font-weight: 600; margin: 0 0 4px; font-size: 0.9rem;"><?= $wedding['bank2_name'] ?></p>
-                <p style="font-size: 1.3rem; font-weight: 700; letter-spacing: 2px; margin: 0 0 16px; color: var(--dark);"><?= $wedding['bank2_acc'] ?></p>
-                <button onclick="copyToClipboard('<?= $wedding['bank2_acc'] ?>', this)" class="btn-map" style="border: none; cursor: pointer; font-size: 0.85rem;">Salin Rekening</button>
+            <div data-reveal="up" data-reveal-delay="200" style="flex: 1; min-width: 280px; max-width: 350px; text-align: center; padding: 40px 20px; background: #fff; border-bottom: 2px solid var(--gold);">
+                <p style="font-weight: 700; font-size: 1.1rem; margin: 0 0 8px; color: var(--dark); letter-spacing: 1px; text-transform: uppercase;"><?= $wedding['bank2_owner'] ?></p>
+                <p style="color: var(--gold); font-weight: 600; margin: 0 0 10px; font-size: 0.95rem;"><?= $wedding['bank2_name'] ?></p>
+                <p style="font-size: 1.5rem; font-weight: 700; letter-spacing: 3px; margin: 0 0 25px; color: var(--dark); font-family: 'Playfair Display', serif;"><?= $wedding['bank2_acc'] ?></p>
+                <button onclick="copyToClipboard('<?= $wedding['bank2_acc'] ?>', this)" class="btn-map" style="border: none; cursor: pointer; font-size: 0.8rem; padding: 10px 24px;">Salin Rekening</button>
             </div>
             <?php endif; ?>
         </div>
@@ -619,7 +678,7 @@
         </div>
         <?php endif; ?>
 
-        <div class="event-card" style="text-align: left; max-width: 600px; margin: auto;">
+        <div style="text-align: left; max-width: 700px; margin: auto; padding: 40px; background: #fffaf5; border-radius: 4px;">
             <form action="<?= $base ?>api/guestbook" method="POST" id="guestbookForm">
                 <input type="hidden" name="wedding_id" value="<?= $wedding['id'] ?>">
                 <input type="hidden" name="slug" value="<?= $wedding['slug'] ?>">
