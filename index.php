@@ -375,9 +375,8 @@ function handleAdmin($action, $parts) {
                 // ── Event ──────────────────────────────────────────────
                 case 'event':
                     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-                        $fields = ['akad_date','akad_time','akad_place',
-                                   'reception_date','reception_time','reception_place','reception_map_link',
-                                   'start_date'];
+                        $fields = ['akad_date','akad_time','akad_place','akad_map_link',
+                                   'reception_date','reception_time','reception_place','reception_map_link'];
                         $data = [];
                         foreach ($fields as $f) $data[$f] = htmlspecialchars(trim($_POST[$f] ?? ''));
                         Models\Wedding::update($id, $data);

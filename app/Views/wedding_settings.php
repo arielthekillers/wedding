@@ -35,7 +35,13 @@ include __DIR__ . '/partials/wedding_nav.php';
             </div>
         </div>
 
-        <div class="form-grid g2" style="margin-top:16px;">
+        <div class="form-grid g3" style="margin-top:16px;">
+            <div class="form-group">
+                <label class="form-label">Tanggal Countdown</label>
+                <input type="date" name="start_date" class="form-control"
+                       value="<?= $wedding['start_date'] ?? '' ?>">
+                <small style="color:#64748b; font-size:0.7rem; display:block; margin-top:4px;">Target hitung mundur di hero section.</small>
+            </div>
             <div class="form-group">
                 <label class="form-label">Tanggal Selesai (Opsional)</label>
                 <input type="date" name="end_date" class="form-control"

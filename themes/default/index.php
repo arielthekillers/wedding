@@ -460,6 +460,12 @@
                     <div class="event-text"><b>Lokasi:</b><br><?= $wedding['akad_place'] ?></div>
                 </div>
             </div>
+            <?php if (!empty($wedding['akad_map_link'])): ?>
+                <a href="<?= $wedding['akad_map_link'] ?>" target="_blank" class="btn-map">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon><line x1="8" y1="2" x2="8" y2="18"></line><line x1="16" y1="6" x2="16" y2="22"></line></svg>
+                    Buka Google Maps
+                </a>
+            <?php endif; ?>
         </div>
 
         <div class="event-card" data-reveal="right" data-reveal-delay="400">
