@@ -35,14 +35,9 @@ include __DIR__ . '/partials/wedding_nav.php';
             </div>
         </div>
 
-        <div class="form-grid g3" style="margin-top:16px;">
+        <div class="form-grid g2" style="margin-top:16px;">
             <div class="form-group">
-                <label class="form-label">Tanggal Mulai</label>
-                <input type="date" name="start_date" class="form-control"
-                       value="<?= $wedding['start_date'] ?? '' ?>">
-            </div>
-            <div class="form-group">
-                <label class="form-label">Tanggal Selesai</label>
+                <label class="form-label">Tanggal Selesai (Opsional)</label>
                 <input type="date" name="end_date" class="form-control"
                        value="<?= $wedding['end_date'] ?? '' ?>">
             </div>

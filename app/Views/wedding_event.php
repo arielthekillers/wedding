@@ -20,12 +20,20 @@ include __DIR__ . '/partials/wedding_nav.php';
             </div>
         </div>
         <div class="section-card-body">
+            <div class="form-group" style="background:#fef9f2; padding:15px; border-radius:10px; border:1px solid #fae8d0; margin-bottom:18px;">
+                <label class="form-label" style="color:#b45309;">🎯 Tanggal Countdown</label>
+                <input type="date" name="start_date" class="form-control"
+                       value="<?= $wedding['start_date'] ?? '' ?>" required
+                       style="border-color:#f59e0b;">
+                <small style="color:#d97706; font-size:0.75rem; margin-top:4px; display:block;">Pilih tanggal akad untuk menjalankan hitung mundur di halaman depan.</small>
+            </div>
+
             <div class="form-grid g2">
                 <div class="form-group">
-                    <label class="form-label">Hari / Tanggal</label>
+                    <label class="form-label">Tampilan Hari / Tanggal</label>
                     <input type="text" name="akad_date" class="form-control"
                            value="<?= htmlspecialchars($wedding['akad_date'] ?? '') ?>"
-                           placeholder="Sabtu, 10 Januari 2026">
+                           placeholder="Contoh: Sabtu, 10 Januari 2026">
                 </div>
                 <div class="form-group">
                     <label class="form-label">Waktu</label>
