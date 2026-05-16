@@ -24,25 +24,25 @@ include __DIR__ . '/partials/wedding_nav.php';
                 <div class="form-group">
                     <label class="form-label">Tampilan Hari / Tanggal</label>
                     <input type="text" name="akad_date" class="form-control"
-                           value="<?= htmlspecialchars($wedding['akad_date'] ?? '') ?>"
+                           value="<?= htmlspecialchars($wedding['akad_date'] ?? '', ENT_QUOTES) ?>"
                            placeholder="Contoh: Sabtu, 10 Januari 2026">
                 </div>
                 <div class="form-group">
                     <label class="form-label">Waktu</label>
                     <input type="text" name="akad_time" class="form-control"
-                           value="<?= htmlspecialchars($wedding['akad_time'] ?? '') ?>"
+                           value="<?= htmlspecialchars($wedding['akad_time'] ?? '', ENT_QUOTES) ?>"
                            placeholder="08.00 – 10.00 WIB">
                 </div>
             </div>
             <div class="form-group" style="margin-top:14px;">
                 <label class="form-label">Tempat / Venue</label>
                 <textarea name="akad_place" class="form-control"
-                          placeholder="Nama gedung / alamat lengkap"><?= htmlspecialchars($wedding['akad_place'] ?? '') ?></textarea>
+                          placeholder="Nama gedung / alamat lengkap"><?= htmlspecialchars($wedding['akad_place'] ?? '', ENT_QUOTES) ?></textarea>
             </div>
             <div class="form-group" style="margin-top:14px;">
                 <label class="form-label">Link Google Maps <small>(opsional)</small></label>
                 <input type="text" name="akad_map_link" class="form-control"
-                       value="<?= htmlspecialchars($wedding['akad_map_link'] ?? '') ?>"
+                       value="<?= htmlspecialchars($wedding['akad_map_link'] ?? '', ENT_QUOTES) ?>"
                        placeholder="https://maps.google.com/...">
             </div>
         </div>
@@ -62,25 +62,25 @@ include __DIR__ . '/partials/wedding_nav.php';
                 <div class="form-group">
                     <label class="form-label">Hari / Tanggal</label>
                     <input type="text" name="reception_date" class="form-control"
-                           value="<?= htmlspecialchars($wedding['reception_date'] ?? '') ?>"
+                           value="<?= htmlspecialchars($wedding['reception_date'] ?? '', ENT_QUOTES) ?>"
                            placeholder="Sabtu, 10 Januari 2026">
                 </div>
                 <div class="form-group">
                     <label class="form-label">Waktu</label>
                     <input type="text" name="reception_time" class="form-control"
-                           value="<?= htmlspecialchars($wedding['reception_time'] ?? '') ?>"
+                           value="<?= htmlspecialchars($wedding['reception_time'] ?? '', ENT_QUOTES) ?>"
                            placeholder="11.00 – 14.00 WIB">
                 </div>
             </div>
             <div class="form-group" style="margin-top:14px;">
                 <label class="form-label">Tempat / Venue</label>
                 <textarea name="reception_place" class="form-control"
-                          placeholder="Nama gedung / alamat lengkap"><?= htmlspecialchars($wedding['reception_place'] ?? '') ?></textarea>
+                          placeholder="Nama gedung / alamat lengkap"><?= htmlspecialchars($wedding['reception_place'] ?? '', ENT_QUOTES) ?></textarea>
             </div>
             <div class="form-group" style="margin-top:14px;">
                 <label class="form-label">Link Google Maps <small>(opsional)</small></label>
                 <input type="text" name="reception_map_link" class="form-control"
-                       value="<?= htmlspecialchars($wedding['reception_map_link'] ?? '') ?>"
+                       value="<?= htmlspecialchars($wedding['reception_map_link'] ?? '', ENT_QUOTES) ?>"
                        placeholder="https://maps.google.com/...">
             </div>
         </div>

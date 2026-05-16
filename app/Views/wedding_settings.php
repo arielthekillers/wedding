@@ -24,12 +24,12 @@ include __DIR__ . '/partials/wedding_nav.php';
             <div class="form-group">
                 <label class="form-label">Judul Internal <small>(nama acara)</small></label>
                 <input type="text" name="title" class="form-control"
-                       value="<?= htmlspecialchars($wedding['title'] ?? '') ?>" required>
+                       value="<?= htmlspecialchars($wedding['title'] ?? '', ENT_QUOTES) ?>" required>
             </div>
             <div class="form-group">
                 <label class="form-label">URL Slug <small>(huruf kecil, tanpa spasi)</small></label>
                 <input type="text" name="slug" id="slug-input" class="form-control"
-                       value="<?= htmlspecialchars($wedding['slug'] ?? '') ?>" required
+                       value="<?= htmlspecialchars($wedding['slug'] ?? '', ENT_QUOTES) ?>" required
                        pattern="[a-z0-9\-]+" title="Hanya huruf kecil, angka, dan tanda minus">
                 <div id="slug-status" style="font-size: 0.75rem; min-height: 1em; margin-top: 4px; font-weight: 600;"></div>
             </div>
@@ -79,7 +79,7 @@ include __DIR__ . '/partials/wedding_nav.php';
         <div class="form-group" style="margin-top:16px;">
             <label class="form-label">URL Musik Latar <small>(Tautan file MP3 atau YouTube)</small></label>
             <input type="url" name="music_url" class="form-control"
-                   value="<?= htmlspecialchars($wedding['music_url'] ?? '') ?>" placeholder="https://example.com/music.mp3 atau https://youtube.com/watch?v=...">
+                   value="<?= htmlspecialchars($wedding['music_url'] ?? '', ENT_QUOTES) ?>" placeholder="https://example.com/music.mp3 atau https://youtube.com/watch?v=...">
         </div>
 
 
@@ -98,7 +98,7 @@ include __DIR__ . '/partials/wedding_nav.php';
             URL Undangan:
             <a href="<?= $base . ($wedding['slug'] ?? '') ?>" id="slug-preview-link" target="_blank"
                style="color:var(--primary); font-weight:600;">
-                <?= $_SERVER['HTTP_HOST'] ?>/<span id="slug-preview-text"><?= htmlspecialchars($wedding['slug'] ?? '') ?></span>
+                <?= $_SERVER['HTTP_HOST'] ?>/<span id="slug-preview-text"><?= htmlspecialchars($wedding['slug'] ?? '', ENT_QUOTES) ?></span>
             </a>
         </span>
     </div>

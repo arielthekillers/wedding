@@ -23,19 +23,19 @@ include __DIR__ . '/partials/wedding_nav.php';
             <div class="form-group">
                 <label class="form-label">Nama Pemilik Rekening</label>
                 <input type="text" name="bank1_owner" class="form-control"
-                       value="<?= htmlspecialchars($wedding['bank1_owner'] ?? '') ?>"
+                       value="<?= htmlspecialchars($wedding['bank1_owner'] ?? '', ENT_QUOTES) ?>"
                        placeholder="SYIFA AULIA FADHILLAH">
             </div>
             <div class="form-group" style="margin-top:14px;">
                 <label class="form-label">Nama Bank</label>
                 <input type="text" name="bank1_name" class="form-control"
-                       value="<?= htmlspecialchars($wedding['bank1_name'] ?? '') ?>"
+                       value="<?= htmlspecialchars($wedding['bank1_name'] ?? '', ENT_QUOTES) ?>"
                        placeholder="Bank Mandiri / BCA / BNI / dst">
             </div>
             <div class="form-group" style="margin-top:14px;">
                 <label class="form-label">Nomor Rekening</label>
                 <input type="text" name="bank1_acc" class="form-control"
-                       value="<?= htmlspecialchars($wedding['bank1_acc'] ?? '') ?>"
+                       value="<?= htmlspecialchars($wedding['bank1_acc'] ?? '', ENT_QUOTES) ?>"
                        placeholder="1480020167113">
             </div>
         </div>
@@ -54,19 +54,19 @@ include __DIR__ . '/partials/wedding_nav.php';
             <div class="form-group">
                 <label class="form-label">Nama Pemilik Rekening</label>
                 <input type="text" name="bank2_owner" class="form-control"
-                       value="<?= htmlspecialchars($wedding['bank2_owner'] ?? '') ?>"
+                       value="<?= htmlspecialchars($wedding['bank2_owner'] ?? '', ENT_QUOTES) ?>"
                        placeholder="ABDUL ROCHIM MUIZ">
             </div>
             <div class="form-group" style="margin-top:14px;">
                 <label class="form-label">Nama Bank</label>
                 <input type="text" name="bank2_name" class="form-control"
-                       value="<?= htmlspecialchars($wedding['bank2_name'] ?? '') ?>"
+                       value="<?= htmlspecialchars($wedding['bank2_name'] ?? '', ENT_QUOTES) ?>"
                        placeholder="Bank Mandiri / BCA / BNI / dst">
             </div>
             <div class="form-group" style="margin-top:14px;">
                 <label class="form-label">Nomor Rekening</label>
                 <input type="text" name="bank2_acc" class="form-control"
-                       value="<?= htmlspecialchars($wedding['bank2_acc'] ?? '') ?>"
+                       value="<?= htmlspecialchars($wedding['bank2_acc'] ?? '', ENT_QUOTES) ?>"
                        placeholder="1480021027993">
             </div>
         </div>

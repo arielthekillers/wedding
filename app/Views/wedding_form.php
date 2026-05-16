@@ -99,15 +99,15 @@
             <div class="grid-2">
                 <div class="form-group">
                     <label>Internal Title (e.g. Billy & Jane Wedding)</label>
-                    <input type="text" name="title" value="<?= $wedding['title'] ?? '' ?>" required>
+                    <input type="text" name="title" value="<?= htmlspecialchars($wedding['title'] ?? '', ENT_QUOTES) ?>" required>
                 </div>
                 <div class="form-group">
                     <label>URL Slug (e.g. billyandjane)</label>
-                    <input type="text" name="slug" id="slug-input" value="<?= $wedding['slug'] ?? '' ?>" required
+                    <input type="text" name="slug" id="slug-input" value="<?= htmlspecialchars($wedding['slug'] ?? '', ENT_QUOTES) ?>" required
                            pattern="[a-z0-9\-]+" title="Hanya huruf kecil, angka, dan tanda minus">
                     <div id="slug-status" style="font-size: 0.75rem; min-height: 1em; margin-top: 4px; font-weight: 600;"></div>
                     <div style="font-size: 0.8rem; color: #64748b; margin-top: 8px;">
-                        URL Preview: <span style="color: var(--primary); font-weight: 600;"><?= $_SERVER['HTTP_HOST'] . (rtrim(str_replace('index.php', '', $_SERVER['SCRIPT_NAME']), '/') . '/') ?></span><span id="slug-preview-text" style="color: var(--primary); font-weight: 600;"><?= $wedding['slug'] ?? '' ?></span>
+                        URL Preview: <span style="color: var(--primary); font-weight: 600;"><?= $_SERVER['HTTP_HOST'] . (rtrim(str_replace('index.php', '', $_SERVER['SCRIPT_NAME']), '/') . '/') ?></span><span id="slug-preview-text" style="color: var(--primary); font-weight: 600;"><?= htmlspecialchars($wedding['slug'] ?? '', ENT_QUOTES) ?></span>
                     </div>
                 </div>
             </div>
@@ -115,11 +115,11 @@
             <div class="grid-2">
                 <div class="form-group">
                     <label>Start Date</label>
-                    <input type="date" name="start_date" value="<?= $wedding['start_date'] ?? '' ?>">
+                    <input type="date" name="start_date" value="<?= htmlspecialchars($wedding['start_date'] ?? '', ENT_QUOTES) ?>">
                 </div>
                 <div class="form-group">
                     <label>End Date</label>
-                    <input type="date" name="end_date" value="<?= $wedding['end_date'] ?? '' ?>">
+                    <input type="date" name="end_date" value="<?= htmlspecialchars($wedding['end_date'] ?? '', ENT_QUOTES) ?>">
                 </div>
             </div>
 
@@ -148,52 +148,52 @@
             <div class="section-title">👰 PENGANTIN WANITA (Bride)</div>
             <div class="form-group">
                 <label>Nama Lengkap</label>
-                <input type="text" name="bride_name" value="<?= $wedding['bride_name'] ?? '' ?>">
+                <input type="text" name="bride_name" value="<?= htmlspecialchars($wedding['bride_name'] ?? '', ENT_QUOTES) ?>">
             </div>
             <div class="grid-2">
                 <div class="form-group">
                     <label>Nama Panggilan</label>
-                    <input type="text" name="bride_nickname" value="<?= $wedding['bride_nickname'] ?? '' ?>">
+                    <input type="text" name="bride_nickname" value="<?= htmlspecialchars($wedding['bride_nickname'] ?? '', ENT_QUOTES) ?>">
                 </div>
                 <div class="form-group">
                     <label>Putri ke berapa</label>
-                    <input type="text" name="bride_order" value="<?= $wedding['bride_order'] ?? '' ?>">
+                    <input type="text" name="bride_order" value="<?= htmlspecialchars($wedding['bride_order'] ?? '', ENT_QUOTES) ?>">
                 </div>
             </div>
             <div class="grid-2">
                 <div class="form-group">
                     <label>Nama Ayah</label>
-                    <input type="text" name="bride_father" value="<?= $wedding['bride_father'] ?? '' ?>">
+                    <input type="text" name="bride_father" value="<?= htmlspecialchars($wedding['bride_father'] ?? '', ENT_QUOTES) ?>">
                 </div>
                 <div class="form-group">
                     <label>Nama Ibu</label>
-                    <input type="text" name="bride_mother" value="<?= $wedding['bride_mother'] ?? '' ?>">
+                    <input type="text" name="bride_mother" value="<?= htmlspecialchars($wedding['bride_mother'] ?? '', ENT_QUOTES) ?>">
                 </div>
             </div>
 
             <div class="section-title">🤵 PENGANTIN PRIA (Groom)</div>
             <div class="form-group">
                 <label>Nama Lengkap</label>
-                <input type="text" name="groom_name" value="<?= $wedding['groom_name'] ?? '' ?>">
+                <input type="text" name="groom_name" value="<?= htmlspecialchars($wedding['groom_name'] ?? '', ENT_QUOTES) ?>">
             </div>
             <div class="grid-2">
                 <div class="form-group">
                     <label>Nama Panggilan</label>
-                    <input type="text" name="groom_nickname" value="<?= $wedding['groom_nickname'] ?? '' ?>">
+                    <input type="text" name="groom_nickname" value="<?= htmlspecialchars($wedding['groom_nickname'] ?? '', ENT_QUOTES) ?>">
                 </div>
                 <div class="form-group">
                     <label>Putra ke berapa</label>
-                    <input type="text" name="groom_order" value="<?= $wedding['groom_order'] ?? '' ?>">
+                    <input type="text" name="groom_order" value="<?= htmlspecialchars($wedding['groom_order'] ?? '', ENT_QUOTES) ?>">
                 </div>
             </div>
             <div class="grid-2">
                 <div class="form-group">
                     <label>Nama Ayah</label>
-                    <input type="text" name="groom_father" value="<?= $wedding['groom_father'] ?? '' ?>">
+                    <input type="text" name="groom_father" value="<?= htmlspecialchars($wedding['groom_father'] ?? '', ENT_QUOTES) ?>">
                 </div>
                 <div class="form-group">
                     <label>Nama Ibu</label>
-                    <input type="text" name="groom_mother" value="<?= $wedding['groom_mother'] ?? '' ?>">
+                    <input type="text" name="groom_mother" value="<?= htmlspecialchars($wedding['groom_mother'] ?? '', ENT_QUOTES) ?>">
                 </div>
             </div>
 
@@ -201,36 +201,36 @@
             <div class="grid-2">
                 <div class="form-group">
                     <label>Hari/tanggal</label>
-                    <input type="text" name="akad_date" value="<?= $wedding['akad_date'] ?? '' ?>">
+                    <input type="text" name="akad_date" value="<?= htmlspecialchars($wedding['akad_date'] ?? '', ENT_QUOTES) ?>">
                 </div>
                 <div class="form-group">
                     <label>Waktu (WIB/WITA/WIT)</label>
-                    <input type="text" name="akad_time" value="<?= $wedding['akad_time'] ?? '' ?>">
+                    <input type="text" name="akad_time" value="<?= htmlspecialchars($wedding['akad_time'] ?? '', ENT_QUOTES) ?>">
                 </div>
             </div>
             <div class="form-group">
                 <label>Tempat</label>
-                <textarea name="akad_place"><?= $wedding['akad_place'] ?? '' ?></textarea>
+                <textarea name="akad_place"><?= htmlspecialchars($wedding['akad_place'] ?? '', ENT_QUOTES) ?></textarea>
             </div>
 
             <div class="section-title">💕 RESEPSI PERNIKAHAN</div>
             <div class="grid-2">
                 <div class="form-group">
                     <label>Hari/tanggal</label>
-                    <input type="text" name="reception_date" value="<?= $wedding['reception_date'] ?? '' ?>">
+                    <input type="text" name="reception_date" value="<?= htmlspecialchars($wedding['reception_date'] ?? '', ENT_QUOTES) ?>">
                 </div>
                 <div class="form-group">
                     <label>Waktu (WIB/WITA/WIT)</label>
-                    <input type="text" name="reception_time" value="<?= $wedding['reception_time'] ?? '' ?>">
+                    <input type="text" name="reception_time" value="<?= htmlspecialchars($wedding['reception_time'] ?? '', ENT_QUOTES) ?>">
                 </div>
             </div>
             <div class="form-group">
                 <label>Tempat</label>
-                <textarea name="reception_place"><?= $wedding['reception_place'] ?? '' ?></textarea>
+                <textarea name="reception_place"><?= htmlspecialchars($wedding['reception_place'] ?? '', ENT_QUOTES) ?></textarea>
             </div>
             <div class="form-group">
                 <label>Sharelok Acara (Maps Link)</label>
-                <input type="text" name="reception_map_link" value="<?= $wedding['reception_map_link'] ?? '' ?>">
+                <input type="text" name="reception_map_link" value="<?= htmlspecialchars($wedding['reception_map_link'] ?? '', ENT_QUOTES) ?>">
             </div>
 
             <div class="section-title">🎁 KIRIM HADIAH (Gift Info)</div>

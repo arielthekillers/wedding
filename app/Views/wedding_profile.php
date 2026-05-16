@@ -33,20 +33,20 @@ include __DIR__ . '/partials/wedding_nav.php';
             <div class="form-group">
                 <label class="form-label">Nama Lengkap</label>
                 <input type="text" name="bride_name" class="form-control"
-                       value="<?= htmlspecialchars($wedding['bride_name'] ?? '') ?>"
+                       value="<?= htmlspecialchars($wedding['bride_name'] ?? '', ENT_QUOTES) ?>"
                        placeholder="Contoh: Siti Rahayu Dewi">
             </div>
             <div class="form-grid g2" style="margin-top:14px;">
                 <div class="form-group">
                     <label class="form-label">Nama Panggilan</label>
                     <input type="text" name="bride_nickname" class="form-control"
-                           value="<?= htmlspecialchars($wedding['bride_nickname'] ?? '') ?>"
+                           value="<?= htmlspecialchars($wedding['bride_nickname'] ?? '', ENT_QUOTES) ?>"
                            placeholder="Rara">
                 </div>
                 <div class="form-group">
                     <label class="form-label">Putri ke-</label>
                     <input type="text" name="bride_order" class="form-control"
-                           value="<?= htmlspecialchars($wedding['bride_order'] ?? '') ?>"
+                           value="<?= htmlspecialchars($wedding['bride_order'] ?? '', ENT_QUOTES) ?>"
                            placeholder="Pertama / ke-2">
                 </div>
             </div>
@@ -55,13 +55,13 @@ include __DIR__ . '/partials/wedding_nav.php';
                 <div class="form-group">
                     <label class="form-label">Nama Ayah</label>
                     <input type="text" name="bride_father" class="form-control"
-                           value="<?= htmlspecialchars($wedding['bride_father'] ?? '') ?>"
+                           value="<?= htmlspecialchars($wedding['bride_father'] ?? '', ENT_QUOTES) ?>"
                            placeholder="Bapak Ahmad">
                 </div>
                 <div class="form-group">
                     <label class="form-label">Nama Ibu</label>
                     <input type="text" name="bride_mother" class="form-control"
-                           value="<?= htmlspecialchars($wedding['bride_mother'] ?? '') ?>"
+                           value="<?= htmlspecialchars($wedding['bride_mother'] ?? '', ENT_QUOTES) ?>"
                            placeholder="Ibu Sarmini">
                 </div>
             </div>
@@ -91,20 +91,20 @@ include __DIR__ . '/partials/wedding_nav.php';
             <div class="form-group">
                 <label class="form-label">Nama Lengkap</label>
                 <input type="text" name="groom_name" class="form-control"
-                       value="<?= htmlspecialchars($wedding['groom_name'] ?? '') ?>"
+                       value="<?= htmlspecialchars($wedding['groom_name'] ?? '', ENT_QUOTES) ?>"
                        placeholder="Contoh: Budi Santoso Putra">
             </div>
             <div class="form-grid g2" style="margin-top:14px;">
                 <div class="form-group">
                     <label class="form-label">Nama Panggilan</label>
                     <input type="text" name="groom_nickname" class="form-control"
-                           value="<?= htmlspecialchars($wedding['groom_nickname'] ?? '') ?>"
+                           value="<?= htmlspecialchars($wedding['groom_nickname'] ?? '', ENT_QUOTES) ?>"
                            placeholder="Budi">
                 </div>
                 <div class="form-group">
                     <label class="form-label">Putra ke-</label>
                     <input type="text" name="groom_order" class="form-control"
-                           value="<?= htmlspecialchars($wedding['groom_order'] ?? '') ?>"
+                           value="<?= htmlspecialchars($wedding['groom_order'] ?? '', ENT_QUOTES) ?>"
                            placeholder="Pertama / ke-2">
                 </div>
             </div>
@@ -113,13 +113,13 @@ include __DIR__ . '/partials/wedding_nav.php';
                 <div class="form-group">
                     <label class="form-label">Nama Ayah</label>
                     <input type="text" name="groom_father" class="form-control"
-                           value="<?= htmlspecialchars($wedding['groom_father'] ?? '') ?>"
+                           value="<?= htmlspecialchars($wedding['groom_father'] ?? '', ENT_QUOTES) ?>"
                            placeholder="Bapak Sutrisno">
                 </div>
                 <div class="form-group">
                     <label class="form-label">Nama Ibu</label>
                     <input type="text" name="groom_mother" class="form-control"
-                           value="<?= htmlspecialchars($wedding['groom_mother'] ?? '') ?>"
+                           value="<?= htmlspecialchars($wedding['groom_mother'] ?? '', ENT_QUOTES) ?>"
                            placeholder="Ibu Wulandari">
                 </div>
             </div>

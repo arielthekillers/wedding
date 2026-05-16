@@ -347,7 +347,7 @@ function handleAdmin($action, $parts) {
                         $fields = ['bride_name','bride_nickname','bride_order','bride_father','bride_mother',
                                    'groom_name','groom_nickname','groom_order','groom_father','groom_mother'];
                         $data = [];
-                        foreach ($fields as $f) $data[$f] = htmlspecialchars(trim($_POST[$f] ?? ''));
+                        foreach ($fields as $f) $data[$f] = trim($_POST[$f] ?? '');
                         // Handle Photo Uploads
                         $uploadDir = __DIR__ . '/uploads/profile/' . $id;
                         if (isset($_FILES['bride_image']) && $_FILES['bride_image']['error'] !== UPLOAD_ERR_NO_FILE) {
@@ -378,7 +378,7 @@ function handleAdmin($action, $parts) {
                         $fields = ['akad_date','akad_time','akad_place','akad_map_link',
                                    'reception_date','reception_time','reception_place','reception_map_link'];
                         $data = [];
-                        foreach ($fields as $f) $data[$f] = htmlspecialchars(trim($_POST[$f] ?? ''));
+                        foreach ($fields as $f) $data[$f] = trim($_POST[$f] ?? '');
                         Models\Wedding::update($id, $data);
                         header('Location: ' . $detailBase . 'event?saved=1');
                         exit;
@@ -391,7 +391,7 @@ function handleAdmin($action, $parts) {
                     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $fields = ['bank1_owner','bank1_name','bank1_acc','bank2_owner','bank2_name','bank2_acc'];
                         $data = [];
-                        foreach ($fields as $f) $data[$f] = htmlspecialchars(trim($_POST[$f] ?? ''));
+                        foreach ($fields as $f) $data[$f] = trim($_POST[$f] ?? '');
                         Models\Wedding::update($id, $data);
                         header('Location: ' . $detailBase . 'gift?saved=1');
                         exit;
@@ -553,7 +553,7 @@ function renderWedding($wedding) {
 function filterInput($post) {
     $data = [];
     foreach ($post as $key => $val) {
-        $data[$key] = is_array($val) ? $val : htmlspecialchars(trim($val));
+        $data[$key] = is_array($val) ? $val : trim($val);
     }
     $data['is_enabled'] = isset($post['is_enabled']) ? 1 : 0;
     return $data;
