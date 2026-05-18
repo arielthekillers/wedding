@@ -103,7 +103,31 @@ class ImageHelper {
 
     private static function loadImage(string $path, string $mime) {
         switch ($mime) {
-            case 'image/jpeg': return @imagecreatefromjpeg($path);
+            case 'image/jpeg':
+                $src = @imagecreatefromjpeg($path);
+                if ($src && function_exists('exif_read_data')) {
+                    $exif = @exif_read_data($path);
+                    if ($exif && !empty($exif['Orientation'])) {
+                        switch ($exif['Orientation']) {
+                            case 3:
+                                $rot = imagerotate($src, 180, 0);
+                                imagedestroy($src);
+                                $src = $rot;
+                                break;
+                            case 6:
+                                $rot = imagerotate($src, 270, 0);
+                                imagedestroy($src);
+                                $src = $rot;
+                                break;
+                            case 8:
+                                $rot = imagerotate($src, 90, 0);
+                                imagedestroy($src);
+                                $src = $rot;
+                                break;
+                        }
+                    }
+                }
+                return $src;
             case 'image/png':  return @imagecreatefrompng($path);
             case 'image/webp': return @imagecreatefromwebp($path);
             case 'image/gif':  return @imagecreatefromgif($path);

@@ -173,11 +173,11 @@
             text-align: left;
             display: flex;
             gap: 12px;
-            align-items: center;
+            align-items: flex-start;
         }
         .story-card img { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
         .story-card h4 { font-family: 'Playfair Display', serif; font-size: 1.1rem; margin: 0 0 5px; }
-        .story-card p { font-size: 0.75rem; color: #666; line-height: 1.4; margin: 0; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+        .story-card p { font-size: 0.75rem; color: #666; line-height: 1.4; margin: 0; }
 
         .story-intro, .story-outro {
             font-size: 0.8rem;
@@ -603,12 +603,22 @@
             margin-top: 4px;
             font-weight: 600;
         }
+        #musicControls {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            z-index: 9999;
+        }
         @media (max-width: 480px) {
             .hero h2 { font-size: clamp(1.5rem, 11vw, 2.8rem); }
             .countdown-container { gap: 6px; padding: 0 10px; }
             .countdown-item { padding: 10px 2px; border-radius: 10px; max-width: 65px; }
             .countdown-item span { font-size: 1.1rem; }
             .countdown-item label { font-size: 0.5rem; letter-spacing: 0.5px; margin-top: 2px; }
+            #musicControls {
+                bottom: 85px;
+                left: 20px;
+            }
         }
     </style>
 </head>
@@ -1025,7 +1035,7 @@
         }
     ?>
     <!-- Background Music Player -->
-    <div id="musicControls" style="position:fixed; bottom:20px; left:20px; z-index:9999;">
+    <div id="musicControls">
         <?php if ($yt_id): ?>
             <div id="musicPlayerDiv" style="position: absolute; left: -9999px; top: -9999px;"></div>
         <?php else: ?>

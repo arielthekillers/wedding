@@ -11,9 +11,6 @@ include __DIR__ . '/partials/wedding_nav.php';
 <div class="alert alert-error">⚠️ Gagal mengupload foto. Pastikan format file didukung (JPG, PNG, WebP, GIF).</div>
 <?php endif; ?>
 
-<!-- ── UPLOAD CARD ── -->
-<input type="file" name="photos[]" id="formPhotoInput" style="display:none" multiple accept="image/*">
-
 <div class="section-card">
     <div class="section-card-header">
         <div class="icon">⬆️</div>
@@ -195,39 +192,86 @@ function executeDelete() {
     if (pendingDelId) window.location.href = BASE_URL + '?action=delete&img_id=' + pendingDelId;
 }
 
-// Upload drag & drop
+// Upload drag & drop and file pick accumulation
+let selectedFiles = new DataTransfer();
+
 document.getElementById('formPhotoInput2').addEventListener('change', function() {
     handleFiles(this.files);
 });
+
 function handleDrop(e) {
     e.preventDefault();
     document.getElementById('dropZone').style.background = '#faf8ff';
     document.getElementById('dropZone').style.borderColor = '#c4b5fd';
-    const files = e.dataTransfer.files;
-    const dt = new DataTransfer();
-    Array.from(files).forEach(f => dt.items.add(f));
-    document.getElementById('formPhotoInput2').files = dt.files;
-    handleFiles(files);
+    handleFiles(e.dataTransfer.files);
 }
+
 function handleFiles(files) {
     if (!files || !files.length) return;
+    
+    // Append newly selected files to the DataTransfer accumulator
+    Array.from(files).forEach(f => {
+        if (f.type.startsWith('image/')) {
+            selectedFiles.items.add(f);
+        }
+    });
+
+    // Update the input element's files
+    document.getElementById('formPhotoInput2').files = selectedFiles.files;
+
+    renderPreviews();
+}
+
+function renderPreviews() {
     const bar = document.getElementById('previewBar');
     bar.innerHTML = '';
-    Array.from(files).slice(0, 14).forEach(f => {
-        if (!f.type.startsWith('image/')) return;
+    
+    Array.from(selectedFiles.files).forEach((f, index) => {
         const r = new FileReader();
         r.onload = ev => {
+            const container = document.createElement('div');
+            container.style.cssText = 'position:relative;width:70px;height:70px;';
+            
             const img = document.createElement('img');
             img.src = ev.target.result;
-            img.style.cssText = 'width:70px;height:70px;border-radius:8px;object-fit:cover;border:2px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.1);';
-            bar.appendChild(img);
+            img.style.cssText = 'width:100%;height:100%;border-radius:8px;object-fit:cover;border:2px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.1);';
+            
+            const delBtn = document.createElement('button');
+            delBtn.innerHTML = '✕';
+            delBtn.type = 'button';
+            delBtn.style.cssText = 'position:absolute;top:-4px;right:-4px;width:18px;height:18px;border-radius:50%;border:none;background:#dc2626;color:white;font-size:10px;font-weight:bold;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,0.2);z-index:10;';
+            delBtn.onclick = (e) => {
+                e.stopPropagation();
+                removeFile(index);
+            };
+            
+            container.appendChild(img);
+            container.appendChild(delBtn);
+            bar.appendChild(container);
         };
         r.readAsDataURL(f);
     });
-    document.getElementById('fileCount').textContent = files.length;
-    document.getElementById('fileInfo').style.display = 'block';
+    
+    document.getElementById('fileCount').textContent = selectedFiles.files.length;
+    if (selectedFiles.files.length > 0) {
+        document.getElementById('fileInfo').style.display = 'block';
+    } else {
+        document.getElementById('fileInfo').style.display = 'none';
+    }
 }
+
+function removeFile(index) {
+    const dt = new DataTransfer();
+    Array.from(selectedFiles.files).forEach((f, i) => {
+        if (i !== index) dt.items.add(f);
+    });
+    selectedFiles = dt;
+    document.getElementById('formPhotoInput2').files = selectedFiles.files;
+    renderPreviews();
+}
+
 function clearFiles() {
+    selectedFiles = new DataTransfer();
     document.getElementById('formPhotoInput2').value = '';
     document.getElementById('previewBar').innerHTML = '';
     document.getElementById('fileInfo').style.display = 'none';
