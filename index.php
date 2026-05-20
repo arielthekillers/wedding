@@ -89,6 +89,7 @@ if ($parts[0] === 'api' && ($parts[1] ?? '') === 'guestbook') {
         // 3. Input validation
         $name    = trim(strip_tags($_POST['name'] ?? ''));
         $email   = trim($_POST['email'] ?? '');
+        $circle  = trim(strip_tags($_POST['circle'] ?? ''));
         $message = trim(strip_tags($_POST['message'] ?? ''));
 
         if (strlen($name) < 2 || strlen($name) > 100) {
@@ -97,6 +98,10 @@ if ($parts[0] === 'api' && ($parts[1] ?? '') === 'guestbook') {
         }
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             header("Location: {$baseUrl}?msg=error&reason=email#guestbook");
+            exit;
+        }
+        if (Wedding::hasEmailSubmitted($wid, $email)) {
+            header("Location: {$baseUrl}?msg=error&reason=duplicate_email#guestbook");
             exit;
         }
         if (strlen($message) < 5 || strlen($message) > 500) {
@@ -110,6 +115,7 @@ if ($parts[0] === 'api' && ($parts[1] ?? '') === 'guestbook') {
                 'wedding_id' => $wid,
                 'name'       => htmlspecialchars($name),
                 'email'      => htmlspecialchars($email),
+                'circle'     => htmlspecialchars($circle),
                 'message'    => htmlspecialchars($message),
                 'attendance' => (int)($_POST['attendance'] ?? 1),
                 'ip_address' => $ip,
@@ -339,6 +345,52 @@ function handleAdmin($action, $parts) {
                     }
                     $all_users = ($_SESSION['role'] === 'admin') ? Models\User::getAll() : [];
                     include 'app/Views/wedding_settings.php';
+                    break;
+
+                // ── Appearance ─────────────────────────────────────────
+                case 'appearance':
+                    $sections = ['hero', 'countdown', 'couple', 'love_story', 'events', 'gallery', 'gifts', 'guestbook'];
+                    
+                    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                        $currentSettings = json_decode($wedding['section_settings'] ?? '{}', true) ?: [];
+                        $uploadDir = __DIR__ . '/uploads/sections/' . $id;
+                        
+                        foreach ($sections as $sec) {
+                            if (!isset($currentSettings[$sec])) {
+                                $currentSettings[$sec] = ['bg_color' => '', 'bg_image' => '', 'bg_opacity' => '0.08'];
+                            }
+                            
+                            $currentSettings[$sec]['bg_color'] = trim($_POST[$sec . '_bg_color'] ?? '');
+                            $currentSettings[$sec]['bg_opacity'] = trim($_POST[$sec . '_bg_opacity'] ?? '0.08');
+
+                            // Check for image upload
+                            if (isset($_FILES[$sec . '_bg_image']) && $_FILES[$sec . '_bg_image']['error'] !== UPLOAD_ERR_NO_FILE) {
+                                $res = Helpers\ImageHelper::processUpload($_FILES[$sec . '_bg_image'], $uploadDir);
+                                if (!isset($res['error'])) {
+                                    // Delete old image if exists
+                                    if (!empty($currentSettings[$sec]['bg_image'])) {
+                                        Helpers\ImageHelper::deleteFiles($currentSettings[$sec]['bg_image'], '');
+                                    }
+                                    $currentSettings[$sec]['bg_image'] = $res['full'];
+                                }
+                            }
+                            
+                            // Check for image removal
+                            if (isset($_POST[$sec . '_remove_bg']) && $_POST[$sec . '_remove_bg'] == '1') {
+                                if (!empty($currentSettings[$sec]['bg_image'])) {
+                                    Helpers\ImageHelper::deleteFiles($currentSettings[$sec]['bg_image'], '');
+                                    $currentSettings[$sec]['bg_image'] = '';
+                                }
+                            }
+                        }
+
+                        Models\Wedding::update($id, ['section_settings' => json_encode($currentSettings)]);
+                        header('Location: ' . $detailBase . 'appearance?saved=1');
+                        exit;
+                    }
+                    
+                    $sectionSettings = json_decode($wedding['section_settings'] ?? '{}', true) ?: [];
+                    include 'app/Views/wedding_appearance.php';
                     break;
 
                 // ── Profile ────────────────────────────────────────────

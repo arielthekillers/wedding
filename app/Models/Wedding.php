@@ -56,11 +56,12 @@ class Wedding {
     // Guestbook Methods
     public static function addMessage($data) {
         $db = getDB();
-        $stmt = $db->prepare("INSERT INTO guestbook (wedding_id, name, email, message, attendance, ip_address) VALUES (?, ?, ?, ?, ?, ?)");
+        $stmt = $db->prepare("INSERT INTO guestbook (wedding_id, name, email, circle, message, attendance, ip_address) VALUES (?, ?, ?, ?, ?, ?, ?)");
         return $stmt->execute([
             $data['wedding_id'],
             $data['name'],
             $data['email'],
+            $data['circle'] ?? null,
             $data['message'],
             $data['attendance'],
             $data['ip_address']
@@ -76,6 +77,20 @@ class Wedding {
 
     public static function deleteMessage($id) {
         $db = getDB();
+        
+        // Ambil info pesan terlebih dahulu untuk mendapatkan wedding_id dan ip_address
+        $stmt = $db->prepare("SELECT wedding_id, ip_address FROM guestbook WHERE id = ?");
+        $stmt->execute([$id]);
+        $msg = $stmt->fetch();
+        
+        if ($msg && !empty($msg['ip_address'])) {
+            // Hapus record rate limit agar pengirim dengan IP ini bisa mengirim ulang segera
+            $db->prepare("DELETE FROM guestbook_rate_limit WHERE wedding_id = ? AND ip_address = ?")->execute([
+                $msg['wedding_id'],
+                $msg['ip_address']
+            ]);
+        }
+        
         $stmt = $db->prepare("DELETE FROM guestbook WHERE id = ?");
         return $stmt->execute([$id]);
     }
@@ -84,6 +99,13 @@ class Wedding {
         $db = getDB();
         $stmt = $db->prepare("UPDATE guestbook SET reply = ?, replied_at = CURRENT_TIMESTAMP WHERE id = ?");
         return $stmt->execute([$replyText, $id]);
+    }
+
+    public static function hasEmailSubmitted($wedding_id, $email) {
+        $db = getDB();
+        $stmt = $db->prepare("SELECT COUNT(*) FROM guestbook WHERE wedding_id = ? AND LOWER(email) = ?");
+        $stmt->execute([$wedding_id, strtolower(trim($email))]);
+        return $stmt->fetchColumn() > 0;
     }
 
     public static function isRateLimited($wedding_id, $ip, $seconds = 300) {

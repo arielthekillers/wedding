@@ -1,14 +1,17 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="<?= isset($_GET['msg']) ? '' : 'locked' ?>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The Wedding of <?= $wedding['bride_nickname'] ?> & <?= $wedding['groom_nickname'] ?></title>
-    <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Montserrat:wght@300;400;600&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Amiri:wght@400;700&family=Montserrat:wght@300;400;600&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
     <style>
+        * {
+            box-sizing: border-box;
+        }
         :root {
             --gold: #c5a059;
-            --dark: #1a1a1a;
+            --dark: #374151;
             --white: #ffffff;
             --soft: #fcf9f5;
         }
@@ -27,13 +30,12 @@
             justify-content: center;
             align-items: center;
             background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&q=80&w=2070') no-repeat center center/cover;
-            background-attachment: fixed;
             color: white;
             padding: 20px;
         }
         .hero h2 { 
             font-family: 'Alex Brush', cursive; 
-            font-size: clamp(2.5rem, 14vw, 6.5rem); 
+            font-size: clamp(2rem, 10vw, 6.5rem); 
             margin: 15px 0; 
             color: var(--white); 
             line-height: 1;
@@ -46,12 +48,18 @@
             height: 100%;
             margin: 0;
             padding: 0;
-            scroll-snap-type: y mandatory;
             scroll-behavior: smooth;
             overflow-x: hidden;
         }
+        html {
+            scroll-snap-type: y mandatory;
+        }
+        html.locked, body.locked {
+            overflow: hidden !important;
+            height: 100% !important;
+        }
         section { 
-            height: 100vh;
+            min-height: 100vh;
             width: 100%;
             scroll-snap-align: start;
             position: relative;
@@ -59,16 +67,17 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            padding: 60px 20px;
             box-sizing: border-box;
         }
-        /* Optimized Parallax Backgrounds */
+        /* Guestbook section lebih sempit padding-nya agar form lebih lebar */
+        section#guestbook { padding-left: 10px; padding-right: 10px; }
+        /* Optimized Backgrounds */
         section::before {
             content: '';
             position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
+            inset: 0;
             background-image: var(--section-bg);
-            background-attachment: fixed;
             background-size: cover;
             background-position: center;
             opacity: 0.08;
@@ -96,26 +105,104 @@
         #gallery { background-color: #111; color: white; }
         #gallery h3 { color: #fff; }
         #gifts { background-color: #fbf8f3; }
-        #guestbook { background-color: #f8f8f8; }
+        #guestbook {
+            background-color: #f8f8f8;
+            height: auto;
+            min-height: 100vh;
+            padding: 80px 20px 100px;
+        }
 
         h3 { font-family: 'Alex Brush', cursive; font-size: clamp(1.8rem, 6vw, 2.8rem); color: var(--gold); margin-top: 0; margin-bottom: 15px; position: relative; }
 
-        /* Horizontal Slider for Gallery */
+        /* Modern Gallery Image Slider */
+        .gallery-slider-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            overflow: hidden;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            border: 2px solid var(--gold);
+        }
         .gallery-slider {
             display: flex;
             overflow-x: auto;
             scroll-snap-type: x mandatory;
-            gap: 15px;
-            padding-bottom: 10px;
+            scrollbar-width: none; /* Hide scrollbar Firefox */
+            -ms-overflow-style: none; /* Hide scrollbar IE/Edge */
             width: 100%;
+            scroll-behavior: smooth;
         }
-        .gallery-slider img {
-            flex: 0 0 70%;
-            height: 280px;
-            object-fit: cover;
+        .gallery-slider::-webkit-scrollbar {
+            display: none; /* Hide scrollbar Chrome/Safari */
+        }
+        .gallery-slide {
+            flex: 0 0 100%;
+            width: 100%;
             scroll-snap-align: center;
-            border-radius: 15px;
-            border: 2px solid #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            height: 320px;
+        }
+        .gallery-slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            cursor: pointer;
+            transition: transform 0.5s ease;
+        }
+        .gallery-slide img:hover {
+            transform: scale(1.05);
+        }
+        .slider-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: none;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(4px);
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        .slider-btn:hover {
+            background: var(--gold);
+            transform: translateY(-50%) scale(1.1);
+        }
+        .slider-btn.prev { left: 12px; }
+        .slider-btn.next { right: 12px; }
+        
+        .gallery-dots {
+            position: absolute;
+            bottom: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 6px;
+            z-index: 10;
+        }
+        .gallery-dots .dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .gallery-dots .dot.active {
+            background: var(--gold) !important;
+            transform: scale(1.2);
         }
 
         /* Horizontal Slider for Guestbook */
@@ -123,34 +210,67 @@
             display: flex;
             overflow-x: auto;
             scroll-snap-type: x mandatory;
-            gap: 15px;
-            padding: 10px 0;
+            gap: 12px;
+            padding: 8px 4px;
             width: 100%;
+            scrollbar-width: none; /* Hide scrollbar for premium feel */
+        }
+        .comment-slider::-webkit-scrollbar {
+            display: none; /* Hide scrollbar for premium feel */
         }
         .comment-item {
-            flex: 0 0 85%;
+            flex: 0 0 88%;
             scroll-snap-align: center;
             margin-bottom: 0 !important;
-            border: 8px solid white;
-            box-shadow: 0 15px 45px rgba(0,0,0,0.08);
-            outline: 1px solid var(--gold);
-            outline-offset: 6px;
-            transition: all 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
-            background: #f8f8f8;
+            background: #ffffff;
+            border: 1px solid rgba(212, 175, 55, 0.22);
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
+            transition: all 0.4s ease;
+            box-sizing: border-box;
         }
-        .couple { display: flex; justify-content: center; align-items: center; gap: 20px; width: 100%; margin-top: 10px; flex-wrap: nowrap; }
-        .person { text-align: center; flex: 1; }
+        .comment-item:only-child {
+            flex: 0 0 100%;
+        }
+        .couple { display: flex; justify-content: center; align-items: flex-start; gap: 8px; width: 100%; margin-top: 10px; flex-wrap: nowrap; }
+        .person { text-align: center; flex: 1; min-width: 0; }
         .person-img { 
-            width: 120px; height: 160px; 
-            border-radius: 70px 70px 15px 15px; 
+            width: 145px; height: 185px; 
+            border-radius: 80px 80px 18px 18px; 
             object-fit: cover; 
             border: 4px solid white; 
-            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
             margin-bottom: 10px;
             transition: transform 0.3s;
         }
-        .person h4 { font-family: 'Playfair Display', serif; font-size: 1.1rem; margin: 0 0 5px; color: var(--dark); }
-        .person p { font-size: 0.7rem; line-height: 1.4; color: #666; margin: 0; }
+        .person h4 { font-family: 'Playfair Display', serif; font-size: 1rem; margin: 0 0 5px; color: var(--dark); }
+        .person p { font-size: 0.68rem; line-height: 1.4; color: #666; margin: 0; }
+
+        /* Couple Quote Block */
+        .couple-quote {
+            margin: 0 auto 18px;
+            max-width: 340px;
+            text-align: center;
+            padding: 0 18px;
+        }
+        .bismillah {
+            font-family: 'Amiri', 'Traditional Arabic', serif;
+            font-size: 1.15rem;
+            font-style: italic;
+            color: #5a6272;
+            line-height: 1.8;
+            margin: 0 0 6px;
+            direction: rtl;
+        }
+        .couple-verse {
+            font-size: 0.75rem;
+            font-style: normal;
+            font-weight: 400;
+            color: #5a6272;
+            line-height: 1.7;
+            margin: 0;
+            font-family: 'Montserrat', sans-serif;
+        }
         
         /* Story Slider */
         .story-slider {
@@ -199,12 +319,42 @@
             margin-top: 5px;
         }
         .event-item-block {
+            position: relative;
+            overflow: hidden;
             padding: 15px 20px;
             border-radius: 20px;
             background: rgba(255,255,255,0.85);
             backdrop-filter: blur(10px);
             box-shadow: 0 8px 20px rgba(0,0,0,0.05);
             text-align: center;
+            z-index: 1;
+        }
+        .event-item-block > * {
+            position: relative;
+            z-index: 2;
+        }
+        .event-item-block::before {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            right: -15px;
+            width: 100px;
+            height: 100px;
+            opacity: 0.08;
+            background-repeat: no-repeat;
+            background-size: contain;
+            pointer-events: none;
+            z-index: 0;
+            transition: transform 0.5s ease;
+        }
+        .event-item-block:hover::before {
+            transform: scale(1.1) rotate(-10deg);
+        }
+        .event-item-block:nth-child(1)::before {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='40' cy='50' r='22' stroke='%23d4af37' stroke-width='4' fill='none'/%3E%3Ccircle cx='60' cy='50' r='22' stroke='%23d4af37' stroke-width='4' fill='none'/%3E%3C/svg%3E");
+        }
+        .event-item-block:nth-child(2)::before {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M35 25 L45 25 L43 55 L37 55 Z' stroke='%23d4af37' stroke-width='4' fill='none' /%3E%3Cpath d='M40 55 L40 75' stroke='%23d4af37' stroke-width='4' /%3E%3Cpath d='M33 75 L47 75' stroke='%23d4af37' stroke-width='4' /%3E%3Cpath d='M65 25 L55 25 L57 55 L63 55 Z' stroke='%23d4af37' stroke-width='4' fill='none' /%3E%3Cpath d='M60 55 L60 75' stroke='%23d4af37' stroke-width='4' /%3E%3Cpath d='M53 75 L67 75' stroke='%23d4af37' stroke-width='4' /%3E%3Ccircle cx='50' cy='20' r='2' fill='%23d4af37' /%3E%3Ccircle cx='47' cy='14' r='3' fill='%23d4af37' /%3E%3Ccircle cx='53' cy='14' r='1.5' fill='%23d4af37' /%3E%3C/svg%3E");
         }
         .event-item-grid {
             display: grid;
@@ -214,81 +364,160 @@
             border-bottom: 1px dashed #eee;
             padding-bottom: 10px;
         }
-        .event-item-block h4 { font-size: 1rem; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 2px; color: var(--gold); border-bottom: 1px solid #f1f5f9; padding-bottom: 8px; display: inline-block; }
+        .event-item-block h4 { font-size: 1rem; margin-top: 2px; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 2px; color: var(--gold); border-bottom: 1px solid #f1f5f9; padding-bottom: 8px; display: inline-block; }
         .detail-box { display: flex; flex-direction: column; align-items: center; gap: 5px; margin-bottom: 12px; }
         .detail-box i { width: 20px; height: 20px; color: var(--gold); margin-bottom: 2px; }
         .detail-box i svg { width: 20px; height: 20px; display: block; }
         .detail-info b { font-size: 0.6rem; display: block; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; }
-        .detail-info span { font-size: 0.8rem; font-weight: 700; color: var(--dark); line-height: 1.3; }
+        .detail-info span { font-size: 0.8rem; font-weight: 600; color: var(--dark); line-height: 1.3; }
         .btn-map-bottom { 
             display: inline-flex; align-items: center; gap: 8px; 
             padding: 8px 20px; font-size: 0.75rem; 
             background: white; border: 1px solid var(--gold); 
             color: var(--gold); border-radius: 50px; 
-            text-decoration: none; font-weight: 700; 
+            text-decoration: none; font-weight: 600; 
             margin-top: 5px; transition: 0.3s;
         }
         .btn-map-bottom:hover { background: var(--gold); color: white; }
         .btn-map-bottom svg { width: 14px; height: 14px; }
         
-        .gift-container { display: flex; gap: 15px; width: 100%; overflow-x: auto; scroll-snap-type: x mandatory; padding: 10px 0; scrollbar-width: none; }
-        .gift-container::-webkit-scrollbar { display: none; }
-        .gift-card { flex: 0 0 80%; scroll-snap-align: center; padding: 15px; background: white; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); text-align: center; }
-        .gift-card:hover { transform: translateY(-5px); }
+        .btn-reminder {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: white;
+            color: var(--dark);
+            border: 1.5px solid var(--gold);
+            padding: 10px 22px;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+        }
+        .btn-reminder:hover {
+            background: var(--gold) !important;
+            color: white !important;
+            box-shadow: 0 6px 20px rgba(197, 160, 89, 0.2) !important;
+            transform: translateY(-2px);
+        }
+        .btn-reminder svg {
+            color: var(--gold);
+            transition: stroke 0.3s, color 0.3s;
+        }
+        .btn-reminder:hover svg {
+            color: white !important;
+            stroke: white !important;
+        }
+        
+        .gift-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            width: 100%;
+            max-width: 380px;
+            margin: 0 auto;
+            padding: 10px 15px;
+        }
+        .gift-card {
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+            padding: 16px 18px;
+            background: white;
+            border-radius: 16px;
+            border: 1px solid #f1f5f9;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+            text-align: center;
+            transition: all 0.3s ease;
+            z-index: 1;
+        }
+        .gift-card > * {
+            position: relative;
+            z-index: 2;
+        }
+        .gift-card::before {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            right: -10px;
+            width: 80px;
+            height: 80px;
+            opacity: 0.05;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect x='15' y='25' width='70' height='50' rx='6' stroke='%23d4af37' stroke-width='4' fill='none'/%3E%3Cline x1='15' y1='40' x2='85' y2='40' stroke='%23d4af37' stroke-width='4'/%3E%3Crect x='25' y='52' width='15' height='10' rx='2' fill='%23d4af37'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-size: contain;
+            pointer-events: none;
+            z-index: 0;
+            transition: transform 0.5s ease;
+        }
+        .gift-card:hover::before {
+            transform: scale(1.1) rotate(-10deg);
+        }
+        .gift-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+            border-color: var(--gold);
+        }
         .bank-badge {
             display: inline-block;
-            padding: 6px 20px;
+            padding: 3px 12px;
             background: #fffaf0;
             border: 1px solid #fdf2d8;
             border-radius: 50px;
             color: var(--gold);
-            font-size: 0.75rem;
+            font-size: 0.65rem;
             font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-bottom: 30px;
+            letter-spacing: 1.5px;
+            margin-bottom: 12px;
         }
         .acc-number {
-            font-family: 'Playfair Display', serif;
-            font-size: 1.8rem;
-            font-weight: 700;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 600;
             color: var(--dark);
-            letter-spacing: 5px;
-            margin: 15px 0;
+            letter-spacing: 1px;
+            margin: 4px 0;
             display: block;
         }
         .acc-owner {
-            font-size: 1rem;
+            font-size: 0.75rem;
             font-weight: 500;
             color: #64748b;
-            margin-bottom: 35px;
+            margin-bottom: 14px;
             text-transform: uppercase;
             letter-spacing: 1px;
         }
         .btn-copy {
-            background: var(--dark);
-            color: white;
-            border: none;
-            padding: 14px 25px;
+            background: transparent;
+            color: var(--gold);
+            border: 1px solid var(--gold);
+            padding: 6px 18px;
             border-radius: 50px;
-            font-size: 0.8rem;
+            font-size: 0.7rem;
             font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 2px;
+            letter-spacing: 1px;
             cursor: pointer;
-            transition: all 0.3s;
-            width: 100%;
-            display: flex;
+            transition: all 0.3s ease;
+            width: auto;
+            min-width: 140px;
+            display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
-            border: 1px solid var(--dark);
+            gap: 6px;
+            margin: 0 auto;
         }
         .btn-copy:hover {
-            background: transparent;
-            color: var(--dark);
+            background: var(--gold);
+            color: white;
         }
-        .btn-copy svg { width: 18px; height: 18px; }
+        .btn-copy svg { width: 14px; height: 14px; }
 
         /* Map Button Styling */
         .btn-map {
@@ -343,93 +572,164 @@
         /* Guestbook & RSVP Redesign */
         .form-card {
             background: #ffffff;
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 15px 45px rgba(0,0,0,0.05);
-            max-width: 700px;
+            padding: 20px 16px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.04);
+            width: 100%;
+            max-width: 100%;
             margin: auto;
             text-align: left;
             border: 1px solid #f1f5f9;
             position: relative;
         }
-        .form-group { margin-bottom: 25px; }
+
+        /* ── Floating Label System ── */
+        .form-group {
+            position: relative;
+            margin-bottom: 12px;
+        }
         .form-group label {
-            display: block;
-            font-weight: 700;
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
+            position: absolute;
+            top: 50%;
+            left: 13px;
+            transform: translateY(-50%);
+            font-size: 0.82rem;
             color: #94a3b8;
-            margin-bottom: 10px;
+            pointer-events: none;
+            transition: all 0.2s ease;
+            background: transparent;
+            padding: 0 3px;
+            font-weight: 500;
+            letter-spacing: 0;
+            text-transform: none;
+            margin-bottom: 0;
+        }
+        /* Textarea label starts from top */
+        .form-group.is-textarea label {
+            top: 14px;
+            transform: none;
+        }
+        /* Floated state: focused or has content */
+        .form-group.floated label,
+        .form-group input:focus ~ label,
+        .form-group textarea:focus ~ label {
+            top: -8px;
+            transform: none;
+            font-size: 0.65rem;
+            color: var(--gold);
+            background: #fff;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+        .form-group.is-textarea.floated label,
+        .form-group.is-textarea input:focus ~ label,
+        .form-group.is-textarea textarea:focus ~ label {
+            top: -8px;
+            transform: none;
         }
         .input-premium {
             width: 100%;
-            padding: 15px 20px;
+            padding: 11px 14px;
             border: 1.5px solid #e2e8f0;
-            border-radius: 12px;
+            border-radius: 10px;
             font-family: inherit;
-            font-size: 0.95rem;
-            transition: all 0.3s;
-            background: #f8fafc;
+            font-size: 0.85rem;
+            transition: all 0.25s;
+            background: #fff;
             color: var(--dark);
             box-sizing: border-box;
         }
+        .input-premium::placeholder { color: transparent; }
         .input-premium:focus {
             outline: none;
             border-color: var(--gold);
-            background: #fff;
-            box-shadow: 0 0 0 4px rgba(197, 160, 89, 0.1);
+            box-shadow: 0 0 0 3px rgba(197, 160, 89, 0.1);
         }
         .rsvp-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 15px;
+            gap: 8px;
         }
-        @media (max-width: 600px) {
-            .rsvp-grid.form-inputs { grid-template-columns: 1fr; }
+        @media (max-width: 480px) {
+            .rsvp-grid.form-inputs { grid-template-columns: 1fr; gap: 0; }
         }
-        .rsvp-option {
+        /* RSVP standalone wrapper — dipisah dari .form-group agar floating label CSS tidak mengganggu */
+        .rsvp-wrapper {
+            display: block;
+            margin-bottom: 12px;
+        }
+        .rsvp-label {
+            display: block;
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 0 0 7px;
+        }
+        /* RSVP Toggle Pill */
+        .rsvp-toggle {
+            display: flex;
+            background: #f1f5f9;
+            border-radius: 50px;
+            padding: 4px;
+            gap: 4px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .rsvp-pill-option {
+            flex: 1;
             position: relative;
             cursor: pointer;
         }
-        .rsvp-option input {
+        .rsvp-pill-option input {
             position: absolute;
             opacity: 0;
             width: 0; height: 0;
         }
-        .rsvp-box {
-            padding: 15px;
-            border: 1.5px solid #e2e8f0;
-            border-radius: 12px;
+        .rsvp-pill-box {
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 10px;
-            transition: all 0.3s;
-            background: #f8fafc;
-            font-size: 0.8rem;
+            gap: 6px;
+            padding: 8px 10px;
+            border-radius: 50px;
+            font-size: 0.75rem;
             font-weight: 700;
-            color: #64748b;
+            color: #94a3b8;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 0.8px;
+            transition: all 0.25s;
+            user-select: none;
         }
-        .rsvp-option input:checked + .rsvp-box {
-            border-color: var(--gold);
-            background: #fffaf0;
-            color: var(--gold);
-            box-shadow: 0 5px 15px rgba(197, 160, 89, 0.1);
+        .rsvp-pill-box svg { width: 14px; height: 14px; }
+        .rsvp-pill-option input:checked + .rsvp-pill-box {
+            background: white;
+            color: var(--dark);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
-        .rsvp-box svg { width: 24px; height: 24px; margin-bottom: 5px; opacity: 0.5; }
-        .rsvp-option input:checked + .rsvp-box svg { opacity: 1; stroke: var(--gold); }
+        /* Hadir checked = green tint */
+        .rsvp-pill-option.is-hadir input:checked + .rsvp-pill-box {
+            color: #166534;
+        }
+        .rsvp-pill-option.is-hadir input:checked + .rsvp-pill-box svg {
+            stroke: #166534;
+        }
+        /* Absen checked = red tint */
+        .rsvp-pill-option.is-absen input:checked + .rsvp-pill-box {
+            color: #991b1b;
+        }
+        .rsvp-pill-option.is-absen input:checked + .rsvp-pill-box svg {
+            stroke: #991b1b;
+        }
 
         .btn-submit {
             background: var(--dark);
             color: white;
             border: none;
-            padding: 18px;
+            padding: 12px;
             width: 100%;
-            border-radius: 12px;
+            border-radius: 10px;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 2px;
@@ -438,8 +738,8 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 12px;
-            font-size: 0.85rem;
+            gap: 10px;
+            font-size: 0.8rem;
         }
         .btn-submit:hover {
             background: var(--gold);
@@ -472,7 +772,7 @@
             opacity: 0;
             visibility: hidden;
         }
-        .overlay-content h1 { font-family: 'Alex Brush', cursive; font-size: 4.5rem; margin: 0; text-shadow: 2px 2px 10px rgba(0,0,0,0.3); }
+        .overlay-content h1 { font-family: 'Alex Brush', cursive; font-size: clamp(2rem, 10vw, 4.5rem); margin: 0; text-shadow: 2px 2px 10px rgba(0,0,0,0.3); white-space: nowrap; }
         .overlay-content p { font-size: 1.1rem; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 30px; }
         .btn-open {
             background: var(--gold);
@@ -551,7 +851,6 @@
         [data-reveal] {
             opacity: 0;
             transition: all 1.2s cubic-bezier(0.2, 0.8, 0.2, 1);
-            will-change: transform, opacity;
         }
         [data-reveal="up"]    { transform: translateY(50px); }
         [data-reveal="down"]  { transform: translateY(-50px); }
@@ -575,15 +874,15 @@
             flex-wrap: nowrap;
         }
         .countdown-item {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.7);
             backdrop-filter: blur(15px);
             -webkit-backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(0, 0, 0, 0.05);
             padding: 15px 5px;
             border-radius: 18px;
             flex: 1;
             max-width: 90px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -592,16 +891,15 @@
             display: block;
             font-size: 1.8rem;
             font-weight: 700;
-            color: var(--white);
+            color: var(--primary);
             line-height: 1.2;
         }
         .countdown-item label {
             font-size: 0.7rem;
             text-transform: uppercase;
-            letter-spacing: 1.5px;
-            color: rgba(255, 255, 255, 0.85);
+            letter-spacing: 1px;
             margin-top: 4px;
-            font-weight: 600;
+            color: var(--text);
         }
         #musicControls {
             position: fixed;
@@ -620,11 +918,71 @@
                 left: 20px;
             }
         }
+
+        /* ─── DYNAMIC SECTION SETTINGS ─── */
+        <?php
+        $secSettings = json_decode($wedding['section_settings'] ?? '{}', true) ?: [];
+        $sectionsMap = [
+            'hero'       => '.hero, #openingOverlay',
+            'countdown'  => '#countdown-section',
+            'couple'     => '#couple',
+            'love_story' => '#love-story',
+            'events'     => '#events',
+            'gallery'    => '#gallery',
+            'gifts'      => '#gifts',
+            'guestbook'  => '#guestbook'
+        ];
+        
+        foreach ($sectionsMap as $key => $selector) {
+            if (!empty($secSettings[$key])) {
+                $cfg = $secSettings[$key];
+                
+                $op = isset($cfg['bg_opacity']) && $cfg['bg_opacity'] !== '' ? (float)$cfg['bg_opacity'] : ($key === 'hero' ? 0.70 : 0.08);
+
+                if ($key === 'hero') {
+                    // For Hero and Overlay, we strip the default background and use ::before for proper opacity blending
+                    if (!empty($cfg['bg_image'])) {
+                        $bgColor = !empty($cfg['bg_color']) ? $cfg['bg_color'] : '#1e293b'; // Default dark bg if none set
+                        
+                        $selectors = explode(',', $selector);
+                        $beforeSelectors = array_map(function($s) { return trim($s) . '::before'; }, $selectors);
+                        $beforeSelector = implode(', ', $beforeSelectors);
+                        
+                        echo "$selector { background: $bgColor !important; }\n";
+                        echo "$beforeSelector { 
+                            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+                            background: url('{$cfg['bg_image']}') no-repeat center center/cover !important; 
+                            opacity: {$op} !important; 
+                            z-index: 0; pointer-events: none; filter: none !important; 
+                        }\n";
+                        echo "#openingOverlay .overlay-content, .hero > div { position: relative; z-index: 2; }\n";
+                    } else {
+                        // If only color/opacity changed but no image, apply color
+                        if (!empty($cfg['bg_color'])) {
+                            echo "$selector { background-color: {$cfg['bg_color']} !important; }\n";
+                        }
+                    }
+                } else {
+                    // Background Color
+                    if (!empty($cfg['bg_color'])) {
+                        echo "$selector { background-color: {$cfg['bg_color']} !important; }\n";
+                    }
+                    
+                    if (!empty($cfg['bg_image'])) {
+                        echo "$selector { --section-bg: url('{$cfg['bg_image']}') !important; }\n";
+                    }
+                    echo "$selector::before { opacity: {$op} !important; }\n";
+                }
+            }
+        }
+        ?>
     </style>
 </head>
-<body class="locked">
+<body class="<?= isset($_GET['msg']) ? '' : 'locked' ?>">
 
-    <!-- Opening Overlay -->
+    <!-- ─── 1. SAMPUL PEMBUKA (OPENING OVERLAY) ─── -->
+    <!-- Layar penutup penuh sebelum tombol 'Buka Undangan' diklik -->
+    <?php if (!isset($_GET['msg'])): ?>
     <div id="openingOverlay">
         <div class="overlay-content">
             <p>The Wedding of</p>
@@ -634,19 +992,59 @@
                 <strong style="font-size: 1.2rem; display: block; margin-top: 5px;"><?= isset($_GET['to']) ? htmlspecialchars($_GET['to']) : 'Tamu Undangan' ?></strong>
             </div>
             <button class="btn-open" onclick="bukaUndangan()" style="margin: 40px auto 0;">
-                <span>💌 Buka Undangan</span>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                    <polyline points="22,6 12,13 2,6"></polyline>
+                </svg>
+                <span>Buka Undangan</span>
             </button>
         </div>
     </div>
+    <?php endif; ?>
 
+    <!-- ─── 2. HAMPARAN UTAMA (HERO SECTION / SAMPUL UTAMA) ─── -->
+    <!-- Layar utama tanpa tanggal, menampilkan text 'Kepada Yth...' dan nama mempelai -->
     <section id="hero" class="hero" style="scroll-snap-align: start;">
         <div data-reveal="zoom">
             <p>The Wedding of</p>
             <h2><?= $wedding['bride_nickname'] ?> & <?= $wedding['groom_nickname'] ?></h2>
-            <p><?= $wedding['akad_date'] ?></p>
+            <div style="margin-top: 30px; font-size: 0.95rem; opacity: 0.9;">
+                Kepada Yth. Bapak/Ibu/Saudara/i:<br>
+                <strong style="font-size: 1.25rem; display: block; margin-top: 5px; color: var(--gold);"><?= isset($_GET['to']) ? htmlspecialchars($_GET['to']) : 'Tamu Undangan' ?></strong>
+            </div>
+        </div>
+    </section>
 
-            <?php if (!empty($wedding['start_date'])): ?>
-            <div id="countdown" class="countdown-container">
+    <!-- ─── 3. HITUNG MUNDUR (COUNTDOWN SECTION) ─── -->
+    <!-- Bagian hitung mundur, sekarang menampilkan tanggal akad di atas jam hitung mundur -->
+    <?php 
+    if (!empty($wedding['start_date'])): 
+        $gcalUrl = '#';
+        try {
+            $startDate = new DateTime($wedding['start_date']);
+            $endDate = clone $startDate;
+            $endDate->modify('+3 hours'); // Durasi default 3 jam
+            
+            $currentUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]" . $base . $wedding['slug'];
+            
+            $title = "Pernikahan " . $wedding['bride_nickname'] . " & " . $wedding['groom_nickname'];
+            $details = "Mohon doa restu Anda dalam acara pernikahan kami.\n\nInfo Detail & Peta Lokasi kunjungi:\n" . $currentUrl;
+            $location = $wedding['akad_place'] ?? '';
+            
+            $gcalUrl = "https://calendar.google.com/calendar/render?action=TEMPLATE"
+                . "&text=" . urlencode($title)
+                . "&dates=" . $startDate->format('Ymd\THis') . "/" . $endDate->format('Ymd\THis')
+                . "&details=" . urlencode($details)
+                . "&location=" . urlencode($location);
+        } catch (Exception $e) {
+            // Fallback
+        }
+    ?>
+    <section id="countdown-section" data-reveal="up" style="scroll-snap-align: start; padding: 60px 20px; text-align: center; position: relative; --section-bg: url('https://images.unsplash.com/photo-1519225421980-715cb0215aed?auto=format&fit=crop&q=80&w=1000');">
+        <div class="section-inner" style="max-width: 800px; margin: 0 auto; position: relative; z-index: 2;">
+            <h3 style="margin-bottom: 8px; font-family: 'Playfair Display', serif; font-size: 2rem; color: var(--gold);">Menuju Hari Bahagia</h3>
+            <p style="font-size: 1.1rem; font-weight: 600; color: var(--dark); margin-bottom: 25px; letter-spacing: 1px;"><?= $wedding['akad_date'] ?></p>
+            <div id="countdown" class="countdown-container" style="margin-top: 0;">
                 <div class="countdown-item">
                     <span id="days">00</span>
                     <label>Hari</label>
@@ -664,14 +1062,38 @@
                     <label>Detik</label>
                 </div>
             </div>
+            
+            <!-- Tombol Pengingat Google Kalender -->
+            <?php if ($gcalUrl !== '#'): ?>
+            <div style="margin-top: 25px;" data-reveal="up" data-reveal-delay="200">
+                <a href="<?= $gcalUrl ?>" target="_blank" class="btn-reminder">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                        <path d="M8 14h.01"></path>
+                        <path d="M12 14h.01"></path>
+                        <path d="M16 14h.01"></path>
+                        <path d="M8 18h.01"></path>
+                        <path d="M12 18h.01"></path>
+                        <path d="M16 18h.01"></path>
+                    </svg>
+                    Ingatkan di Google Calendar
+                </a>
+            </div>
             <?php endif; ?>
         </div>
     </section>
+    <?php endif; ?>
 
     <section id="couple" data-reveal="up" style="scroll-snap-align: start; --section-bg: url('https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&q=80&w=1000');">
         <div class="section-inner">
             <h3>The Happy Couple</h3>
-            <p>Maha suci Allah yang telah menciptakan mahluk-Nya berpasang-pasangan. Ya Allah, perkenankanlah kami merangkaikan kasih sayang yang Kau ciptakan dalam rumah tangga kami.</p>
+            <div class="couple-quote" data-reveal="up" data-reveal-delay="100">
+                <p class="bismillah">بسم الله الرحمن الرحيم</p>
+                <p class="couple-verse">Maha suci Allah yang telah menciptakan makhluk-Nya berpasang-pasangan.<br>Ya Allah, perkenankanlah kami merangkaikan kasih sayang yang Kau ciptakan dalam rumah tangga kami.</p>
+            </div>
             <div class="couple">
                 <div class="person" data-reveal="left" data-reveal-delay="300">
                     <?php if (!empty($wedding['bride_image'])): ?>
@@ -729,7 +1151,7 @@
 
     <section id="events" data-reveal="up" style="scroll-snap-align: start; --section-bg: url('https://images.unsplash.com/photo-1469334031218-e382a71b716b?auto=format&fit=crop&q=80&w=1000');">
         <div class="section-inner">
-            <h3 style="font-family: 'Playfair Display', serif; font-weight: 700; font-style: italic;">Save the Date</h3>
+            <h3 style="font-family: 'Playfair Display', serif; font-weight: 700; font-style: italic; margin-top: 0; margin-bottom: 8px;">Save the Date</h3>
             <div class="event-wrapper">
                 <div class="event-item-block" data-reveal="up">
                     <h4>Akad Nikah</h4>
@@ -788,10 +1210,25 @@
             <?php 
             $gallery = Models\Wedding::getGallery($wedding['id']);
             if (!empty($gallery)): ?>
-                <div class="gallery-slider">
-                <?php foreach ($gallery as $img): ?>
-                    <img src="<?= $img['image_url'] ?>" alt="Gallery" onclick="openLightbox('<?= $img['image_url'] ?>')">
-                <?php endforeach; ?>
+                <div class="gallery-slider-container">
+                    <div class="gallery-slider" id="gallerySlider">
+                    <?php foreach ($gallery as $img): ?>
+                        <div class="gallery-slide">
+                            <img src="<?= $img['image_url'] ?>" alt="Gallery" onclick="openLightbox('<?= $img['image_url'] ?>')">
+                        </div>
+                    <?php endforeach; ?>
+                    </div>
+                    
+                    <!-- Navigation Buttons -->
+                    <button class="slider-btn prev" onclick="slideGallery(-1)">&#10094;</button>
+                    <button class="slider-btn next" onclick="slideGallery(1)">&#10095;</button>
+                    
+                    <!-- Slide Indicators / Dots -->
+                    <div class="gallery-dots" id="galleryDots">
+                        <?php foreach ($gallery as $i => $img): ?>
+                            <span class="dot <?= $i === 0 ? 'active' : '' ?>" onclick="goToSlide(<?= $i ?>)"></span>
+                        <?php endforeach; ?>
+                    </div>
                 </div>
 
                 <!-- Lightbox -->
@@ -820,6 +1257,42 @@
                 document.getElementById('lightbox').style.display = 'none';
                 document.body.style.overflow = '';
             }
+            
+            // Gallery Slider Functions
+            function slideGallery(direction) {
+                const slider = document.getElementById('gallerySlider');
+                if (!slider) return;
+                const slideWidth = slider.offsetWidth;
+                slider.scrollBy({
+                    left: direction * slideWidth,
+                    behavior: 'smooth'
+                });
+            }
+            function goToSlide(slideIndex) {
+                const slider = document.getElementById('gallerySlider');
+                if (!slider) return;
+                const slideWidth = slider.offsetWidth;
+                slider.scrollTo({
+                    left: slideIndex * slideWidth,
+                    behavior: 'smooth'
+                });
+            }
+            document.addEventListener('DOMContentLoaded', function() {
+                const slider = document.getElementById('gallerySlider');
+                const dots = document.querySelectorAll('#galleryDots .dot');
+                if (slider && dots.length > 0) {
+                    slider.addEventListener('scroll', () => {
+                        const index = Math.round(slider.scrollLeft / slider.offsetWidth);
+                        dots.forEach((dot, i) => {
+                            if (i === index) {
+                                dot.classList.add('active');
+                            } else {
+                                dot.classList.remove('active');
+                            }
+                        });
+                    });
+                }
+            });
             </script>
 <?php endif; ?>
         </div>
@@ -865,21 +1338,50 @@
             $msg    = $_GET['msg'] ?? '';
             $reason = $_GET['reason'] ?? '';
             $errorTexts = [
-                'ratelimit' => 'Kamu sudah mengirim pesan. Tunggu 5 menit sebelum mengirim lagi.',
-                'name'      => 'Nama tidak valid. Minimal 2 karakter.',
-                'email'     => 'Alamat email tidak valid.',
-                'message'   => 'Pesan terlalu pendek (min 5 karakter) atau terlalu panjang (maks 500).',
+                'ratelimit'       => 'Kamu sudah mengirim pesan. Tunggu 5 menit sebelum mengirim lagi.',
+                'name'            => 'Nama tidak valid. Minimal 2 karakter.',
+                'email'           => 'Alamat email tidak valid.',
+                'duplicate_email' => 'Alamat email ini sudah digunakan untuk mengirim ucapan sebelumnya.',
+                'message'         => 'Pesan terlalu pendek (min 5 karakter) atau terlalu panjang (maks 500).',
             ];
             ?>
 
             <?php if ($msg === 'sent'): ?>
-            <div style="background:#dcfce7; color:#166534; padding:14px 20px; border-radius:10px; max-width:600px; margin:0 auto 20px; font-weight:600; font-size:0.9rem;">
-                ✅ Ucapan kamu berhasil terkirim! Terima kasih 💐
+            <div id="guestbookAlert" style="background: rgba(253, 251, 247, 0.96); color: #846e53; padding: 16px 24px; border-radius: 12px; max-width: 600px; margin: 0 auto 24px; font-weight: 500; font-size: 0.88rem; border: 1px solid rgba(212, 175, 55, 0.25); box-shadow: 0 10px 30px rgba(132, 110, 83, 0.06); backdrop-filter: blur(8px); text-align: center; font-family: 'Montserrat', sans-serif; letter-spacing: 0.5px; transition: opacity 1.5s ease, transform 1.5s ease; opacity: 1; transform: translateY(0);">
+                <span>Terima kasih atas doa restu dan ucapan hangat Anda.</span>
             </div>
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    const alertEl = document.getElementById('guestbookAlert');
+                    if (alertEl) {
+                        setTimeout(() => {
+                            alertEl.style.opacity = '0';
+                            alertEl.style.transform = 'translateY(-10px)';
+                            setTimeout(() => {
+                                alertEl.style.display = 'none';
+                            }, 1500);
+                        }, 4000);
+                    }
+                });
+            </script>
             <?php elseif ($msg === 'error'): ?>
-            <div style="background:#fee2e2; color:#991b1b; padding:14px 20px; border-radius:10px; max-width:600px; margin:0 auto 20px; font-weight:600; font-size:0.9rem;">
-                ⚠️ <?= $errorTexts[$reason] ?? 'Terjadi kesalahan. Coba lagi.' ?>
+            <div id="guestbookAlert" style="background: rgba(253, 245, 245, 0.96); color: #b91c1c; padding: 16px 24px; border-radius: 12px; max-width: 600px; margin: 0 auto 24px; font-weight: 500; font-size: 0.88rem; border: 1px solid rgba(185, 28, 28, 0.15); box-shadow: 0 10px 30px rgba(185, 28, 28, 0.05); backdrop-filter: blur(8px); text-align: center; font-family: 'Montserrat', sans-serif; letter-spacing: 0.5px; transition: opacity 1.5s ease, transform 1.5s ease; opacity: 1; transform: translateY(0);">
+                <span><?= htmlspecialchars($errorTexts[$reason] ?? 'Terjadi kesalahan. Silakan coba kembali.') ?></span>
             </div>
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    const alertEl = document.getElementById('guestbookAlert');
+                    if (alertEl) {
+                        setTimeout(() => {
+                            alertEl.style.opacity = '0';
+                            alertEl.style.transform = 'translateY(-10px)';
+                            setTimeout(() => {
+                                alertEl.style.display = 'none';
+                            }, 1500);
+                        }, 4000);
+                    }
+                });
+            </script>
             <?php endif; ?>
 
             <div class="form-card">
@@ -891,45 +1393,54 @@
                         <input type="text" name="website" tabindex="-1" autocomplete="off">
                     </div>
 
-                    <div class="rsvp-grid form-inputs" style="margin-bottom: 25px;">
+                    <!-- Nama & Email -->
+                    <div class="rsvp-grid form-inputs">
                         <div class="form-group">
-                            <label>Nama Tamu</label>
-                            <input type="text" name="name" class="input-premium" required minlength="2" maxlength="100" placeholder="Ketik nama Anda...">
+                            <input type="text" name="name" class="input-premium" id="fldName" required minlength="2" maxlength="100" placeholder="Nama Tamu" autocomplete="name">
+                            <label for="fldName">Nama Tamu</label>
                         </div>
                         <div class="form-group">
-                            <label>Email <small>(Avatar)</small></label>
-                            <input type="email" name="email" class="input-premium" required placeholder="email@example.com">
+                            <input type="email" name="email" class="input-premium" id="fldEmail" required placeholder="Email" autocomplete="email">
+                            <label for="fldEmail">Email (Avatar)</label>
                         </div>
                     </div>
 
+                    <!-- Kota / Kantor / Circle -->
                     <div class="form-group">
-                        <label>Konfirmasi Kehadiran (Reservation)</label>
-                        <div class="rsvp-grid">
-                            <label class="rsvp-option">
+                        <input type="text" name="circle" class="input-premium" id="fldCircle" maxlength="100" placeholder="Kota / Kantor / Circle">
+                        <label for="fldCircle">Kota / Kantor / Circle</label>
+                    </div>
+
+                    <!-- RSVP -->
+                    <div class="rsvp-wrapper">
+                        <p class="rsvp-label">Konfirmasi Kehadiran</p>
+                        <div class="rsvp-toggle">
+                            <label class="rsvp-pill-option is-hadir">
                                 <input type="radio" name="attendance" value="1" checked onchange="highlightRsvp()">
-                                <div class="rsvp-box" id="lbl-hadir">
+                                <div class="rsvp-pill-box" id="lbl-hadir">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"></path></svg>
-                                    <span>Hadir</span>
+                                    Hadir
                                 </div>
                             </label>
-                            <label class="rsvp-option">
+                            <label class="rsvp-pill-option is-absen">
                                 <input type="radio" name="attendance" value="0" onchange="highlightRsvp()">
-                                <div class="rsvp-box" id="lbl-tidak">
+                                <div class="rsvp-pill-box" id="lbl-tidak">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                                    <span>Absen</span>
+                                    Absen
                                 </div>
                             </label>
                         </div>
                     </div>
 
-                    <div class="form-group">
-                        <label>Pesan / Doa Restu <small id="charCount">(0/500)</small></label>
-                        <textarea name="message" class="input-premium" required minlength="5" maxlength="500" id="msgArea"
-                            style="height:120px; resize:none;" placeholder="Tulis ucapan selamat & doa restu..."></textarea>
+                    <!-- Pesan -->
+                    <div class="form-group is-textarea">
+                        <textarea name="message" class="input-premium" id="msgArea" required minlength="5" maxlength="500"
+                            style="height:75px; resize:none;" placeholder="Tulis ucapan..."></textarea>
+                        <label for="msgArea">Pesan / Doa Restu <small id="charCount">(0/500)</small></label>
                     </div>
 
                     <button type="submit" class="btn-submit">
-                        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13"></path><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13"></path><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
                         Kirim Ucapan
                     </button>
                 </form>
@@ -944,7 +1455,7 @@
                 <p style="text-align:center; color:#999;">Belum ada ucapan. Jadilah yang pertama! 🌸</p>
             <?php else: ?>
                 <p style="text-align:center; color:#aaa; font-size:0.75rem; margin-bottom:15px; letter-spacing:1px; text-transform:uppercase;">
-                    Geser untuk melihat <?= $total ?> ucapan
+                    <?= $total === 1 ? '1 Ucapan Doa Restu' : 'Geser untuk melihat ' . $total . ' ucapan' ?>
                 </p>
 
                 <div id="commentList" class="comment-slider">
@@ -952,20 +1463,23 @@
                     $avatar  = Models\Wedding::gravatarUrl($m['email'] ?? '', 60);
                     $isHadir = (bool)$m['attendance'];
                 ?>
-                <div class="comment-item" style="display: flex; flex-direction: row; gap: 15px; background: white; padding: 20px; border-radius: 15px; border: 1px solid #f0f0f0; align-items: flex-start; text-align: left;">
-                    <img src="<?= $avatar ?>" alt="avatar" width="45" height="45" style="border-radius: 50%; border: 2px solid <?= $isHadir ? '#dcfce7' : '#fee2e2' ?>;">
-                    <div style="flex: 1;">
-                        <div style="margin-bottom: 5px;">
-                            <strong style="font-size: 0.9rem; display: block;"><?= $m['name'] ?></strong>
-                            <span style="font-size: 0.65rem; padding: 2px 8px; border-radius: 10px; background: <?= $isHadir ? '#dcfce7' : '#fee2e2' ?>; color: <?= $isHadir ? '#166534' : '#991b1b' ?>; font-weight: 700;">
-                                <?= $isHadir ? 'HADIR' : 'ABSEN' ?>
+                <div class="comment-item" style="display: flex; flex-direction: row; gap: 10px; padding: 12px 14px; align-items: flex-start; text-align: left;">
+                    <img src="<?= $avatar ?>" alt="avatar" width="38" height="38" style="border-radius: 50%; border: 1.5px solid <?= $isHadir ? '#dcfce7' : '#fee2e2' ?>; flex-shrink: 0; object-fit: cover;">
+                    <div style="flex: 1; min-width: 0;">
+                        <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-bottom: 4px;">
+                            <strong style="font-size: 0.85rem; color: #2c3e50; font-weight: 700;"><?= htmlspecialchars($m['name']) ?></strong>
+                            <?php if (!empty($m['circle'])): ?>
+                                <span style="font-size: 0.72rem; color: #8e9eab; font-weight: 500;">(<?= htmlspecialchars($m['circle']) ?>)</span>
+                            <?php endif; ?>
+                            <span style="font-size: 0.58rem; padding: 1px 5px; border-radius: 6px; background: <?= $isHadir ? '#dcfce7' : '#fee2e2' ?>; color: <?= $isHadir ? '#166534' : '#991b1b' ?>; font-weight: 700; letter-spacing: 0.3px; text-transform: uppercase;">
+                                <?= $isHadir ? 'Hadir' : 'Absen' ?>
                             </span>
                         </div>
-                        <p style="font-size: 0.85rem; color: #555; line-height: 1.5; margin: 0;"><?= $m['message'] ?></p>
+                        <p style="font-size: 0.8rem; color: #555; line-height: 1.4; margin: 0; word-break: break-word;"><?= nl2br(htmlspecialchars($m['message'])) ?></p>
                         <?php if (!empty($m['reply'])): ?>
-                        <div style="margin-top:10px; padding:10px; background:#fdf9f1; border-radius:8px; border-left:3px solid var(--gold);">
-                            <small style="color:var(--gold); font-weight:700; display:block; margin-bottom:2px;">Balasan:</small>
-                            <p style="margin:0; font-size:0.8rem; color:#666;"><?= nl2br(htmlspecialchars($m['reply'])) ?></p>
+                        <div style="margin-top: 8px; padding: 8px 10px; background: #faf6ef; border-radius: 8px; border-left: 2.5px solid var(--gold);">
+                            <small style="color: var(--gold); font-weight: 700; display: block; margin-bottom: 2px; font-size: 0.7rem;">Balasan:</small>
+                            <p style="margin: 0; font-size: 0.76rem; color: #666; line-height: 1.35;"><?= nl2br(htmlspecialchars($m['reply'])) ?></p>
                         </div>
                         <?php endif; ?>
                     </div>
@@ -994,9 +1508,8 @@
         }
         
         function highlightRsvp() {
-            const hadir = document.querySelector('input[name=attendance][value="1"]').checked;
-            document.getElementById('lbl-hadir').style.borderColor = hadir ? '#166534' : '#ddd';
-            document.getElementById('lbl-tidak').style.borderColor = hadir ? '#ddd' : '#ef4444';
+            // Styling sekarang dihandle oleh CSS :checked selector pada .rsvp-pill-option
+            // Fungsi ini tetap ada agar onchange handler tidak error
         }
         highlightRsvp();
 
@@ -1009,17 +1522,34 @@
             });
         }
 
-        // Auto-scroll to guestbook on msg
-        const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.get('msg')) {
-            const gb = document.getElementById('guestbook');
-            if (gb) gb.scrollIntoView({ behavior: 'smooth' });
+        // ── Floating Label Logic ──────────────────────────────
+        function checkFloating(el) {
+            const group = el.closest('.form-group');
+            if (!group) return;
+            if (el.value && el.value.trim() !== '') {
+                group.classList.add('floated');
+            } else {
+                group.classList.remove('floated');
+            }
         }
+        // Attach to all inputs and textareas in the form
+        document.querySelectorAll('#guestbookForm .input-premium').forEach(el => {
+            el.addEventListener('input', () => checkFloating(el));
+            el.addEventListener('change', () => checkFloating(el));
+            // Run immediately in case browser autofills
+            checkFloating(el);
+        });
+        // Handle autofill after slight delay (browser fills after DOMContentLoaded)
+        setTimeout(() => {
+            document.querySelectorAll('#guestbookForm .input-premium').forEach(el => checkFloating(el));
+        }, 300);
+
+        // Auto-scroll logic is handled in DOMContentLoaded below
     </script>
 
     <!-- Floating Navigation -->
     <nav class="floating-nav">
-        <a href="#hero" class="nav-item" title="Home"><i><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg></i></a>
+        <a href="<?= !empty($wedding['start_date']) ? '#countdown-section' : '#couple' ?>" class="nav-item" title="Home"><i><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg></i></a>
         <a href="#couple" class="nav-item" title="Couple"><i><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></i></a>
         <a href="#love-story" class="nav-item" title="Story"><i><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></i></a>
         <a href="#events" class="nav-item" title="Events"><i><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg></i></a>
@@ -1137,8 +1667,29 @@
         function bukaUndangan() {
             const overlay = document.getElementById('openingOverlay');
             if (overlay) {
+                const htmlEl = document.documentElement;
+                const bodyEl = document.body;
+                
+                // Disable scroll snapping temporarily to prevent automatic jump/snapping on unlock
+                htmlEl.style.scrollSnapType = 'none';
+                bodyEl.style.scrollSnapType = 'none';
+                
                 overlay.classList.add('fade-out');
-                document.body.classList.remove('locked');
+                bodyEl.classList.remove('locked');
+                htmlEl.classList.remove('locked');
+                
+                // Scroll straight to the countdown section (or couple if countdown is empty)
+                const target = document.getElementById('countdown-section') || document.getElementById('couple');
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+                
+                // Re-enable scroll snap after transition
+                setTimeout(() => {
+                    htmlEl.style.scrollSnapType = '';
+                    bodyEl.style.scrollSnapType = '';
+                }, 1000);
+                
                 setTimeout(() => overlay.remove(), 1000);
             }
             // Start Music if exists
@@ -1150,18 +1701,116 @@
             if (!isPlaying && !document.getElementById('openingOverlay')) toggleMusic();
         }, { once: true });
 
-        document.querySelectorAll('.nav-item').forEach(link => {
-            link.addEventListener('click', function(e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }
-            });
-        });
-
         // Reveal Animation logic
         document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const hasMsg = urlParams.get('msg');
+            
+            if ('scrollRestoration' in history) {
+                history.scrollRestoration = 'manual';
+            }
+            
+            if (!hasMsg) {
+                window.scrollTo(0, 0);
+            } else {
+                // Scroll to the guestbook section immediately after loading
+                setTimeout(() => {
+                    const gb = document.getElementById('guestbook');
+                    if (gb) {
+                        const htmlEl = document.documentElement;
+                        const bodyEl = document.body;
+                        
+                        // Temporarily disable scroll snapping to prevent scroll interference
+                        htmlEl.style.scrollSnapType = 'none';
+                        bodyEl.style.scrollSnapType = 'none';
+                        
+                        gb.scrollIntoView({ behavior: 'auto', block: 'start' });
+                        
+                        // Restore scroll snapping after a short delay
+                        setTimeout(() => {
+                            htmlEl.style.scrollSnapType = '';
+                            bodyEl.style.scrollSnapType = '';
+                        }, 500);
+                    }
+                }, 100);
+            }
+            
+            // Navigation smooth scrolling with scroll-snap conflict workaround
+            document.querySelectorAll('.nav-item').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href');
+                    const target = document.querySelector(targetId);
+                    if (target) {
+                        // Temporarily disable scroll snapping to prevent conflicts during smooth scroll
+                        const htmlEl = document.documentElement;
+                        const bodyEl = document.body;
+                        
+                        htmlEl.style.scrollSnapType = 'none';
+                        bodyEl.style.scrollSnapType = 'none';
+                        
+                        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        
+                        // Update active state in navigation
+                        document.querySelectorAll('.nav-item').forEach(item => {
+                            item.classList.remove('active');
+                        });
+                        this.classList.add('active');
+                        
+                        // Push history state if possible
+                        if (history.pushState) {
+                            history.pushState(null, null, targetId);
+                        } else {
+                            location.hash = targetId;
+                        }
+                        
+                        // Re-enable scroll snapping after scroll completes (approx 800ms)
+                        setTimeout(() => {
+                            htmlEl.style.scrollSnapType = '';
+                            bodyEl.style.scrollSnapType = '';
+                        }, 800);
+                    }
+                });
+            });
+
+            // Active Navigation Highlighting on Scroll
+            const navItems = document.querySelectorAll('.nav-item');
+            const navSections = document.querySelectorAll('section[id]');
+            
+            const navObserverOptions = {
+                root: null,
+                rootMargin: '-50% 0px -50% 0px', // Trigger when section occupies the center of the viewport
+                threshold: 0
+            };
+            
+            const navObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const id = entry.target.getAttribute('id');
+                        
+                        // Tentukan href nav-item mana yang harus diaktifkan
+                        // Baik section 'hero' (sampul) maupun 'countdown-section' sama-sama
+                        // direpresentasikan oleh tombol Home yang kini href-nya #countdown-section
+                        let activeHref;
+                        if (id === 'hero' || id === 'countdown-section') {
+                            activeHref = '#countdown-section';
+                        } else {
+                            activeHref = `#${id}`;
+                        }
+                        
+                        navItems.forEach(item => {
+                            if (item.getAttribute('href') === activeHref) {
+                                item.classList.add('active');
+                            } else {
+                                item.classList.remove('active');
+                            }
+                        });
+                    }
+                });
+            }, navObserverOptions);
+            
+            navSections.forEach(section => navObserver.observe(section));
+
             const observerOptions = { threshold: 0.1, rootMargin: "0px 0px -50px 0px" };
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
@@ -1186,7 +1835,13 @@
             function updateCountdown() {
                 const now = new Date().getTime(), distance = targetDate - now;
                 if (distance < 0) {
-                    if (countdownContainer) countdownContainer.innerHTML = '<div style="font-weight:700; letter-spacing:2px;">HARI BAHAGIA TELAH TIBA! 🌸</div>';
+                    if (daysEl) daysEl.textContent = "00";
+                    if (hoursEl) hoursEl.textContent = "00";
+                    if (minsEl) minsEl.textContent = "00";
+                    if (secsEl) secsEl.textContent = "00";
+                    if (countdownContainer && !document.getElementById('happyMessage')) {
+                        countdownContainer.insertAdjacentHTML('afterend', '<div id="happyMessage" style="margin-top:20px; font-weight:700; letter-spacing:2px; font-size:1.1rem; text-shadow: 1px 1px 5px rgba(0,0,0,0.5);">HARI BAHAGIA TELAH TIBA! 🌸</div>');
+                    }
                     return;
                 }
                 const d = Math.floor(distance / (1000 * 60 * 60 * 24)),

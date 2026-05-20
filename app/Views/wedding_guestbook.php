@@ -50,6 +50,11 @@ $gbCount  = count($messages);
                 <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px;">
                     <strong style="font-size:0.93rem;"><?= htmlspecialchars($msg['name']) ?></strong>
                     <span style="font-size:0.72rem;color:#94a3b8;"><?= htmlspecialchars($msg['email'] ?? '') ?></span>
+                    <?php if (!empty($msg['circle'])): ?>
+                    <span style="background:#f1f5f9;color:#475569;font-size:0.7rem;font-weight:600;padding:2px 9px;border-radius:20px;" title="Kota / Kantor / Circle">
+                        📍 <?= htmlspecialchars($msg['circle']) ?>
+                    </span>
+                    <?php endif; ?>
                     <span style="background:<?= $att['color'] ?>;color:<?= $att['text'] ?>;font-size:0.7rem;font-weight:700;padding:2px 9px;border-radius:20px;">
                         <?= $att['label'] ?>
                     </span>

@@ -18,6 +18,7 @@ if (!isset($gbCount))    $gbCount    = count(Models\Wedding::getMessages($wid));
 
 $tabs = [
     'settings'  => ['icon' => '⚙️',  'label' => 'Pengaturan'],
+    'appearance'=> ['icon' => '🎨',  'label' => 'Tampilan'],
     'profile'   => ['icon' => '👰',  'label' => 'Pengantin'],
     'event'     => ['icon' => '📅',  'label' => 'Acara'],
     'gift'      => ['icon' => '🎁',  'label' => 'Hadiah'],
