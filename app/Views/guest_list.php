@@ -59,6 +59,22 @@ $weddingUrl = $scheme . '://' . $host . $basePath . '/' . $wedding['slug'];
             </tr>
             <?php foreach ($allGuests as $g): 
                 $link = $weddingUrl . '?to=' . rawurlencode($g['name']);
+                
+                $bride = $wedding['bride_nickname'] ?: $wedding['bride_name'];
+                $groom = $wedding['groom_nickname'] ?: $wedding['groom_name'];
+                $coupleNames = $bride . ' & ' . $groom;
+
+                $waMessage = "*السَّلاَمُ عَلَيْكُمْ وَرَحْمَةُ اللّٰهِ وَبَرَكَاتُهُ*\n"
+                           . "Maha suci Allah yang telah menjadikan segala sesuatu lebih indah dan sempurna.\n\n"
+                           . "Tanpa mengurangi rasa hormat, perkenankan kami mengundang Bapak/Ibu/Saudara/i *{$g['name']}* untuk menghadiri acara pernikahan kami:\n\n"
+                           . "*{$coupleNames}*\n\n"
+                           . "Berikut link undangan untuk informasi lengkap mengenai acara kami:\n"
+                           . "{$link}\n\n"
+                           . "Merupakan suatu kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan untuk hadir dan memberikan doa restu.\n\n"
+                           . "Mohon maaf perihal undangan yang hanya dibagikan melalui pesan digital ini.\n\n"
+                           . "*وَالسَّلاَمُ عَلَيْكُمْ وَرَحْمَةُ اللّٰهِ وَبَرَكَاتُهُ*\n\n"
+                           . "Kami yang berbahagia,\n"
+                           . "*{$coupleNames}*";
             ?>
             <tr class="guest-row cat-<?= $g['category_id'] ?>" style="border-bottom: 1px solid #f1f5f9;">
                 <td style="padding: 12px 20px;">
@@ -74,7 +90,7 @@ $weddingUrl = $scheme . '://' . $host . $basePath . '/' . $wedding['slug'];
                         <button onclick="copyLink('<?= htmlspecialchars($link, ENT_QUOTES) ?>', <?= $g['id'] ?>)" class="btn btn-ghost btn-sm" style="display:inline-flex; align-items:center; gap:4px; padding:6px 10px; font-size:0.75rem;">
                             <span>🔗</span><span>Salin</span>
                         </button>
-                        <a href="https://wa.me/?text=<?= rawurlencode('Halo ' . $g['name'] . '! Kami mengundang kamu ke pernikahan kami 💍 ' . $link) ?>"
+                        <a href="https://api.whatsapp.com/send?text=<?= rawurlencode($waMessage) ?>"
                            target="_blank" class="btn btn-sm" style="display:inline-flex; align-items:center; gap:4px; background:#dcfce7; color:#166534; border:1px solid #bbf7d0; padding:6px 10px; font-size:0.75rem;">
                            <span>💬</span><span>WA</span>
                         </a>

@@ -121,9 +121,14 @@ $sectionsMeta = [
 
                     <div class="form-group">
                         <label class="form-label">Gambar Latar Belakang</label>
-                        <?php if (!empty($cfg['bg_image'])): ?>
+                        <?php if (!empty($cfg['bg_image'])): 
+                            $bgSrc = $cfg['bg_image'];
+                            if (preg_match('#(uploads/.+)$#', $bgSrc, $_m)) {
+                                $bgSrc = rtrim($GLOBALS['base'] ?? '/', '/') . '/' . $_m[1];
+                            }
+                        ?>
                             <div style="display: flex; gap: 10px; align-items: flex-start; margin-bottom: 10px;">
-                                <img src="<?= $cfg['bg_image'] ?>" alt="Background" style="width: 80px; height: 50px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border);">
+                                <img src="<?= $bgSrc ?>" alt="Background" style="width: 80px; height: 50px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border);">
                                 <label class="form-check" style="font-size: 0.8rem; color: #dc2626;">
                                     <input type="checkbox" name="<?= $sec ?>_remove_bg" value="1">
                                     Hapus gambar ini

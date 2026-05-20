@@ -77,10 +77,13 @@ class ImageHelper {
         imagedestroy($thumb);
         imagedestroy($src);
 
-        // 8. Build relative URLs (relative to web root / DOCUMENT_ROOT)
-        $docRoot    = rtrim($_SERVER['DOCUMENT_ROOT'], '/\\');
-        $relFull    = '/' . ltrim(str_replace('\\', '/', substr($fullPath,  strlen($docRoot))), '/');
-        $relThumb   = '/' . ltrim(str_replace('\\', '/', substr($thumbPath, strlen($docRoot))), '/');
+        // 8. Build relative URLs (relative to app root, using base URL)
+        //    Uses SCRIPT_FILENAME instead of DOCUMENT_ROOT to correctly handle
+        //    subdomain-to-subdirectory mapping on shared hosting.
+        $appRoot  = rtrim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_FILENAME'])), '/');
+        $base     = isset($GLOBALS['base']) ? rtrim($GLOBALS['base'], '/') : '';
+        $relFull  = $base . '/' . ltrim(str_replace('\\', '/', substr($fullPath,  strlen($appRoot))), '/');
+        $relThumb = $base . '/' . ltrim(str_replace('\\', '/', substr($thumbPath, strlen($appRoot))), '/');
 
         return ['full' => $relFull, 'thumb' => $relThumb];
     }
@@ -89,10 +92,18 @@ class ImageHelper {
      * Delete full + thumb files for a given relative URL pair.
      */
     public static function deleteFiles(string $fullUrl, string $thumbUrl): void {
-        $docRoot = rtrim($_SERVER['DOCUMENT_ROOT'], '/\\');
+        $appRoot = rtrim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_FILENAME'])), '/');
         foreach ([$fullUrl, $thumbUrl] as $url) {
             if (empty($url)) continue;
-            $path = $docRoot . '/' . ltrim(str_replace('/', DIRECTORY_SEPARATOR, $url), '/\\');
+            // Extract 'uploads/...' portion for reliable path resolution
+            // This handles both old (DOCUMENT_ROOT-based) and new (base-relative) paths
+            if (preg_match('#(uploads/.+)$#', $url, $m)) {
+                $path = $appRoot . '/' . str_replace('/', DIRECTORY_SEPARATOR, $m[1]);
+            } else {
+                // Fallback: try DOCUMENT_ROOT for non-uploads paths
+                $docRoot = rtrim($_SERVER['DOCUMENT_ROOT'], '/\\');
+                $path = $docRoot . '/' . ltrim(str_replace('/', DIRECTORY_SEPARATOR, $url), '/\\');
+            }
             if (file_exists($path)) {
                 @unlink($path);
             }

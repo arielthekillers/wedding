@@ -922,6 +922,15 @@
         /* ─── DYNAMIC SECTION SETTINGS ─── */
         <?php
         $secSettings = json_decode($wedding['section_settings'] ?? '{}', true) ?: [];
+        // Helper: normalize bg_image paths to fix DOCUMENT_ROOT vs subdomain mismatch
+        $normBg = function($path) {
+            if (empty($path)) return $path;
+            if (preg_match('#(uploads/.+)$#', $path, $m)) {
+                $b = isset($GLOBALS['base']) ? rtrim($GLOBALS['base'], '/') : '';
+                return $b . '/' . $m[1];
+            }
+            return $path;
+        };
         $sectionsMap = [
             'hero'       => '.hero, #openingOverlay',
             'countdown'  => '#countdown-section',
@@ -943,6 +952,7 @@
                     // For Hero and Overlay, we strip the default background and use ::before for proper opacity blending
                     if (!empty($cfg['bg_image'])) {
                         $bgColor = !empty($cfg['bg_color']) ? $cfg['bg_color'] : '#1e293b'; // Default dark bg if none set
+                        $bgImgUrl = $normBg($cfg['bg_image']);
                         
                         $selectors = explode(',', $selector);
                         $beforeSelectors = array_map(function($s) { return trim($s) . '::before'; }, $selectors);
@@ -951,7 +961,7 @@
                         echo "$selector { background: $bgColor !important; }\n";
                         echo "$beforeSelector { 
                             content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
-                            background: url('{$cfg['bg_image']}') no-repeat center center/cover !important; 
+                            background: url('{$bgImgUrl}') no-repeat center center/cover !important; 
                             opacity: {$op} !important; 
                             z-index: 0; pointer-events: none; filter: none !important; 
                         }\n";
@@ -969,7 +979,8 @@
                     }
                     
                     if (!empty($cfg['bg_image'])) {
-                        echo "$selector { --section-bg: url('{$cfg['bg_image']}') !important; }\n";
+                        $bgImgUrl = $normBg($cfg['bg_image']);
+                        echo "$selector { --section-bg: url('{$bgImgUrl}') !important; }\n";
                     }
                     echo "$selector::before { opacity: {$op} !important; }\n";
                 }
