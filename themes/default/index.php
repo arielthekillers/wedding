@@ -1031,6 +1031,7 @@
     <?php 
     if (!empty($wedding['start_date'])): 
         $gcalUrl = '#';
+        $countdownDateText = '';
         try {
             $startDate = new DateTime($wedding['start_date']);
             $endDate = clone $startDate;
@@ -1047,14 +1048,49 @@
                 . "&dates=" . $startDate->format('Ymd\THis') . "/" . $endDate->format('Ymd\THis')
                 . "&details=" . urlencode($details)
                 . "&location=" . urlencode($location);
+            
+            // Format start_date to Indonesian date format
+            $timestamp = $startDate->getTimestamp();
+            $days = [
+                'Sunday' => 'Minggu',
+                'Monday' => 'Senin',
+                'Tuesday' => 'Selasa',
+                'Wednesday' => 'Rabu',
+                'Thursday' => 'Kamis',
+                'Friday' => 'Jum\'at',
+                'Saturday' => 'Sabtu'
+            ];
+            $months = [
+                'January' => 'Januari',
+                'February' => 'Februari',
+                'March' => 'Maret',
+                'April' => 'April',
+                'May' => 'Mei',
+                'June' => 'Juni',
+                'July' => 'Juli',
+                'August' => 'Agustus',
+                'September' => 'September',
+                'October' => 'Oktober',
+                'November' => 'November',
+                'December' => 'Desember'
+            ];
+            $dayName = $days[date('l', $timestamp)] ?? date('l', $timestamp);
+            $dayNum = date('j', $timestamp);
+            $monthName = $months[date('F', $timestamp)] ?? date('F', $timestamp);
+            $year = date('Y', $timestamp);
+            $countdownDateText = "$dayName, $dayNum " . strtoupper($monthName) . " $year";
         } catch (Exception $e) {
             // Fallback
+        }
+        
+        if (empty($countdownDateText)) {
+            $countdownDateText = $wedding['akad_date'];
         }
     ?>
     <section id="countdown-section" data-reveal="up" style="scroll-snap-align: start; padding: 60px 20px; text-align: center; position: relative; --section-bg: url('https://images.unsplash.com/photo-1519225421980-715cb0215aed?auto=format&fit=crop&q=80&w=1000');">
         <div class="section-inner" style="max-width: 800px; margin: 0 auto; position: relative; z-index: 2;">
             <h3 style="margin-bottom: 8px; font-family: 'Playfair Display', serif; font-size: 2rem; color: var(--gold);">Menuju Hari Bahagia</h3>
-            <p style="font-size: 1.1rem; font-weight: 600; color: var(--dark); margin-bottom: 25px; letter-spacing: 1px;"><?= $wedding['akad_date'] ?></p>
+            <p style="font-size: 1.1rem; font-weight: 600; color: var(--dark); margin-bottom: 25px; letter-spacing: 1px;">Menghitung hari menuju ikatan suci</p>
             <div id="countdown" class="countdown-container" style="margin-top: 0;">
                 <div class="countdown-item">
                     <span id="days">00</span>
