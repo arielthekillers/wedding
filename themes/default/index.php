@@ -1,5 +1,12 @@
+<?php
+$secSettings = json_decode($wedding['section_settings'] ?? '{}', true) ?: [];
+$isSecActive = function($key) use ($secSettings) {
+    if (!isset($secSettings[$key]['is_active'])) return true;
+    return $secSettings[$key]['is_active'] !== '0' && $secSettings[$key]['is_active'] !== false;
+};
+?>
 <!DOCTYPE html>
-<html lang="en" class="<?= isset($_GET['msg']) ? '' : 'locked' ?>">
+<html lang="en" class="<?= (isset($_GET['msg']) || !$isSecActive('hero')) ? '' : 'locked' ?>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -919,6 +926,16 @@
             }
         }
 
+        /* ─── TEXT COLOR SCHEMES ─── */
+        .text-light, .text-light h1, .text-light h2, .text-light h3, .text-light h4, .text-light strong, .text-light b { color: #ffffff !important; }
+        .text-light p, .text-light span, .text-light label, .text-light div, .text-light small, .text-light .bismillah, .text-light .couple-verse, .text-light .story-intro, .text-light .story-outro { color: #e2e8f0 !important; }
+        .text-light .btn-map-bottom, .text-light .btn-reminder, .text-light .btn-copy { border-color: #ffffff !important; color: #ffffff !important; background: transparent !important; }
+        .text-light .btn-map-bottom:hover, .text-light .btn-reminder:hover, .text-light .btn-copy:hover { background: #ffffff !important; color: #1e293b !important; }
+
+        .text-dark, .text-dark h1, .text-dark h2, .text-dark h4, .text-dark strong, .text-dark b { color: #0f172a !important; }
+        .text-dark h3 { color: var(--gold) !important; }
+        .text-dark p, .text-dark span, .text-dark label, .text-dark div, .text-dark small, .text-dark .bismillah, .text-dark .couple-verse, .text-dark .story-intro, .text-dark .story-outro { color: #475569 !important; }
+
         /* ─── DYNAMIC SECTION SETTINGS ─── */
         <?php
         $secSettings = json_decode($wedding['section_settings'] ?? '{}', true) ?: [];
@@ -989,12 +1006,15 @@
         ?>
     </style>
 </head>
-<body class="<?= isset($_GET['msg']) ? '' : 'locked' ?>">
+<body class="<?= (isset($_GET['msg']) || !$isSecActive('hero')) ? '' : 'locked' ?>">
 
     <!-- ─── 1. SAMPUL PEMBUKA (OPENING OVERLAY) ─── -->
     <!-- Layar penutup penuh sebelum tombol 'Buka Undangan' diklik -->
+    <?php if ($isSecActive('hero')): 
+        $heroTextClass = ($secSettings['hero']['text_color'] ?? 'light') === 'light' ? 'text-light' : 'text-dark';
+    ?>
     <?php if (!isset($_GET['msg'])): ?>
-    <div id="openingOverlay">
+    <div id="openingOverlay" class="<?= $heroTextClass ?>">
         <div class="overlay-content">
             <p>The Wedding of</p>
             <h1><?= $wedding['bride_nickname'] ?> & <?= $wedding['groom_nickname'] ?></h1>
@@ -1015,7 +1035,7 @@
 
     <!-- ─── 2. HAMPARAN UTAMA (HERO SECTION / SAMPUL UTAMA) ─── -->
     <!-- Layar utama tanpa tanggal, menampilkan text 'Kepada Yth...' dan nama mempelai -->
-    <section id="hero" class="hero" style="scroll-snap-align: start;">
+    <section id="hero" class="hero <?= $heroTextClass ?>" style="scroll-snap-align: start;">
         <div data-reveal="zoom">
             <p>The Wedding of</p>
             <h2><?= $wedding['bride_nickname'] ?> & <?= $wedding['groom_nickname'] ?></h2>
@@ -1025,11 +1045,13 @@
             </div>
         </div>
     </section>
+    <?php endif; ?>
 
     <!-- ─── 3. HITUNG MUNDUR (COUNTDOWN SECTION) ─── -->
     <!-- Bagian hitung mundur, sekarang menampilkan tanggal akad di atas jam hitung mundur -->
     <?php 
-    if (!empty($wedding['start_date'])): 
+    if ($isSecActive('countdown') && !empty($wedding['start_date'])): 
+        $countdownTextClass = ($secSettings['countdown']['text_color'] ?? 'dark') === 'light' ? 'text-light' : 'text-dark';
         $gcalUrl = '#';
         $countdownDateText = '';
         try {
@@ -1087,7 +1109,7 @@
             $countdownDateText = $wedding['akad_date'];
         }
     ?>
-    <section id="countdown-section" data-reveal="up" style="scroll-snap-align: start; padding: 60px 20px; text-align: center; position: relative; --section-bg: url('https://images.unsplash.com/photo-1519225421980-715cb0215aed?auto=format&fit=crop&q=80&w=1000');">
+    <section id="countdown-section" class="<?= $countdownTextClass ?>" data-reveal="up" style="scroll-snap-align: start; padding: 60px 20px; text-align: center; position: relative; --section-bg: url('https://images.unsplash.com/photo-1519225421980-715cb0215aed?auto=format&fit=crop&q=80&w=1000');">
         <div class="section-inner" style="max-width: 800px; margin: 0 auto; position: relative; z-index: 2;">
             <h3 style="margin-bottom: 8px; font-family: 'Playfair Display', serif; font-size: 2rem; color: var(--gold);">Menuju Hari Bahagia</h3>
             <p style="font-size: 1.1rem; font-weight: 600; color: var(--dark); margin-bottom: 25px; letter-spacing: 1px;">Menghitung hari menuju ikatan suci</p>
@@ -1134,7 +1156,10 @@
     </section>
     <?php endif; ?>
 
-    <section id="couple" data-reveal="up" style="scroll-snap-align: start; --section-bg: url('https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&q=80&w=1000');">
+    <?php if ($isSecActive('couple')): 
+        $coupleTextClass = ($secSettings['couple']['text_color'] ?? 'dark') === 'light' ? 'text-light' : 'text-dark';
+    ?>
+    <section id="couple" class="<?= $coupleTextClass ?>" data-reveal="up" style="scroll-snap-align: start; --section-bg: url('https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&q=80&w=1000');">
         <div class="section-inner">
             <h3>The Happy Couple</h3>
             <div class="couple-quote" data-reveal="up" data-reveal-delay="100">
@@ -1160,8 +1185,12 @@
             </div>
         </div>
     </section>
+    <?php endif; ?>
 
-    <section id="love-story" data-reveal="up" style="scroll-snap-align: start; --section-bg: url('https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&q=80&w=1000');">
+    <?php if ($isSecActive('love_story')): 
+        $storyTextClass = ($secSettings['love_story']['text_color'] ?? 'dark') === 'light' ? 'text-light' : 'text-dark';
+    ?>
+    <section id="love-story" class="<?= $storyTextClass ?>" data-reveal="up" style="scroll-snap-align: start; --section-bg: url('https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&q=80&w=1000');">
         <div class="section-inner">
             <h3>Our Love Story</h3>
             
@@ -1174,7 +1203,7 @@
             if (!empty($loveStories)): ?>
                 <div class="story-slider">
                     <?php foreach ($loveStories as $ls): ?>
-                    <div class="story-card">
+                    <div class="story-card" style="color: var(--dark) !important;">
                         <?php if (!empty($ls['image_url'])): ?>
                         <img src="<?= htmlspecialchars($ls['image_url']) ?>">
                         <?php else: ?>
@@ -1182,8 +1211,8 @@
                         <?php endif; ?>
                         <div>
                             <div style="font-size:0.6rem; color:var(--gold); font-weight:700; text-transform:uppercase;"><?= date('M Y', strtotime($ls['story_date'])) ?></div>
-                            <h4><?= htmlspecialchars($ls['title']) ?></h4>
-                            <p><?= htmlspecialchars($ls['content']) ?></p>
+                            <h4 style="color: var(--dark) !important;"><?= htmlspecialchars($ls['title']) ?></h4>
+                            <p style="color: #666 !important;"><?= htmlspecialchars($ls['content']) ?></p>
                         </div>
                     </div>
                     <?php endforeach; ?>
@@ -1195,26 +1224,30 @@
             <?php endif; ?>
         </div>
     </section>
+    <?php endif; ?>
 
-    <section id="events" data-reveal="up" style="scroll-snap-align: start; --section-bg: url('https://images.unsplash.com/photo-1469334031218-e382a71b716b?auto=format&fit=crop&q=80&w=1000');">
+    <?php if ($isSecActive('events')): 
+        $eventsTextClass = ($secSettings['events']['text_color'] ?? 'dark') === 'light' ? 'text-light' : 'text-dark';
+    ?>
+    <section id="events" class="<?= $eventsTextClass ?>" data-reveal="up" style="scroll-snap-align: start; --section-bg: url('https://images.unsplash.com/photo-1469334031218-e382a71b716b?auto=format&fit=crop&q=80&w=1000');">
         <div class="section-inner">
             <h3 style="font-family: 'Playfair Display', serif; font-weight: 700; font-style: italic; margin-top: 0; margin-bottom: 8px;">Save the Date</h3>
             <div class="event-wrapper">
-                <div class="event-item-block" data-reveal="up">
-                    <h4>Akad Nikah</h4>
+                <div class="event-item-block" data-reveal="up" style="color: var(--dark) !important;">
+                    <h4 style="color: var(--gold) !important;">Akad Nikah</h4>
                     <div class="event-item-grid">
                         <div class="detail-box">
                             <i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line></svg></i>
-                            <div class="detail-info"><b>Hari / Tanggal</b><span><?= $wedding['akad_date'] ?></span></div>
+                            <div class="detail-info"><b>Hari / Tanggal</b><span style="color: var(--dark) !important;"><?= $wedding['akad_date'] ?></span></div>
                         </div>
                         <div class="detail-box">
                             <i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></i>
-                            <div class="detail-info"><b>Waktu</b><span><?= $wedding['akad_time'] ?></span></div>
+                            <div class="detail-info"><b>Waktu</b><span style="color: var(--dark) !important;"><?= $wedding['akad_time'] ?></span></div>
                         </div>
                     </div>
                     <div class="detail-box">
                         <i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path></svg></i>
-                        <div class="detail-info"><b>Lokasi</b><span><?= $wedding['akad_place'] ?></span></div>
+                        <div class="detail-info"><b>Lokasi</b><span style="color: var(--dark) !important;"><?= $wedding['akad_place'] ?></span></div>
                     </div>
                     <?php if (!empty($wedding['akad_map_link'])): ?>
                         <a href="<?= $wedding['akad_map_link'] ?>" target="_blank" class="btn-map-bottom">
@@ -1224,21 +1257,21 @@
                     <?php endif; ?>
                 </div>
 
-                <div class="event-item-block" data-reveal="up" data-reveal-delay="200">
-                    <h4>Resepsi</h4>
+                <div class="event-item-block" data-reveal="up" data-reveal-delay="200" style="color: var(--dark) !important;">
+                    <h4 style="color: var(--gold) !important;">Resepsi</h4>
                     <div class="event-item-grid">
                         <div class="detail-box">
                             <i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line></svg></i>
-                            <div class="detail-info"><b>Hari / Tanggal</b><span><?= $wedding['reception_date'] ?></span></div>
+                            <div class="detail-info"><b>Hari / Tanggal</b><span style="color: var(--dark) !important;"><?= $wedding['reception_date'] ?></span></div>
                         </div>
                         <div class="detail-box">
                             <i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></i>
-                            <div class="detail-info"><b>Waktu</b><span><?= $wedding['reception_time'] ?></span></div>
+                            <div class="detail-info"><b>Waktu</b><span style="color: var(--dark) !important;"><?= $wedding['reception_time'] ?></span></div>
                         </div>
                     </div>
                     <div class="detail-box">
                         <i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path></svg></i>
-                        <div class="detail-info"><b>Lokasi</b><span><?= $wedding['reception_place'] ?></span></div>
+                        <div class="detail-info"><b>Lokasi</b><span style="color: var(--dark) !important;"><?= $wedding['reception_place'] ?></span></div>
                     </div>
                     <?php if (!empty($wedding['reception_map_link'])): ?>
                         <a href="<?= $wedding['reception_map_link'] ?>" target="_blank" class="btn-map-bottom">
@@ -1250,8 +1283,12 @@
             </div>
         </div>
     </section>
+    <?php endif; ?>
 
-    <section id="gallery" data-reveal="up" style="scroll-snap-align: start; --section-bg: url('https://images.unsplash.com/photo-1465495910676-424343b01393?auto=format&fit=crop&q=80&w=1000');">
+    <?php if ($isSecActive('gallery')): 
+        $galleryTextClass = ($secSettings['gallery']['text_color'] ?? 'light') === 'light' ? 'text-light' : 'text-dark';
+    ?>
+    <section id="gallery" class="<?= $galleryTextClass ?>" data-reveal="up" style="scroll-snap-align: start; --section-bg: url('https://images.unsplash.com/photo-1465495910676-424343b01393?auto=format&fit=crop&q=80&w=1000');">
         <div class="section-inner">
             <h3>Our Gallery</h3>
             <?php 
@@ -1344,18 +1381,22 @@
 <?php endif; ?>
         </div>
     </section>
+    <?php endif; ?>
 
-    <section id="gifts" data-reveal="up" style="--section-bg: url('https://images.unsplash.com/photo-1513519245088-0e12902e35ca?auto=format&fit=crop&q=80&w=1000');">
+    <?php if ($isSecActive('gifts')): 
+        $giftsTextClass = ($secSettings['gifts']['text_color'] ?? 'dark') === 'light' ? 'text-light' : 'text-dark';
+    ?>
+    <section id="gifts" class="<?= $giftsTextClass ?>" data-reveal="up" style="--section-bg: url('https://images.unsplash.com/photo-1513519245088-0e12902e35ca?auto=format&fit=crop&q=80&w=1000');">
         <div class="section-inner">
             <h3>Wedding Gift</h3>
             <p style="margin-bottom: 40px; color: #64748b;">Doa restu Anda merupakan hadiah terindah bagi kami. Namun jika Anda ingin memberikan hadiah, silakan melalui saluran berikut:</p>
             
             <div class="gift-container">
                 <?php if (!empty($wedding['bank1_acc'])): ?>
-                <div class="gift-card" data-reveal="up">
+                <div class="gift-card" data-reveal="up" style="color: var(--dark) !important;">
                     <span class="bank-badge"><?= $wedding['bank1_name'] ?></span>
-                    <span class="acc-number"><?= $wedding['bank1_acc'] ?></span>
-                    <p class="acc-owner">A.N <?= $wedding['bank1_owner'] ?></p>
+                    <span class="acc-number" style="color: var(--dark) !important;"><?= $wedding['bank1_acc'] ?></span>
+                    <p class="acc-owner" style="color: #64748b !important;">A.N <?= $wedding['bank1_owner'] ?></p>
                     <button onclick="copyToClipboard('<?= $wedding['bank1_acc'] ?>')" class="btn-copy">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
                         Salin Rekening
@@ -1364,10 +1405,10 @@
                 <?php endif; ?>
 
                 <?php if (!empty($wedding['bank2_acc'])): ?>
-                <div class="gift-card" data-reveal="up" data-reveal-delay="200">
+                <div class="gift-card" data-reveal="up" data-reveal-delay="200" style="color: var(--dark) !important;">
                     <span class="bank-badge"><?= $wedding['bank2_name'] ?></span>
-                    <span class="acc-number"><?= $wedding['bank2_acc'] ?></span>
-                    <p class="acc-owner">A.N <?= $wedding['bank2_owner'] ?></p>
+                    <span class="acc-number" style="color: var(--dark) !important;"><?= $wedding['bank2_acc'] ?></span>
+                    <p class="acc-owner" style="color: #64748b !important;">A.N <?= $wedding['bank2_owner'] ?></p>
                     <button onclick="copyToClipboard('<?= $wedding['bank2_acc'] ?>')" class="btn-copy">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
                         Salin Rekening
@@ -1377,8 +1418,12 @@
             </div>
         </div>
     </section>
+    <?php endif; ?>
 
-    <section id="guestbook" data-reveal="up" style="--section-bg: url('https://images.unsplash.com/photo-1522673607200-1648835ede57?auto=format&fit=crop&q=80&w=1000');">
+    <?php if ($isSecActive('guestbook')): 
+        $guestbookTextClass = ($secSettings['guestbook']['text_color'] ?? 'dark') === 'light' ? 'text-light' : 'text-dark';
+    ?>
+    <section id="guestbook" class="<?= $guestbookTextClass ?>" data-reveal="up" style="--section-bg: url('https://images.unsplash.com/photo-1522673607200-1648835ede57?auto=format&fit=crop&q=80&w=1000');">
         <div class="section-inner">
             <h3>Guestbook & Reservation</h3>
             <?php 
@@ -1389,7 +1434,7 @@
                 'name'            => 'Nama tidak valid. Minimal 2 karakter.',
                 'email'           => 'Alamat email tidak valid.',
                 'duplicate_email' => 'Alamat email ini sudah digunakan untuk mengirim ucapan sebelumnya.',
-                'message'         => 'Pesan terlalu pendek (min 5 karakter) atau terlalu panjang (maks 500).',
+                'message'         => 'Pesan terlalu pendek (min 5 karakter) or terlalu panjang (maks 500).',
             ];
             ?>
 
@@ -1431,7 +1476,7 @@
             </script>
             <?php endif; ?>
 
-            <div class="form-card">
+            <div class="form-card" style="color: var(--dark) !important;">
                 <form action="<?= $base ?>api/guestbook" method="POST" id="guestbookForm">
                     <input type="hidden" name="wedding_id" value="<?= $wedding['id'] ?>">
                     <input type="hidden" name="slug" value="<?= $wedding['slug'] ?>">
@@ -1483,7 +1528,7 @@
                     <div class="form-group is-textarea">
                         <textarea name="message" class="input-premium" id="msgArea" required minlength="5" maxlength="500"
                             style="height:75px; resize:none;" placeholder="Tulis ucapan..."></textarea>
-                        <label for="msgArea">Pesan / Doa Restu <small id="charCount">(0/500)</small></label>
+                        <label for="msgArea" style="background: #ffffff !important;">Pesan / Doa Restu <small id="charCount">(0/500)</small></label>
                     </div>
 
                     <button type="submit" class="btn-submit">
@@ -1510,7 +1555,7 @@
                     $avatar  = Models\Wedding::gravatarUrl($m['email'] ?? '', 60);
                     $isHadir = (bool)$m['attendance'];
                 ?>
-                <div class="comment-item" style="display: flex; flex-direction: row; gap: 10px; padding: 12px 14px; align-items: flex-start; text-align: left;">
+                <div class="comment-item" style="display: flex; flex-direction: row; gap: 10px; padding: 12px 14px; align-items: flex-start; text-align: left; color: var(--dark) !important;">
                     <img src="<?= $avatar ?>" alt="avatar" width="38" height="38" style="border-radius: 50%; border: 1.5px solid <?= $isHadir ? '#dcfce7' : '#fee2e2' ?>; flex-shrink: 0; object-fit: cover;">
                     <div style="flex: 1; min-width: 0;">
                         <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-bottom: 4px;">
@@ -1522,11 +1567,11 @@
                                 <?= $isHadir ? 'Hadir' : 'Absen' ?>
                             </span>
                         </div>
-                        <p style="font-size: 0.8rem; color: #555; line-height: 1.4; margin: 0; word-break: break-word;"><?= nl2br(htmlspecialchars($m['message'])) ?></p>
+                        <p style="font-size: 0.8rem; color: #555 !important; line-height: 1.4; margin: 0; word-break: break-word;"><?= nl2br(htmlspecialchars($m['message'])) ?></p>
                         <?php if (!empty($m['reply'])): ?>
                         <div style="margin-top: 8px; padding: 8px 10px; background: #faf6ef; border-radius: 8px; border-left: 2.5px solid var(--gold);">
                             <small style="color: var(--gold); font-weight: 700; display: block; margin-bottom: 2px; font-size: 0.7rem;">Balasan:</small>
-                            <p style="margin: 0; font-size: 0.76rem; color: #666; line-height: 1.35;"><?= nl2br(htmlspecialchars($m['reply'])) ?></p>
+                            <p style="margin: 0; font-size: 0.76rem; color: #666 !important; line-height: 1.35;"><?= nl2br(htmlspecialchars($m['reply'])) ?></p>
                         </div>
                         <?php endif; ?>
                     </div>
@@ -1536,6 +1581,7 @@
             <?php endif; ?>
         </div>
     </section>
+    <?php endif; ?>
 
     <div class="footer">
         <p>Made with Love - Wedding Manager</p>
@@ -1596,13 +1642,42 @@
 
     <!-- Floating Navigation -->
     <nav class="floating-nav">
-        <a href="<?= !empty($wedding['start_date']) ? '#countdown-section' : '#couple' ?>" class="nav-item" title="Home"><i><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg></i></a>
-        <a href="#couple" class="nav-item" title="Couple"><i><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></i></a>
-        <a href="#love-story" class="nav-item" title="Story"><i><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></i></a>
-        <a href="#events" class="nav-item" title="Events"><i><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg></i></a>
-        <a href="#gallery" class="nav-item" title="Gallery"><i><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg></i></a>
-        <a href="#gifts" class="nav-item" title="Gifts"><i><svg viewBox="0 0 24 24"><polyline points="20 12 20 22 4 22 4 12"></polyline><rect x="2" y="7" width="20" height="5"></rect><line x1="12" y1="22" x2="12" y2="7"></line><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path></svg></i></a>
-        <a href="#guestbook" class="nav-item" title="Reservation"><i><svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg></i></a>
+        <?php if ($isSecActive('hero')): ?>
+            <?php 
+            // Determine first active target section for Home button
+            $homeTarget = '#couple';
+            if ($isSecActive('countdown') && !empty($wedding['start_date'])) {
+                $homeTarget = '#countdown-section';
+            } elseif (!$isSecActive('couple')) {
+                // If couple is inactive, find first active section
+                foreach (['love_story' => '#love-story', 'events' => '#events', 'gallery' => '#gallery', 'gifts' => '#gifts', 'guestbook' => '#guestbook'] as $secKey => $targetId) {
+                    if ($isSecActive($secKey)) {
+                        $homeTarget = $targetId;
+                        break;
+                    }
+                }
+            }
+            ?>
+            <a href="<?= $homeTarget ?>" class="nav-item" title="Home"><i><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg></i></a>
+        <?php endif; ?>
+        <?php if ($isSecActive('couple')): ?>
+            <a href="#couple" class="nav-item" title="Couple"><i><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></i></a>
+        <?php endif; ?>
+        <?php if ($isSecActive('love_story')): ?>
+            <a href="#love-story" class="nav-item" title="Story"><i><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></i></a>
+        <?php endif; ?>
+        <?php if ($isSecActive('events')): ?>
+            <a href="#events" class="nav-item" title="Events"><i><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg></i></a>
+        <?php endif; ?>
+        <?php if ($isSecActive('gallery')): ?>
+            <a href="#gallery" class="nav-item" title="Gallery"><i><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg></i></a>
+        <?php endif; ?>
+        <?php if ($isSecActive('gifts')): ?>
+            <a href="#gifts" class="nav-item" title="Gifts"><i><svg viewBox="0 0 24 24"><polyline points="20 12 20 22 4 22 4 12"></polyline><rect x="2" y="7" width="20" height="5"></rect><line x1="12" y1="22" x2="12" y2="7"></line><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path></svg></i></a>
+        <?php endif; ?>
+        <?php if ($isSecActive('guestbook')): ?>
+            <a href="#guestbook" class="nav-item" title="Reservation"><i><svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg></i></a>
+        <?php endif; ?>
     </nav>
 
     <?php if (!empty($wedding['music_url'])): 

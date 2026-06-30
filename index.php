@@ -349,43 +349,60 @@ function handleAdmin($action, $parts) {
 
                 // ── Appearance ─────────────────────────────────────────
                 case 'appearance':
-                    $sections = ['hero', 'countdown', 'couple', 'love_story', 'events', 'gallery', 'gifts', 'guestbook'];
-                    
+                case 'appearance_countdown':
+                case 'appearance_couple':
+                case 'appearance_story':
+                case 'appearance_event':
+                case 'appearance_gallery':
+                case 'appearance_gift':
+                case 'appearance_guestbook':
+                    $secMap = [
+                        'appearance'           => 'hero',
+                        'appearance_countdown' => 'countdown',
+                        'appearance_couple'    => 'couple',
+                        'appearance_story'     => 'love_story',
+                        'appearance_event'     => 'events',
+                        'appearance_gallery'   => 'gallery',
+                        'appearance_gift'      => 'gifts',
+                        'appearance_guestbook' => 'guestbook',
+                    ];
+                    $activeSec = $secMap[$tab] ?? 'hero';
+
                     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $currentSettings = json_decode($wedding['section_settings'] ?? '{}', true) ?: [];
                         $uploadDir = __DIR__ . '/uploads/sections/' . $id;
                         
-                        foreach ($sections as $sec) {
-                            if (!isset($currentSettings[$sec])) {
-                                $currentSettings[$sec] = ['bg_color' => '', 'bg_image' => '', 'bg_opacity' => '0.08'];
-                            }
-                            
-                            $currentSettings[$sec]['bg_color'] = trim($_POST[$sec . '_bg_color'] ?? '');
-                            $currentSettings[$sec]['bg_opacity'] = trim($_POST[$sec . '_bg_opacity'] ?? '0.08');
+                        $sec = $activeSec;
+                        if (!isset($currentSettings[$sec])) {
+                            $currentSettings[$sec] = ['bg_color' => '', 'bg_image' => '', 'bg_opacity' => '0.08'];
+                        }
+                        
+                        $currentSettings[$sec]['bg_color'] = trim($_POST['bg_color'] ?? '');
+                        $currentSettings[$sec]['bg_opacity'] = trim($_POST['bg_opacity'] ?? '0.08');
+                        $currentSettings[$sec]['is_active'] = trim($_POST['is_active'] ?? '1');
+                        $currentSettings[$sec]['text_color'] = trim($_POST['text_color'] ?? 'dark');
 
-                            // Check for image upload
-                            if (isset($_FILES[$sec . '_bg_image']) && $_FILES[$sec . '_bg_image']['error'] !== UPLOAD_ERR_NO_FILE) {
-                                $res = Helpers\ImageHelper::processUpload($_FILES[$sec . '_bg_image'], $uploadDir);
-                                if (!isset($res['error'])) {
-                                    // Delete old image if exists
-                                    if (!empty($currentSettings[$sec]['bg_image'])) {
-                                        Helpers\ImageHelper::deleteFiles($currentSettings[$sec]['bg_image'], '');
-                                    }
-                                    $currentSettings[$sec]['bg_image'] = $res['full'];
-                                }
-                            }
-                            
-                            // Check for image removal
-                            if (isset($_POST[$sec . '_remove_bg']) && $_POST[$sec . '_remove_bg'] == '1') {
+                        // Check for image upload
+                        if (isset($_FILES['bg_image']) && $_FILES['bg_image']['error'] !== UPLOAD_ERR_NO_FILE) {
+                            $res = Helpers\ImageHelper::processUpload($_FILES['bg_image'], $uploadDir);
+                            if (!isset($res['error'])) {
                                 if (!empty($currentSettings[$sec]['bg_image'])) {
                                     Helpers\ImageHelper::deleteFiles($currentSettings[$sec]['bg_image'], '');
-                                    $currentSettings[$sec]['bg_image'] = '';
                                 }
+                                $currentSettings[$sec]['bg_image'] = $res['full'];
+                            }
+                        }
+                        
+                        // Check for image removal
+                        if (isset($_POST['remove_bg']) && $_POST['remove_bg'] == '1') {
+                            if (!empty($currentSettings[$sec]['bg_image'])) {
+                                Helpers\ImageHelper::deleteFiles($currentSettings[$sec]['bg_image'], '');
+                                $currentSettings[$sec]['bg_image'] = '';
                             }
                         }
 
                         Models\Wedding::update($id, ['section_settings' => json_encode($currentSettings)]);
-                        header('Location: ' . $detailBase . 'appearance?saved=1');
+                        header('Location: ' . $detailBase . $tab . '?saved=1');
                         exit;
                     }
                     
