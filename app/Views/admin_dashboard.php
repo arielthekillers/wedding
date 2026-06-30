@@ -108,6 +108,60 @@
             font-weight:700; font-size:1rem; text-decoration:none;
             box-shadow:0 4px 12px rgba(139,92,246,0.35);
         }
+
+        /* ─── DROPDOWN MENU ─── */
+        .manage-dropdown-wrapper {
+            position: relative;
+            display: flex;
+            flex: 1;
+        }
+        .btn-manage {
+            width: 100%;
+            border: none;
+            cursor: pointer;
+            outline: none;
+            justify-content: center;
+        }
+        .manage-dropdown-menu {
+            display: none;
+            position: absolute;
+            bottom: calc(100% + 8px);
+            left: 0;
+            width: 100%;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(139,92,246,0.15);
+            border: 1px solid var(--border);
+            z-index: 10;
+            overflow: hidden;
+            animation: slideUp 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .manage-dropdown-menu.show {
+            display: block;
+        }
+        .manage-dropdown-menu a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 18px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text);
+            text-decoration: none;
+            transition: background 0.15s, color 0.15s;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .manage-dropdown-menu a:last-child {
+            border-bottom: none;
+        }
+        .manage-dropdown-menu a:hover {
+            background: #f8fafc;
+            color: var(--primary);
+        }
     </style>
 </head>
 <body>
@@ -185,7 +239,17 @@
                     &nbsp;|&nbsp; 🎨 <?= htmlspecialchars($w['theme_path']) ?>
                 </div>
                 <div class="card-actions">
-                    <a href="admin/detail/<?= $w['id'] ?>" class="btn-manage">⚙️ Kelola</a>
+                    <div class="manage-dropdown-wrapper">
+                        <button type="button" class="btn-manage" onclick="toggleManageDropdown(event, 'dropdown-<?= $w['id'] ?>')">
+                            ⚙️ Kelola
+                        </button>
+                        <div id="dropdown-<?= $w['id'] ?>" class="manage-dropdown-menu">
+                            <a href="<?= $GLOBALS['base'] ?>admin/detail/<?= $w['id'] ?>/settings">⚙️ Settings</a>
+                            <a href="<?= $GLOBALS['base'] ?>admin/detail/<?= $w['id'] ?>/profile">📝 Content Data</a>
+                            <a href="<?= $GLOBALS['base'] ?>admin/detail/<?= $w['id'] ?>/appearance">🎨 Layout</a>
+                            <a href="<?= $GLOBALS['base'] ?>admin/detail/<?= $w['id'] ?>/guests">💬 Interaksi</a>
+                        </div>
+                    </div>
                     <a href="<?= $GLOBALS['base'] ?>preview/<?= $w['slug'] ?>" target="_blank" class="btn-preview">🌐 Preview</a>
                     <?php if ($_SESSION['role'] === 'admin'): ?>
                     <a href="admin/delete/<?= $w['id'] ?>" class="btn-del"
@@ -198,5 +262,27 @@
         </div>
 
     </div>
+
+    <script>
+    function toggleManageDropdown(event, id) {
+        event.stopPropagation();
+        const dropdowns = document.querySelectorAll('.manage-dropdown-menu');
+        dropdowns.forEach(d => {
+            if (d.id !== id) {
+                d.classList.remove('show');
+            }
+        });
+        
+        const current = document.getElementById(id);
+        current.classList.toggle('show');
+    }
+
+    document.addEventListener('click', function(event) {
+        const dropdowns = document.querySelectorAll('.manage-dropdown-menu');
+        dropdowns.forEach(d => {
+            d.classList.remove('show');
+        });
+    });
+    </script>
 </body>
 </html>

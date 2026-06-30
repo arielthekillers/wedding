@@ -27,6 +27,29 @@ $tabs = [
     'guests'    => ['icon' => '📋',  'label' => 'Daftar Undangan'],
     'guestbook' => ['icon' => '📝',  'label' => 'Buku Tamu', 'count' => $gbCount],
 ];
+
+// Mapping of sub-tabs to main-tabs / categories
+$categoryMapping = [
+    'settings'   => 'settings',
+    'appearance' => 'layout',
+    'profile'    => 'content',
+    'event'      => 'content',
+    'gift'       => 'content',
+    'gallery'    => 'content',
+    'story'      => 'content',
+    'guests'     => 'interaction',
+    'guestbook'  => 'interaction',
+];
+
+$activeCategory = $categoryMapping[$activeTab] ?? 'settings';
+
+// Filter $tabs to only show the ones belonging to the active category
+$visibleTabs = [];
+foreach ($tabs as $key => $tab) {
+    if (($categoryMapping[$key] ?? '') === $activeCategory) {
+        $visibleTabs[$key] = $tab;
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -253,7 +276,7 @@ $tabs = [
 
 <!-- ── TAB NAVIGATION ── -->
 <nav class="mgmt-tabs">
-    <?php foreach ($tabs as $tabKey => $tab): ?>
+    <?php foreach ($visibleTabs as $tabKey => $tab): ?>
     <a href="<?= $base ?>admin/detail/<?= $wid ?>/<?= $tabKey ?>"
        class="mgmt-tab <?= $activeTab === $tabKey ? 'active' : '' ?>">
         <?= $tab['icon'] ?> <?= $tab['label'] ?>
