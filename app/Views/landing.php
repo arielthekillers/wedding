@@ -5,261 +5,109 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Palovite - Premium Digital Wedding Invitations</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --primary: #8b5cf6;
-            --secondary: #ec4899;
-            --bg-color: #0f172a;
-            --text-main: #f8fafc;
-            --text-muted: #cbd5e1;
-            --card-bg: rgba(30, 41, 59, 0.7);
-            --gradient: linear-gradient(135deg, var(--primary), var(--secondary));
-            --glow: 0 0 20px rgba(139, 92, 246, 0.5);
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                    }
+                }
+            }
         }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Outfit', sans-serif;
-        }
-
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            overflow-x: hidden;
-        }
-
-        /* Nav */
-        header {
-            position: fixed;
-            top: 0;
-            width: 100%;
-            padding: 20px 50px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            z-index: 1000;
-            background: rgba(15, 23, 42, 0.8);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-        }
-
-        .logo {
-            font-size: 1.8rem;
-            font-weight: 800;
-            background: var(--gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            letter-spacing: -0.5px;
-        }
-
-        .btn-login {
-            background: var(--gradient);
-            color: white;
-            text-decoration: none;
-            padding: 10px 24px;
-            border-radius: 50px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            box-shadow: var(--glow);
-        }
-
-        .btn-login:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 0 30px rgba(236, 72, 153, 0.6);
-        }
-
-        /* Hero */
-        .hero {
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            padding: 0 20px;
-            position: relative;
-        }
-
-        /* Decorative background blobs */
-        .blob {
-            position: absolute;
-            filter: blur(80px);
-            z-index: -1;
-            opacity: 0.6;
-        }
-        .blob-1 { top: 20%; left: 10%; width: 300px; height: 300px; background: var(--primary); border-radius: 50%; }
-        .blob-2 { bottom: 20%; right: 10%; width: 400px; height: 400px; background: var(--secondary); border-radius: 50%; }
-
-        .hero h1 {
-            font-size: 4.5rem;
-            line-height: 1.1;
-            margin-bottom: 24px;
-            font-weight: 800;
-        }
-
-        .hero h1 span {
-            background: var(--gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .hero p {
-            font-size: 1.25rem;
-            color: var(--text-muted);
-            max-width: 600px;
-            margin-bottom: 40px;
-            font-weight: 300;
-            line-height: 1.6;
-        }
-
-        .hero-btns {
-            display: flex;
-            gap: 16px;
-        }
-
-        .btn-primary {
-            background: var(--text-main);
-            color: var(--bg-color);
-            text-decoration: none;
-            padding: 14px 32px;
-            border-radius: 50px;
-            font-weight: 700;
-            font-size: 1.1rem;
-            transition: all 0.3s ease;
-        }
-
-        .btn-primary:hover {
-            background: #e2e8f0;
-            transform: translateY(-2px);
-        }
-
-        /* Features */
-        .features {
-            padding: 100px 20px;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .section-title {
-            text-align: center;
-            font-size: 2.5rem;
-            margin-bottom: 60px;
-            font-weight: 700;
-        }
-
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
-        }
-
-        .feature-card {
-            background: var(--card-bg);
-            border: 1px solid rgba(255,255,255,0.05);
-            padding: 40px 30px;
-            border-radius: 24px;
-            backdrop-filter: blur(10px);
-            transition: transform 0.3s ease, border-color 0.3s ease;
-        }
-
-        .feature-card:hover {
-            transform: translateY(-10px);
-            border-color: rgba(139, 92, 246, 0.4);
-        }
-
-        .feature-icon {
-            font-size: 2.5rem;
-            margin-bottom: 20px;
-            display: inline-block;
-        }
-
-        .feature-title {
-            font-size: 1.4rem;
-            margin-bottom: 12px;
-            font-weight: 600;
-        }
-
-        .feature-desc {
-            color: var(--text-muted);
-            line-height: 1.6;
-            font-weight: 300;
-        }
-
-        /* Footer */
-        footer {
-            text-align: center;
-            padding: 40px 20px;
-            color: var(--text-muted);
-            border-top: 1px solid rgba(255,255,255,0.05);
-            margin-top: 50px;
-        }
-
-        @media (max-width: 768px) {
-            .hero h1 { font-size: 3rem; }
-            header { padding: 20px; }
-        }
-    </style>
+    </script>
 </head>
-<body>
+<body class="bg-slate-950 text-slate-100 font-sans min-h-screen relative overflow-x-hidden">
+    <!-- Decorative background blobs -->
+    <div class="absolute top-[20%] left-[5%] w-[350px] h-[350px] bg-blue-600/10 blur-[100px] rounded-full z-0"></div>
+    <div class="absolute bottom-[20%] right-[5%] w-[450px] h-[450px] bg-slate-800/30 blur-[120px] rounded-full z-0"></div>
 
-    <div class="blob blob-1"></div>
-    <div class="blob blob-2"></div>
-
-    <header>
-        <div class="logo">Palovite</div>
-        <a href="<?= $base ?>login" class="btn-login">Login Client</a>
+    <!-- ── NAVBAR ── -->
+    <header class="fixed top-0 left-0 w-full px-6 md:px-12 h-20 flex items-center justify-between z-50 bg-slate-950/80 backdrop-blur-xl border-b border-slate-900">
+        <div class="logo text-2xl font-extrabold tracking-tight bg-gradient-to-r from-blue-500 to-indigo-400 bg-clip-text text-transparent">Palovite</div>
+        <a href="<?= $base ?>login" class="inline-flex items-center gap-1.5 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 transition-all py-2 px-5 rounded-full shadow-lg shadow-blue-600/15 hover:scale-[1.02]">
+            Login Client
+        </a>
     </header>
 
-    <section class="hero">
-        <h1>Momen Spesial,<br><span>Lebih Mengesankan</span></h1>
-        <p>Buat undangan pernikahan digital interaktif, elegan, dan mudah dikelola dengan Palovite. Bagikan momen bahagiamu ke seluruh dunia hanya dengan satu klik.</p>
-        <div class="hero-btns">
-            <a href="<?= $base ?>login" class="btn-login">Mulai Sekarang</a>
-            <a href="#features" class="btn-primary">Pelajari Fitur</a>
+    <!-- ── HERO SECTION ── -->
+    <section class="min-h-screen flex flex-col justify-center items-center text-center px-4 pt-20 z-10 relative">
+        <h1 class="text-4xl md:text-6xl lg:text-7xl font-extrabold leading-tight mb-6 max-w-4xl tracking-tight">
+            Momen Spesial,<br>
+            <span class="bg-gradient-to-r from-blue-500 to-indigo-400 bg-clip-text text-transparent">Lebih Mengesankan</span>
+        </h1>
+        <p class="text-base md:text-lg text-slate-400 max-w-2xl mb-10 leading-relaxed font-light">
+            Buat undangan pernikahan digital interaktif, elegan, dan mudah dikelola dengan Palovite. Bagikan momen bahagiamu ke seluruh dunia hanya dengan satu klik.
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4">
+            <a href="<?= $base ?>login" class="inline-flex items-center justify-center gap-2 text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 transition-all py-3.5 px-8 rounded-full shadow-lg shadow-blue-600/20 hover:scale-[1.02]">
+                Mulai Sekarang
+            </a>
+            <a href="#features" class="inline-flex items-center justify-center gap-2 text-sm font-bold text-slate-800 bg-slate-100 hover:bg-slate-200 transition-all py-3.5 px-8 rounded-full hover:scale-[1.02]">
+                Pelajari Fitur
+            </a>
         </div>
     </section>
 
-    <section id="features" class="features">
-        <h2 class="section-title">Kenapa Memilih Palovite?</h2>
-        <div class="grid">
-            <div class="feature-card">
-                <div class="feature-icon">🎨</div>
-                <h3 class="feature-title">Desain Premium</h3>
-                <p class="feature-desc">Pilihan tema eksklusif yang dirancang khusus untuk membuat undangan pernikahan Anda terlihat mewah dan modern.</p>
+    <!-- ── FEATURES SECTION ── -->
+    <section id="features" class="max-w-6xl mx-auto px-6 py-24 relative z-10">
+        <h2 class="text-3xl md:text-4xl font-extrabold text-center mb-16 tracking-tight">Kenapa Memilih Palovite?</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- Feature 1 -->
+            <div class="bg-slate-900/50 border border-slate-850 p-8 rounded-2xl backdrop-blur-md hover:border-blue-600/40 transition-all group hover:-translate-y-1">
+                <div class="w-12 h-12 rounded-xl bg-blue-950/50 border border-blue-900/30 flex items-center justify-center text-blue-500 mb-6 group-hover:bg-blue-600 group-hover:text-white transition-all">
+                    <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6"><path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 14.7255 3.09032 17.1962 4.85857 19C5.3215 19.4629 5.25368 20.2443 4.90885 20.7303L4.85857 20.8012C4.30135 21.5878 4.79679 22 5.75936 22H12Z"></path><circle cx="7.5" cy="10.5" r="1.5" fill="currentColor"></circle><circle cx="11.5" cy="7.5" r="1.5" fill="currentColor"></circle><circle cx="16.5" cy="9.5" r="1.5" fill="currentColor"></circle><circle cx="15.5" cy="14.5" r="1.5" fill="currentColor"></circle></svg>
+                </div>
+                <h3 class="text-lg font-bold mb-3 tracking-tight">Desain Premium</h3>
+                <p class="text-slate-400 text-sm font-light leading-relaxed">Pilihan tema eksklusif yang dirancang khusus untuk membuat undangan pernikahan Anda terlihat mewah dan modern.</p>
             </div>
-            <div class="feature-card">
-                <div class="feature-icon">✨</div>
-                <h3 class="feature-title">Interaktif & Animasi</h3>
-                <p class="feature-desc">Dilengkapi dengan efek visual memukau, musik latar, dan galeri foto untuk pengalaman tamu yang tak terlupakan.</p>
+            <!-- Feature 2 -->
+            <div class="bg-slate-900/50 border border-slate-850 p-8 rounded-2xl backdrop-blur-md hover:border-blue-600/40 transition-all group hover:-translate-y-1">
+                <div class="w-12 h-12 rounded-xl bg-blue-950/50 border border-blue-900/30 flex items-center justify-center text-blue-500 mb-6 group-hover:bg-blue-600 group-hover:text-white transition-all">
+                    <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6"><path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m0-12.728l.707.707m11.314 11.314l.707.707M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8z"></path></svg>
+                </div>
+                <h3 class="text-lg font-bold mb-3 tracking-tight">Interaktif & Animasi</h3>
+                <p class="text-slate-400 text-sm font-light leading-relaxed">Dilengkapi dengan efek visual memukau, musik latar, dan galeri foto untuk pengalaman tamu yang tak terlupakan.</p>
             </div>
-            <div class="feature-card">
-                <div class="feature-icon">📱</div>
-                <h3 class="feature-title">Responsif Penuh</h3>
-                <p class="feature-desc">Undangan Anda akan tampil sempurna di semua perangkat, baik smartphone, tablet, maupun komputer desktop.</p>
+            <!-- Feature 3 -->
+            <div class="bg-slate-900/50 border border-slate-850 p-8 rounded-2xl backdrop-blur-md hover:border-blue-600/40 transition-all group hover:-translate-y-1">
+                <div class="w-12 h-12 rounded-xl bg-blue-950/50 border border-blue-900/30 flex items-center justify-center text-blue-500 mb-6 group-hover:bg-blue-600 group-hover:text-white transition-all">
+                    <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
+                </div>
+                <h3 class="text-lg font-bold mb-3 tracking-tight">Responsif Penuh</h3>
+                <p class="text-slate-400 text-sm font-light leading-relaxed">Undangan Anda akan tampil sempurna di semua perangkat, baik smartphone, tablet, maupun komputer desktop.</p>
             </div>
-            <div class="feature-card">
-                <div class="feature-icon">👥</div>
-                <h3 class="feature-title">Manajemen Tamu</h3>
-                <p class="feature-desc">Kelola daftar tamu, RSVP, dan pesan buku tamu secara real-time langsung dari dashboard pintar Anda.</p>
+            <!-- Feature 4 -->
+            <div class="bg-slate-900/50 border border-slate-850 p-8 rounded-2xl backdrop-blur-md hover:border-blue-600/40 transition-all group hover:-translate-y-1">
+                <div class="w-12 h-12 rounded-xl bg-blue-950/50 border border-blue-900/30 flex items-center justify-center text-blue-500 mb-6 group-hover:bg-blue-600 group-hover:text-white transition-all">
+                    <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                </div>
+                <h3 class="text-lg font-bold mb-3 tracking-tight">Manajemen Tamu</h3>
+                <p class="text-slate-400 text-sm font-light leading-relaxed">Kelola daftar tamu, RSVP, dan pesan buku tamu secara real-time langsung dari dashboard pintar Anda.</p>
             </div>
-            <div class="feature-card">
-                <div class="feature-icon">🔒</div>
-                <h3 class="feature-title">Akses Privat</h3>
-                <p class="feature-desc">Dapatkan kontrol penuh. Setiap klien memiliki akun login khusus untuk memperbarui detail acara kapan saja.</p>
+            <!-- Feature 5 -->
+            <div class="bg-slate-900/50 border border-slate-850 p-8 rounded-2xl backdrop-blur-md hover:border-blue-600/40 transition-all group hover:-translate-y-1">
+                <div class="w-12 h-12 rounded-xl bg-blue-950/50 border border-blue-900/30 flex items-center justify-center text-blue-500 mb-6 group-hover:bg-blue-600 group-hover:text-white transition-all">
+                    <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                </div>
+                <h3 class="text-lg font-bold mb-3 tracking-tight">Akses Privat</h3>
+                <p class="text-slate-400 text-sm font-light leading-relaxed">Dapatkan kontrol penuh. Setiap klien memiliki akun login khusus untuk memperbarui detail acara kapan saja.</p>
             </div>
-            <div class="feature-card">
-                <div class="feature-icon">🚀</div>
-                <h3 class="feature-title">Cepat & Aman</h3>
-                <p class="feature-desc">Infrastruktur cloud yang menjamin undangan Anda dapat diakses dengan cepat tanpa gangguan, dijamin aman.</p>
+            <!-- Feature 6 -->
+            <div class="bg-slate-900/50 border border-slate-850 p-8 rounded-2xl backdrop-blur-md hover:border-blue-600/40 transition-all group hover:-translate-y-1">
+                <div class="w-12 h-12 rounded-xl bg-blue-950/50 border border-blue-900/30 flex items-center justify-center text-blue-500 mb-6 group-hover:bg-blue-600 group-hover:text-white transition-all">
+                    <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"></path></svg>
+                </div>
+                <h3 class="text-lg font-bold mb-3 tracking-tight">Cepat & Aman</h3>
+                <p class="text-slate-400 text-sm font-light leading-relaxed">Infrastruktur cloud yang menjamin undangan Anda dapat diakses dengan cepat tanpa gangguan, dijamin aman.</p>
             </div>
         </div>
     </section>
 
-    <footer>
+    <!-- ── FOOTER ── -->
+    <footer class="text-center py-10 text-xs text-slate-500 border-t border-slate-900 relative z-10">
         <p>&copy; <?= date('Y') ?> Palovite. All rights reserved.</p>
     </footer>
-
 </body>
 </html>

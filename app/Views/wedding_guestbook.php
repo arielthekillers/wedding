@@ -7,16 +7,16 @@ $gbCount  = count($messages);
 ?>
 
 <?php if (isset($_GET['deleted'])): ?>
-<div class="alert alert-success">🗑️ Pesan berhasil dihapus.</div>
+<div class="alert alert-success">Pesan berhasil dihapus.</div>
 <?php endif; ?>
 <?php if (isset($_GET['replied'])): ?>
-<div class="alert alert-success">💬 Balasan berhasil disimpan.</div>
+<div class="alert alert-success">Balasan berhasil disimpan.</div>
 <?php endif; ?>
 
 <div class="section-card">
     <div class="section-card-header" style="justify-content:space-between;">
         <div style="display:flex;align-items:center;gap:10px;">
-            <div class="icon">📝</div>
+            <div class="icon"><svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="w-4.5 h-4.5 text-blue-600"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg></div>
             <div>
                 <h2>Buku Tamu</h2>
                 <p>Pesan dan ucapan dari tamu undangan</p>
@@ -29,7 +29,7 @@ $gbCount  = count($messages);
 
     <?php if (empty($messages)): ?>
     <div style="text-align:center;padding:60px 20px;">
-        <div style="font-size:3rem;margin-bottom:12px;">📭</div>
+        <div class="flex justify-center text-blue-600 mb-3"><svg viewBox="0 0 24 24" width="40" height="40" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round" class="w-10 h-10"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path></svg></div>
         <h3 style="margin:0 0 6px;color:#475569;">Belum ada pesan</h3>
         <p style="color:#94a3b8;margin:0;">Tamu belum menulis ucapan di buku tamu.</p>
     </div>
@@ -51,8 +51,8 @@ $gbCount  = count($messages);
                     <strong style="font-size:0.93rem;"><?= htmlspecialchars($msg['name']) ?></strong>
                     <span style="font-size:0.72rem;color:#94a3b8;"><?= htmlspecialchars($msg['email'] ?? '') ?></span>
                     <?php if (!empty($msg['circle'])): ?>
-                    <span style="background:#f1f5f9;color:#475569;font-size:0.7rem;font-weight:600;padding:2px 9px;border-radius:20px;" title="Kota / Kantor / Circle">
-                        📍 <?= htmlspecialchars($msg['circle']) ?>
+                    <span style="background:#f1f5f9;color:#475569;font-size:0.7rem;font-weight:600;padding:2px 9px;border-radius:20px; display:inline-flex; align-items:center; gap:2px;" title="Kota / Kantor / Circle">
+                        <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round" class="w-2.5 h-2.5 inline-block"><path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z"></path><circle cx="12" cy="10" r="3"></circle></svg> <?= htmlspecialchars($msg['circle']) ?>
                     </span>
                     <?php endif; ?>
                     <span style="background:<?= $att['color'] ?>;color:<?= $att['text'] ?>;font-size:0.7rem;font-weight:700;padding:2px 9px;border-radius:20px;">
@@ -94,12 +94,12 @@ $gbCount  = count($messages);
             <div style="display:flex; flex-direction:column; gap:8px; align-items:flex-end; flex-shrink:0;">
                 <a href="?action=deletemsg&msg_id=<?= $msg['id'] ?>"
                    onclick="return confirm('Hapus pesan dari <?= htmlspecialchars(addslashes($msg['name'])) ?>?')"
-                   style="color:#dc2626;font-size:0.78rem;font-weight:600;text-decoration:none;padding:5px 10px;border-radius:7px;background:#fee2e2;white-space:nowrap;width:100%;text-align:center;">
-                    🗑️ Hapus
+                   style="color:#dc2626;font-size:0.78rem;font-weight:600;text-decoration:none;padding:5px 10px;border-radius:7px;background:#fee2e2;white-space:nowrap;width:100%;text-align:center; display:inline-flex; align-items:center; justify-content:center; gap:4px;">
+                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="w-3 h-3"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg> Hapus
                 </a>
                 <button type="button" onclick="toggleReplyForm(<?= $msg['id'] ?>)"
-                        style="color:var(--primary);font-size:0.78rem;font-weight:600;border:none;cursor:pointer;padding:5px 10px;border-radius:7px;background:#ede9fe;white-space:nowrap;width:100%;">
-                    💬 Balas
+                        style="color:var(--primary);font-size:0.78rem;font-weight:600;border:none;cursor:pointer;padding:5px 10px;border-radius:7px;background:#ede9fe;white-space:nowrap;width:100%; display:inline-flex; align-items:center; justify-content:center; gap:4px;">
+                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="w-3 h-3"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg> Balas
                 </button>
             </div>
         </div>

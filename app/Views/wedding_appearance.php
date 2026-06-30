@@ -53,7 +53,7 @@ $sectionsMeta = [
     border-radius: 50%;
     background: var(--primary);
     cursor: pointer;
-    box-shadow: 0 0 10px rgba(139, 92, 246, 0.4);
+    box-shadow: 0 0 10px rgba(37, 99, 235, 0.4);
     border: 2px solid white;
 }
 .form-range::-moz-range-thumb {
@@ -62,19 +62,19 @@ $sectionsMeta = [
     border-radius: 50%;
     background: var(--primary);
     cursor: pointer;
-    box-shadow: 0 0 10px rgba(139, 92, 246, 0.4);
+    box-shadow: 0 0 10px rgba(37, 99, 235, 0.4);
     border: 2px solid white;
 }
 </style>
 
 <?php if (isset($_GET['saved'])): ?>
-<div class="alert alert-success">✅ Pengaturan tampilan berhasil disimpan!</div>
+<div class="alert alert-success">Pengaturan tampilan berhasil disimpan!</div>
 <?php endif; ?>
 
 <form method="POST" enctype="multipart/form-data">
     <div class="section-card">
         <div class="section-card-header">
-            <div class="icon">🎨</div>
+            <div class="icon"><svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="w-4.5 h-4.5 text-blue-600"><path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 14.7255 3.09032 17.1962 4.85857 19C5.3215 19.4629 5.25368 20.2443 4.90885 20.7303L4.85857 20.8012C4.30135 21.5878 4.79679 22 5.75936 22H12Z"></path><circle cx="7.5" cy="10.5" r="1.5" fill="currentColor"></circle><circle cx="11.5" cy="7.5" r="1.5" fill="currentColor"></circle><circle cx="16.5" cy="9.5" r="1.5" fill="currentColor"></circle><circle cx="15.5" cy="14.5" r="1.5" fill="currentColor"></circle></svg></div>
             <div>
                 <h2>Pengaturan Tampilan per Bagian</h2>
                 <p>Sesuaikan warna, gambar latar, dan tingkat transparansi untuk setiap bagian (section) pada tema undangan.</p>
@@ -144,7 +144,7 @@ $sectionsMeta = [
 
         </div>
         <div class="section-card-footer">
-            <button type="submit" class="btn btn-primary">💾 Simpan Tampilan</button>
+            <button type="submit" class="btn btn-primary"><svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="w-3.5 h-3.5 mr-1.5 inline-block"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg> Simpan Tampilan</button>
         </div>
     </div>
 </form>

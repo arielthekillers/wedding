@@ -4,7 +4,7 @@ include __DIR__ . '/partials/wedding_nav.php';
 ?>
 
 <?php if (isset($_GET['saved'])): ?>
-<div class="alert alert-success">✅ Informasi hadiah berhasil disimpan!</div>
+<div class="alert alert-success">Informasi hadiah berhasil disimpan!</div>
 <?php endif; ?>
 
 <form method="POST">
@@ -13,7 +13,7 @@ include __DIR__ . '/partials/wedding_nav.php';
     <!-- ── BANK 1 ── -->
     <div class="section-card">
         <div class="section-card-header">
-            <div class="icon">🏦</div>
+            <div class="icon"><svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="w-4.5 h-4.5 text-blue-600"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg></div>
             <div>
                 <h2>Rekening 1</h2>
                 <p>Rekening atas nama pengantin pertama</p>
@@ -44,7 +44,7 @@ include __DIR__ . '/partials/wedding_nav.php';
     <!-- ── BANK 2 ── -->
     <div class="section-card">
         <div class="section-card-header">
-            <div class="icon">🏦</div>
+            <div class="icon"><svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="w-4.5 h-4.5 text-blue-600"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg></div>
             <div>
                 <h2>Rekening 2</h2>
                 <p>Rekening atas nama pengantin kedua</p>
@@ -76,7 +76,7 @@ include __DIR__ . '/partials/wedding_nav.php';
 
 <div class="section-card" style="margin-top:0;">
     <div class="section-card-footer">
-        <button type="submit" class="btn btn-primary">💾 Simpan Info Hadiah</button>
+        <button type="submit" class="btn btn-primary"><svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="w-3.5 h-3.5 mr-1.5 inline-block"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg> Simpan Info Hadiah</button>
         <span style="font-size:0.8rem; color:#94a3b8;">Kosongkan nomor rekening untuk menyembunyikan bagian hadiah</span>
     </div>
 </div>

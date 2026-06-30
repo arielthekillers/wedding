@@ -5,263 +5,172 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Wedding Admin Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        :root { --primary:#8b5cf6; --secondary:#ec4899; --grad:linear-gradient(135deg,#8b5cf6,#ec4899); --bg:#f4f6fb; --card:#fff; --text:#1e293b; --border:#e2e8f0; }
-        * { box-sizing:border-box; }
-        body { font-family:'Outfit',sans-serif; background:var(--bg); color:var(--text); margin:0; }
-
-        /* TOPBAR */
-        .dashboard-topbar {
-            background: var(--grad);
-            color: white; padding: 0 32px;
-            display: flex; align-items: center; justify-content: space-between;
-            height: 64px;
-            box-shadow: 0 4px 20px rgba(139,92,246,0.3);
-            position: sticky; top: 0; z-index: 100;
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                    },
+                    animation: {
+                        'slide-up': 'slideUp 0.18s cubic-bezier(0.16, 1, 0.3, 1)',
+                    },
+                    keyframes: {
+                        slideUp: {
+                            '0%': { opacity: '0', transform: 'translateY(8px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
         }
-        .dashboard-topbar h1 { margin:0; font-size:1.35rem; font-weight:700; letter-spacing:0.3px; }
-        .dashboard-topbar h1 span { font-weight:300; opacity:0.8; }
-        .btn-new {
-            display:inline-flex; align-items:center; gap:6px;
-            padding:9px 20px; border-radius:10px;
-            background:rgba(255,255,255,0.2); color:white;
-            font-weight:700; font-size:0.88rem; text-decoration:none;
-            border: 1.5px solid rgba(255,255,255,0.4);
-            transition: background 0.2s;
-        }
-        .btn-new:hover { background:rgba(255,255,255,0.35); color:white; }
-
-        .container { max-width: 1060px; margin: 36px auto; padding: 0 20px 60px; }
-
-        /* STATS */
-        .stats-row { display:flex; gap:14px; margin-bottom:28px; flex-wrap:wrap; }
-        .stat-card {
-            background:var(--card); border-radius:12px; padding:16px 22px;
-            border:1px solid var(--border); box-shadow:0 2px 8px rgba(0,0,0,0.05);
-            display:flex; align-items:center; gap:14px; flex:1; min-width:180px;
-        }
-        .stat-icon { font-size:1.6rem; width:44px; height:44px; background:#ede9fe; border-radius:10px; display:flex; align-items:center; justify-content:center; }
-        .stat-num { font-size:1.5rem; font-weight:700; color:var(--primary); }
-        .stat-label { font-size:0.78rem; color:#64748b; }
-
-        /* SECTION HEADER */
-        .section-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
-        .section-header h2 { margin:0; font-size:1.05rem; font-weight:700; color:#475569; }
-
-        /* WEDDING CARDS */
-        .wedding-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(320px,1fr)); gap:18px; }
-        .wedding-card {
-            background:var(--card); border-radius:16px; padding:22px;
-            box-shadow:0 4px 14px rgba(0,0,0,0.06); border:1px solid var(--border);
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        .wedding-card:hover { transform:translateY(-3px); box-shadow:0 10px 28px rgba(0,0,0,0.1); }
-        .card-top { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:10px; }
-        .card-emoji { font-size:1.8rem; }
-        .status-pill {
-            font-size:0.7rem; font-weight:700; padding:3px 10px; border-radius:20px; text-transform:uppercase;
-        }
-        .status-on  { background:#dcfce7; color:#166534; }
-        .status-off { background:#fee2e2; color:#991b1b; }
-        .card-title { font-size:1.15rem; font-weight:700; margin:0 0 4px; line-height:1.3; }
-        .card-url {
-            color:var(--primary); font-size:0.82rem; text-decoration:none; font-weight:500;
-            display:inline-block; margin-bottom:8px; word-break:break-all;
-        }
-        .card-url:hover { text-decoration:underline; }
-        .card-meta { font-size:0.78rem; color:#94a3b8; }
-        .card-actions { margin-top:18px; display:flex; gap:8px; align-items:center; }
-        .btn-manage {
-            display:inline-flex; align-items:center; gap:5px;
-            padding:9px 18px; border-radius:9px;
-            background:var(--grad); color:white;
-            font-weight:700; font-size:0.85rem; text-decoration:none;
-            box-shadow:0 4px 10px rgba(139,92,246,0.3);
-            transition:transform 0.2s, box-shadow 0.2s; flex:1; justify-content:center;
-        }
-        .btn-manage:hover { transform:translateY(-1px); box-shadow:0 6px 14px rgba(139,92,246,0.4); color:white; }
-        .btn-preview {
-            display:inline-flex; align-items:center; gap:4px;
-            padding:9px 14px; border-radius:9px;
-            background:#eff6ff; color:#2563eb;
-            font-weight:600; font-size:0.82rem; text-decoration:none;
-            border:1px solid #bfdbfe; transition:background 0.2s;
-        }
-        .btn-preview:hover { background:#dbeafe; color:#2563eb; }
-        .btn-del {
-            display:inline-flex; align-items:center;
-            padding:9px 10px; border-radius:9px;
-            background:#fee2e2; color:#dc2626;
-            font-size:0.85rem; text-decoration:none; border:1px solid #fecaca;
-            transition:background 0.2s;
-        }
-        .btn-del:hover { background:#fecaca; color:#b91c1c; }
-
-        /* EMPTY */
-        .empty-state { text-align:center; padding:70px 20px; background:var(--card); border-radius:16px; border:2px dashed var(--border); grid-column:1/-1; }
-        .empty-state .icon { font-size:3.5rem; margin-bottom:14px; }
-        .empty-state p { color:#94a3b8; margin:6px 0 20px; }
-        .btn-create-big {
-            display:inline-flex; align-items:center; gap:6px;
-            padding:12px 28px; border-radius:10px;
-            background:var(--grad); color:white;
-            font-weight:700; font-size:1rem; text-decoration:none;
-            box-shadow:0 4px 12px rgba(139,92,246,0.35);
-        }
-
-        /* ─── DROPDOWN MENU ─── */
-        .manage-dropdown-wrapper {
-            position: relative;
-            display: flex;
-            flex: 1;
-        }
-        .btn-manage {
-            width: 100%;
-            border: none;
-            cursor: pointer;
-            outline: none;
-            justify-content: center;
-        }
-        .manage-dropdown-menu {
-            display: none;
-            position: absolute;
-            bottom: calc(100% + 8px);
-            left: 0;
-            width: 100%;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(139,92,246,0.15);
-            border: 1px solid var(--border);
-            z-index: 10;
-            overflow: hidden;
-            animation: slideUp 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .manage-dropdown-menu.show {
-            display: block;
-        }
-        .manage-dropdown-menu a {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 12px 18px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: var(--text);
-            text-decoration: none;
-            transition: background 0.15s, color 0.15s;
-            border-bottom: 1px solid #f1f5f9;
-        }
-        .manage-dropdown-menu a:last-child {
-            border-bottom: none;
-        }
-        .manage-dropdown-menu a:hover {
-            background: #f8fafc;
-            color: var(--primary);
-        }
-    </style>
+    </script>
 </head>
-<body>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen">
     <!-- ── TOPBAR ── -->
-    <div class="dashboard-topbar">
-        <h1>Palovite <span><?= $_SESSION['role'] === 'admin' ? 'Admin' : 'Client' ?></span></h1>
-        <div style="display:flex; gap:12px; align-items:center;">
-            <?php if ($_SESSION['role'] === 'admin'): ?>
-                <a href="admin/users" class="btn-new" style="background:transparent; border-color:transparent;">👥 Manage Users</a>
-                <a href="admin/create" class="btn-new">+ Buat Undangan</a>
-            <?php endif; ?>
-            <a href="<?= $GLOBALS['base'] ?>logout" class="btn-new" style="background:transparent;">Logout</a>
+    <header class="bg-slate-900 text-white sticky top-0 z-50 shadow-md">
+        <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+            <h1 class="flex items-center gap-2 text-lg font-bold tracking-tight">
+                <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"></path><path d="M12 6a6 6 0 1 0 0 12 6 6 0 0 0 0-12z"></path></svg>
+                <span>Palovite</span>
+                <span class="text-xs font-semibold px-2 py-0.5 bg-slate-800 text-slate-300 rounded border border-slate-700 ml-1"><?= $_SESSION['role'] === 'admin' ? 'Admin' : 'Client' ?></span>
+            </h1>
+            <div class="flex items-center gap-3">
+                <?php if ($_SESSION['role'] === 'admin'): ?>
+                    <a href="admin/users" class="inline-flex items-center gap-1.5 text-sm font-semibold text-slate-300 hover:text-white transition-colors py-1.5 px-3 rounded hover:bg-slate-800">
+                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="w-3.5 h-3.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                        Manage Users
+                    </a>
+                    <a href="admin/create" class="inline-flex items-center gap-1.5 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 transition-colors py-1.5 px-4 rounded shadow">
+                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="w-3.5 h-3.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                        Buat Undangan
+                    </a>
+                <?php endif; ?>
+                <a href="<?= $GLOBALS['base'] ?>logout" class="inline-flex items-center gap-1.5 text-sm font-semibold text-slate-300 hover:text-white transition-colors py-1.5 px-3 rounded hover:bg-slate-800 border border-slate-700">
+                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="w-3.5 h-3.5"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                    Logout
+                </a>
+            </div>
         </div>
-    </div>
+    </header>
 
-    <div class="container">
-
+    <main class="max-w-6xl mx-auto px-4 py-8">
         <!-- ── STATS ROW ── -->
-        <div class="stats-row">
-            <div class="stat-card">
-                <div class="stat-icon">💍</div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-10">
+            <div class="bg-white rounded-lg p-5 border border-slate-200 shadow-sm flex items-center gap-4">
+                <div class="w-12 h-12 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center flex-shrink-0">
+                    <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><circle cx="12" cy="12" r="8"></circle><circle cx="12" cy="12" r="4"></circle></svg>
+                </div>
                 <div>
-                    <div class="stat-num"><?= count($weddings) ?></div>
-                    <div class="stat-label">Total Undangan</div>
+                    <div class="text-2xl font-bold text-slate-900"><?= count($weddings) ?></div>
+                    <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Total Undangan</div>
                 </div>
             </div>
-            <div class="stat-card">
-                <div class="stat-icon">✅</div>
+            <div class="bg-white rounded-lg p-5 border border-slate-200 shadow-sm flex items-center gap-4">
+                <div class="w-12 h-12 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center flex-shrink-0">
+                    <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                </div>
                 <div>
-                    <div class="stat-num"><?= count(array_filter($weddings, fn($w) => $w['is_enabled'])) ?></div>
-                    <div class="stat-label">Undangan Aktif</div>
+                    <div class="text-2xl font-bold text-slate-900"><?= count(array_filter($weddings, fn($w) => $w['is_enabled'])) ?></div>
+                    <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Undangan Aktif</div>
                 </div>
             </div>
-            <div class="stat-card">
-                <div class="stat-icon">🌐</div>
+            <div class="bg-white rounded-lg p-5 border border-slate-200 shadow-sm flex items-center gap-4">
+                <div class="w-12 h-12 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center flex-shrink-0">
+                    <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                </div>
                 <div>
-                    <div class="stat-num"><?= $_SERVER['HTTP_HOST'] ?></div>
-                    <div class="stat-label">Server</div>
+                    <div class="text-2xl font-bold text-slate-900"><?= $_SERVER['HTTP_HOST'] ?></div>
+                    <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Server</div>
                 </div>
             </div>
         </div>
 
         <!-- ── WEDDING LIST ── -->
-        <div class="section-header">
-            <h2>Daftar Undangan</h2>
+        <div class="flex items-center justify-between mb-6">
+            <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Daftar Undangan</h2>
         </div>
 
-        <div class="wedding-grid">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <?php if (empty($weddings)): ?>
-            <div class="empty-state">
-                <div class="icon">💍</div>
-                <h3 style="margin:0 0 8px;">Belum ada undangan</h3>
+            <div class="col-span-full bg-white rounded-lg border-2 border-dashed border-slate-300 py-16 px-4 text-center">
+                <div class="text-slate-400 mb-4 flex justify-center">
+                    <svg viewBox="0 0 24 24" width="48" height="48" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" class="w-12 h-12"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                </div>
+                <h3 class="text-lg font-bold text-slate-700 mb-1">Belum ada undangan</h3>
                 <?php if ($_SESSION['role'] === 'admin'): ?>
-                    <p>Buat undangan digital pertama Anda sekarang!</p>
-                    <a href="admin/create" class="btn-create-big">+ Buat Undangan Pertama</a>
+                    <p class="text-sm text-slate-500 mb-6">Buat undangan digital pertama Anda sekarang!</p>
+                    <a href="admin/create" class="inline-flex items-center gap-1.5 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 transition-colors py-2.5 px-6 rounded shadow">
+                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                        Buat Undangan Pertama
+                    </a>
                 <?php else: ?>
-                    <p>Anda belum memiliki undangan yang terhubung dengan akun ini. Silakan hubungi admin.</p>
+                    <p class="text-sm text-slate-500">Anda belum memiliki undangan yang terhubung dengan akun ini. Silakan hubungi admin.</p>
                 <?php endif; ?>
             </div>
             <?php else: ?>
             <?php foreach ($weddings as $w): ?>
-            <div class="wedding-card">
-                <div class="card-top">
-                    <div class="card-emoji">💍</div>
-                    <span class="status-pill <?= $w['is_enabled'] ? 'status-on' : 'status-off' ?>">
-                        <?= $w['is_enabled'] ? 'Aktif' : 'Nonaktif' ?>
-                    </span>
+            <div class="bg-white rounded-lg p-6 border border-slate-200 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 flex flex-col justify-between h-[230px]">
+                <div>
+                    <div class="flex items-start justify-between mb-3">
+                        <div class="text-blue-600">
+                            <svg viewBox="0 0 24 24" width="28" height="28" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round" class="w-7 h-7"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"></path><path d="M12 6a6 6 0 1 0 0 12 6 6 0 0 0 0-12z"></path></svg>
+                        </div>
+                        <span class="inline-flex text-[10px] font-bold tracking-wider uppercase px-2.5 py-0.5 rounded-full <?= $w['is_enabled'] ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700' ?>">
+                            <?= $w['is_enabled'] ? 'Aktif' : 'Nonaktif' ?>
+                        </span>
+                    </div>
+                    <h3 class="text-base font-bold text-slate-900 truncate mb-1"><?= htmlspecialchars($w['title']) ?></h3>
+                    <a href="<?= $w['slug'] ?>" target="_blank" class="text-xs font-semibold text-blue-600 hover:underline block mb-3 truncate">
+                        <?= $_SERVER['HTTP_HOST'] ?>/<?= htmlspecialchars($w['slug']) ?>
+                    </a>
+                    <div class="text-[11px] font-semibold text-slate-500">
+                        Periode: <?= $w['start_date'] ?> - <?= $w['end_date'] ?>
+                        &middot; Tema: <?= htmlspecialchars($w['theme_path']) ?>
+                    </div>
                 </div>
-                <div class="card-title"><?= htmlspecialchars($w['title']) ?></div>
-                <a href="<?= $w['slug'] ?>" target="_blank" class="card-url">
-                    🌐 <?= $_SERVER['HTTP_HOST'] ?>/<?= htmlspecialchars($w['slug']) ?>
-                </a>
-                <div class="card-meta">
-                    📅 <?= $w['start_date'] ?> &nbsp;→&nbsp; <?= $w['end_date'] ?>
-                    &nbsp;|&nbsp; 🎨 <?= htmlspecialchars($w['theme_path']) ?>
-                </div>
-                <div class="card-actions">
-                    <div class="manage-dropdown-wrapper">
-                        <button type="button" class="btn-manage" onclick="toggleManageDropdown(event, 'dropdown-<?= $w['id'] ?>')">
-                            ⚙️ Kelola
+                <div class="flex items-center gap-2 mt-4">
+                    <div class="relative flex-1">
+                        <button type="button" onclick="toggleManageDropdown(event, 'dropdown-<?= $w['id'] ?>')" class="w-full inline-flex items-center justify-center gap-1.5 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 transition-colors py-2 px-4 rounded-lg shadow-sm">
+                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="w-3.5 h-3.5"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                            Kelola
                         </button>
-                        <div id="dropdown-<?= $w['id'] ?>" class="manage-dropdown-menu">
-                            <a href="<?= $GLOBALS['base'] ?>admin/detail/<?= $w['id'] ?>/settings">⚙️ Settings</a>
-                            <a href="<?= $GLOBALS['base'] ?>admin/detail/<?= $w['id'] ?>/profile">📝 Content Data</a>
-                            <a href="<?= $GLOBALS['base'] ?>admin/detail/<?= $w['id'] ?>/appearance">🎨 Layout</a>
-                            <a href="<?= $GLOBALS['base'] ?>admin/detail/<?= $w['id'] ?>/guests">💬 Interaksi</a>
+                        <div id="dropdown-<?= $w['id'] ?>" class="manage-dropdown-menu hidden absolute bottom-[calc(100%+8px)] left-0 w-full bg-white rounded-lg shadow-xl border border-slate-200 z-10 overflow-hidden animate-slide-up">
+                            <a href="<?= $GLOBALS['base'] ?>admin/detail/<?= $w['id'] ?>/settings" class="flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:text-blue-600 transition-colors border-b border-slate-100">
+                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="w-3.5 h-3.5"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                                Settings
+                            </a>
+                            <a href="<?= $GLOBALS['base'] ?>admin/detail/<?= $w['id'] ?>/profile" class="flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:text-blue-600 transition-colors border-b border-slate-100">
+                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="w-3.5 h-3.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                                Content Data
+                            </a>
+                            <a href="<?= $GLOBALS['base'] ?>admin/detail/<?= $w['id'] ?>/appearance" class="flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:text-blue-600 transition-colors border-b border-slate-100">
+                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="w-3.5 h-3.5"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+                                Layout
+                            </a>
+                            <a href="<?= $GLOBALS['base'] ?>admin/detail/<?= $w['id'] ?>/guests" class="flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:text-blue-600 transition-colors">
+                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="w-3.5 h-3.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                                Interaksi
+                            </a>
                         </div>
                     </div>
-                    <a href="<?= $GLOBALS['base'] ?>preview/<?= $w['slug'] ?>" target="_blank" class="btn-preview">🌐 Preview</a>
+                    <a href="<?= $GLOBALS['base'] ?>preview/<?= $w['slug'] ?>" target="_blank" class="inline-flex items-center justify-center gap-1.5 text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-200 transition-colors py-2 px-3.5 rounded-lg shadow-sm">
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="w-3.5 h-3.5"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                        Preview
+                    </a>
                     <?php if ($_SESSION['role'] === 'admin'): ?>
-                    <a href="admin/delete/<?= $w['id'] ?>" class="btn-del"
-                       onclick="return confirm('Hapus undangan <?= htmlspecialchars(addslashes($w['title'])) ?>? Semua data akan dihapus.')">🗑️</a>
+                    <a href="admin/delete/<?= $w['id'] ?>" class="inline-flex items-center justify-center text-rose-600 bg-rose-50 hover:bg-rose-100 border border-rose-200 transition-colors py-2 px-2.5 rounded-lg"
+                       onclick="return confirm('Hapus undangan <?= htmlspecialchars(addslashes($w['title'])) ?>? Semua data akan dihapus.')">
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="w-3.5 h-3.5"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                    </a>
                     <?php endif; ?>
                 </div>
             </div>
             <?php endforeach; ?>
             <?php endif; ?>
         </div>
-
-    </div>
+    </main>
 
     <script>
     function toggleManageDropdown(event, id) {
@@ -269,18 +178,18 @@
         const dropdowns = document.querySelectorAll('.manage-dropdown-menu');
         dropdowns.forEach(d => {
             if (d.id !== id) {
-                d.classList.remove('show');
+                d.classList.add('hidden');
             }
         });
         
         const current = document.getElementById(id);
-        current.classList.toggle('show');
+        current.classList.toggle('hidden');
     }
 
     document.addEventListener('click', function(event) {
         const dropdowns = document.querySelectorAll('.manage-dropdown-menu');
         dropdowns.forEach(d => {
-            d.classList.remove('show');
+            d.classList.add('hidden');
         });
     });
     </script>

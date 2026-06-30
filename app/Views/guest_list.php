@@ -9,20 +9,20 @@ $weddingUrl = $scheme . '://' . $host . $basePath . '/' . $wedding['slug'];
 ?>
 
 <?php if (isset($_GET['saved'])): ?>
-<div class="alert alert-success">✅ Data berhasil disimpan!</div>
+<div class="alert alert-success">Data berhasil disimpan!</div>
 <?php elseif (isset($_GET['deleted'])): ?>
-<div class="alert alert-success">🗑️ Data berhasil dihapus!</div>
+<div class="alert alert-success">Data berhasil dihapus!</div>
 <?php endif; ?>
 
 <div class="section-card">
     <div class="section-card-header" style="justify-content:space-between; align-items:center; flex-wrap:wrap; gap:15px; display:flex;">
         <div style="display:flex;align-items:center;gap:10px;">
-            <div class="icon">📋</div>
+            <div class="icon"><svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="w-4.5 h-4.5 text-blue-600"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg></div>
             <h2 style="margin:0;">Manajemen Daftar Undangan</h2>
         </div>
         <div style="display:flex; gap:10px;">
-            <button type="button" onclick="openAddCatModal()" class="btn btn-ghost btn-sm" style="padding:6px 12px; font-size:0.8rem;">+ Tambah Kategori</button>
-            <button type="button" onclick="openAddGuestModal()" class="btn btn-primary btn-sm" style="padding:6px 16px; font-size:0.8rem; border-radius:30px;">+ Tambah Tamu</button>
+            <button type="button" onclick="openAddCatModal()" class="btn btn-ghost btn-sm" style="padding:6px 12px; font-size:0.8rem; display:inline-flex; align-items:center; gap:4px;"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round" class="w-3 h-3"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg> Tambah Kategori</button>
+            <button type="button" onclick="openAddGuestModal()" class="btn btn-primary btn-sm" style="padding:6px 16px; font-size:0.8rem; border-radius:30px; display:inline-flex; align-items:center; gap:4px;"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round" class="w-3 h-3"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg> Tambah Tamu</button>
         </div>
     </div>
     
@@ -47,7 +47,7 @@ $weddingUrl = $scheme . '://' . $host . $basePath . '/' . $wedding['slug'];
         <!-- Guest Matrix Table -->
         <?php if (empty($allGuests)): ?>
         <div style="text-align:center;padding:50px 0;">
-            <div style="font-size:2.5rem;margin-bottom:10px;">📭</div>
+            <div class="flex justify-center text-blue-600 mb-3"><svg viewBox="0 0 24 24" width="40" height="40" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round" class="w-10 h-10"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path></svg></div>
             <p style="color:#94a3b8;margin:0;">Sistem undangan masih kosong. Mulai dengan membuat kategori & tambah tamu.</p>
         </div>
         <?php else: ?>
@@ -88,20 +88,20 @@ $weddingUrl = $scheme . '://' . $host . $basePath . '/' . $wedding['slug'];
                 <td style="padding: 12px 20px; text-align:right;">
                     <div style="display:inline-flex; gap:6px; align-items:center; position:relative;">
                         <button onclick="copyLink('<?= htmlspecialchars($link, ENT_QUOTES) ?>', <?= $g['id'] ?>)" class="btn btn-ghost btn-sm" style="display:inline-flex; align-items:center; gap:4px; padding:6px 10px; font-size:0.75rem;">
-                            <span>🔗</span><span>Salin</span>
+                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="w-3 h-3"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg><span>Salin</span>
                         </button>
                         <a href="https://api.whatsapp.com/send?text=<?= rawurlencode($waMessage) ?>"
                            target="_blank" class="btn btn-sm" style="display:inline-flex; align-items:center; gap:4px; background:#dcfce7; color:#166534; border:1px solid #bbf7d0; padding:6px 10px; font-size:0.75rem;">
-                           <span>💬</span><span>WA</span>
+                           <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="w-3 h-3"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg><span>WA</span>
                         </a>
                         <span style="color:#e2e8f0; margin:0 4px;">|</span>
                         <button onclick="openEditModal(<?= $g['id'] ?>, '<?= htmlspecialchars(addslashes($g['name'])) ?>', <?= $g['category_id'] ?>)" 
                                 class="btn btn-ghost btn-sm" style="display:inline-flex; align-items:center; gap:4px; color:#d97706; padding:6px 10px; font-size:0.75rem;">
-                                <span>✏️</span><span>Edit</span>
+                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="w-3 h-3"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4z"></path></svg><span>Edit</span>
                         </button>
                         <span onclick="confirmGuestDelete(event, <?= $g['id'] ?>, '<?= htmlspecialchars(addslashes($g['name'])) ?>')" 
                            class="btn btn-ghost btn-sm" style="display:inline-flex; align-items:center; gap:4px; color:#dc2626; padding:6px 10px; font-size:0.75rem; cursor:pointer;">
-                           <span>🗑️</span><span>Hapus</span>
+                           <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="w-3 h-3"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg><span>Hapus</span>
                         </span>
                         
                         <div id="flash-<?= $g['id'] ?>" style="font-size:0.7rem; color:#166534; font-weight:700; position:absolute; display:none; top:-20px; right:0;">✓ URL disalin</div>
@@ -204,7 +204,7 @@ $weddingUrl = $scheme . '://' . $host . $basePath . '/' . $wedding['slug'];
             <button type="button" onclick="closeModals()" class="close-btn">&times;</button>
         </div>
         <div class="section-card-body" style="text-align:center;">
-            <div style="font-size:3rem; margin-bottom:15px;">⚠️</div>
+            <div class="flex justify-center text-amber-500 mb-3"><svg viewBox="0 0 24 24" width="48" height="48" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="w-12 h-12"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg></div>
             <p style="margin-bottom:20px; color:#475569; line-height:1.5;">
                 Apakah Anda yakin ingin menghapus kategori <strong id="delCatName"></strong>?<br>
                 <span style="color:#ef4444; font-size:0.85rem; font-weight:600;">Semua tamu di dalamnya akan ikut terhapus selamanya.</span>
@@ -225,7 +225,7 @@ $weddingUrl = $scheme . '://' . $host . $basePath . '/' . $wedding['slug'];
             <button type="button" onclick="closeModals()" class="close-btn">&times;</button>
         </div>
         <div class="section-card-body" style="text-align:center;">
-            <div style="font-size:3rem; margin-bottom:15px;">🗑️</div>
+            <div class="flex justify-center text-rose-500 mb-3"><svg viewBox="0 0 24 24" width="48" height="48" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="w-12 h-12"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></div>
             <p style="margin-bottom:20px; color:#475569; line-height:1.5;">
                 Apakah Anda yakin ingin menghapus nama tamu <strong id="delGuestName"></strong>?
             </p>

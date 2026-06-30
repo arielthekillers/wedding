@@ -4,15 +4,15 @@ include __DIR__ . '/partials/wedding_nav.php';
 ?>
 
 <?php if (isset($_GET['saved'])): ?>
-<div class="alert alert-success">✅ Pengaturan berhasil disimpan!</div>
+<div class="alert alert-success">Pengaturan berhasil disimpan!</div>
 <?php elseif (isset($_GET['error'])): ?>
-<div class="alert alert-error">⚠️ <?= htmlspecialchars($_GET['error']) ?></div>
+<div class="alert alert-error"><?= htmlspecialchars($_GET['error']) ?></div>
 <?php endif; ?>
 
 <form method="POST">
 <div class="section-card">
     <div class="section-card-header">
-        <div class="icon">⚙️</div>
+        <div class="icon"><svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="w-4.5 h-4.5 text-blue-600"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg></div>
         <div>
             <h2>Pengaturan Umum</h2>
             <p>Identitas undangan, URL, dan konfigurasi tampilan</p>
@@ -93,7 +93,7 @@ include __DIR__ . '/partials/wedding_nav.php';
 
     </div>
     <div class="section-card-footer">
-        <button type="submit" class="btn btn-primary">💾 Simpan Pengaturan</button>
+        <button type="submit" class="btn btn-primary"><svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="w-3.5 h-3.5 mr-1.5 inline-block"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg> Simpan Pengaturan</button>
         <span style="font-size:0.8rem; color:#94a3b8;">
             URL Undangan:
             <a href="<?= $base . ($wedding['slug'] ?? '') ?>" id="slug-preview-link" target="_blank"
@@ -147,10 +147,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 .then(response => response.json())
                 .then(data => {
                     if (data.available) {
-                        slugStatus.textContent = '✅ ' + data.message;
+                        slugStatus.textContent = '✓ ' + data.message;
                         slugStatus.style.color = '#10b981'; // Success green
                     } else {
-                        slugStatus.textContent = '❌ ' + data.message;
+                        slugStatus.textContent = '✗ ' + data.message;
                         slugStatus.style.color = '#ef4444'; // Error red
                     }
                 })
