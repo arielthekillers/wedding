@@ -67,6 +67,21 @@ foreach ($tabs as $key => $tab) {
         $visibleTabs[$key] = $tab;
     }
 }
+
+// ── Live Preview (appearance tabs) ──
+$_sectionAnchors = [
+    'appearance'           => 'hero',
+    'appearance_countdown' => 'countdown-section',
+    'appearance_couple'    => 'couple',
+    'appearance_story'     => 'love-story',
+    'appearance_event'     => 'events',
+    'appearance_gallery'   => 'gallery',
+    'appearance_gift'      => 'gifts',
+    'appearance_guestbook' => 'guestbook',
+];
+$isAppearancePage = isset($_sectionAnchors[$activeTab]);
+$_previewAnchor   = $_sectionAnchors[$activeTab] ?? '';
+$_previewUrl      = $base . 'preview/' . $slug . '?section_preview=' . urlencode($_previewAnchor);
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -202,6 +217,145 @@ foreach ($tabs as $key => $tab) {
         }
     </style>
 </head>
+
+<?php if ($isAppearancePage): ?>
+<!-- ════════════ SPLIT-SCREEN LAYOUT (Appearance) ════════════ -->
+<body style="margin:0;padding:0;overflow:hidden;background:#0f172a;font-family:'Outfit',sans-serif;">
+<style>
+html,body{height:100%;margin:0;padding:0;}
+body{display:flex;flex-direction:column;overflow:hidden;background:#0f172a;}
+/* JS sets --vh for accurate mobile height */
+:root{--vh:1vh;}
+#app-layout{display:flex;flex-direction:column;height:calc(var(--vh,1vh)*100);overflow:hidden;}
+/* ─ Topbar ─ */
+#app-topbar{flex-shrink:0;background:#0f172a;color:white;padding:0 14px;height:50px;display:flex;align-items:center;justify-content:space-between;gap:10px;border-bottom:1px solid rgba(255,255,255,0.07);z-index:50;}
+.atb-btn{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);color:rgba(255,255,255,0.85);padding:5px 11px;border-radius:7px;font-size:0.72rem;font-weight:600;cursor:pointer;font-family:inherit;text-decoration:none;transition:background 0.2s;white-space:nowrap;}
+.atb-btn:hover{background:rgba(255,255,255,0.16);color:white;}
+/* ─ Preview pane ─ */
+#preview-pane{flex:1;overflow:hidden;background:#0f172a;display:flex;justify-content:center;align-items:stretch;min-height:0;padding:0;}
+#phone-wrapper{width:100%;max-width:430px;height:100%;overflow:hidden;border-radius:20px 20px 0 0;box-shadow:0 0 60px rgba(0,0,0,0.55);position:relative;}
+#previewFrame{width:100%;height:100%;border:none;display:block;}
+/* ─ Settings panel ─ */
+#settings-panel{
+    flex-shrink:0;
+    background:white;
+    border-radius:20px 20px 0 0;
+    box-shadow:0 -10px 40px rgba(0,0,0,0.3);
+    display:flex;
+    flex-direction:column;
+    position:relative;
+    z-index:30;
+    overflow:hidden;
+    /* Safe area for notch phones */
+    padding-bottom:env(safe-area-inset-bottom,0px);
+    /* Ensure panel never goes off-screen on mobile */
+    max-height:calc(var(--vh,1vh)*100 - 50px);
+}
+#panel-handle{
+    padding:12px 16px 10px;
+    min-height:36px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    flex-shrink:0;
+    user-select:none;
+    -webkit-user-select:none;
+    touch-action:manipulation;
+    background:white;
+}
+.handle-bar{
+    width:40px;height:4px;
+    background:#d1d5db;
+    border-radius:4px;
+    pointer-events:none;
+    transition:background 0.2s,width 0.2s;
+}
+/* When minimized: wider bar as subtle hint */
+.panel-minimized .handle-bar{background:#94a3b8;width:52px;}
+#panel-tabs{border-bottom:1px solid #e2e8f0;overflow-x:auto;flex-shrink:0;display:flex;padding:0 6px;-ms-overflow-style:none;scrollbar-width:none;}
+#panel-tabs::-webkit-scrollbar{display:none;}
+#panel-tabs a{display:inline-flex;align-items:center;gap:5px;padding:10px 13px;font-size:0.79rem;font-weight:600;border-bottom:2.5px solid transparent;color:#64748b;text-decoration:none;white-space:nowrap;transition:all 0.2s;flex-shrink:0;}
+#panel-tabs a.ptab-active{border-bottom-color:#2563eb;color:#2563eb;}
+#panel-tabs a:not(.ptab-active):hover{color:#2563eb;background:#f8fafc;border-radius:6px 6px 0 0;}
+/* ─ Panel body ─ */
+#panel-body{overflow-y:auto;overflow-x:hidden;flex:1;transition:max-height 0.38s cubic-bezier(0.4,0,0.2,1),opacity 0.25s ease;opacity:1;}
+/* Minimized: collapse body, keep handle+tabs visible */
+.panel-minimized #panel-body{max-height:0!important;overflow:hidden;opacity:0;pointer-events:none;}
+/* Strip card chrome inside panel */
+#panel-body .section-card{border-radius:0;border:none;box-shadow:none;margin:0;}
+#panel-body .alert{margin:12px 16px 0;}
+#panel-body .section-card-footer{position:sticky;bottom:0;z-index:5;background:white;box-shadow:0 -4px 16px rgba(0,0,0,0.07);}
+</style>
+
+<script>
+/* Fix mobile viewport height — browsers vary in how they handle 100vh */
+(function(){
+    function setVH(){
+        var vh = window.innerHeight * 0.01;
+        document.documentElement.style.setProperty('--vh', vh + 'px');
+    }
+    setVH();
+    window.addEventListener('resize', setVH);
+    window.addEventListener('orientationchange', function(){ setTimeout(setVH,150); });
+})();
+</script>
+
+<div id="app-layout">
+
+  <!-- TOP BAR -->
+  <div id="app-topbar">
+    <div style="display:flex;align-items:center;gap:9px;min-width:0;overflow:hidden;">
+      <a href="<?= $base ?>admin" class="atb-btn" style="padding:5px 8px;flex-shrink:0;" title="Dashboard">
+        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+      </a>
+      <div style="min-width:0;overflow:hidden;">
+        <div style="font-weight:700;font-size:0.85rem;color:white;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"><?= htmlspecialchars($wedding['title']) ?></div>
+        <div style="font-size:0.67rem;color:#94a3b8;white-space:nowrap;">Live Preview &middot; <?= htmlspecialchars($tabs[$activeTab]['label'] ?? '') ?></div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:7px;flex-shrink:0;">
+      <button onclick="reloadPreview()" class="atb-btn" type="button">
+        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+        Refresh
+      </button>
+      <a href="<?= $base ?>preview/<?= $slug ?>" target="_blank" class="atb-btn">
+        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+        Buka
+      </a>
+    </div>
+  </div>
+
+  <!-- PREVIEW PANE -->
+  <div id="preview-pane">
+    <div id="phone-wrapper">
+      <iframe id="previewFrame"
+        src="<?= htmlspecialchars($_previewUrl) ?>"
+        frameborder="0"
+        title="Preview Undangan Digital">
+      </iframe>
+    </div>
+  </div>
+
+  <!-- SETTINGS PANEL -->
+  <div id="settings-panel" class="panel-minimized">
+    <div id="panel-handle" onclick="toggleMinimize()" title="Buka / Tutup panel">
+      <div class="handle-bar"></div>
+    </div>
+    <nav id="panel-tabs">
+      <?php foreach ($visibleTabs as $tabKey => $tab): ?>
+      <a href="<?= $base ?>admin/detail/<?= $wid ?>/<?= $tabKey ?>"
+         class="<?= $activeTab === $tabKey ? 'ptab-active' : '' ?>">
+        <?= $tab['icon'] ?>
+        <span><?= $tab['label'] ?></span>
+      </a>
+      <?php endforeach; ?>
+    </nav>
+    <div id="panel-body">
+    <!-- view content injected below -->
+
+<?php else: ?>
+<!-- ════════════ NORMAL LAYOUT ════════════ -->
 <body class="bg-slate-50 text-slate-800 font-sans min-h-screen">
 
 <!-- ── TOPBAR ── -->
@@ -247,3 +401,4 @@ foreach ($tabs as $key => $tab) {
 
 <!-- ── CONTENT START ── -->
 <div class="max-w-4xl mx-auto px-4 py-8">
+<?php endif; ?>

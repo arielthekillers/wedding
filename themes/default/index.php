@@ -4,6 +4,20 @@ $isSecActive = function($key) use ($secSettings) {
     if (!isset($secSettings[$key]['is_active'])) return true;
     return $secSettings[$key]['is_active'] !== '0' && $secSettings[$key]['is_active'] !== false;
 };
+
+// ── Section Preview Mode (admin live preview) ──
+// Usage: ?section_preview=hero  |  ?section_preview=couple  | etc.
+$_sp = isset($_GET['section_preview']) ? trim($_GET['section_preview']) : null;
+$_spMode = ($_sp !== null && $_sp !== '');
+// Allowed section IDs in theme
+$_spAllowed = ['hero','countdown-section','couple','love-story','events','gallery','gifts','guestbook'];
+if ($_spMode && !in_array($_sp, $_spAllowed)) $_spMode = false;
+
+// In preview mode: always render all sections regardless of active status.
+// CSS isolation handles hiding the non-target sections visually.
+if ($_spMode) {
+    $isSecActive = function($key) { return true; };
+}
 ?>
 <!DOCTYPE html>
 <html lang="en" class="<?= (isset($_GET['msg']) || !$isSecActive('hero')) ? '' : 'locked' ?>">
@@ -1005,8 +1019,43 @@ $isSecActive = function($key) use ($secSettings) {
         }
         ?>
     </style>
+    <?php if ($_spMode): ?>
+    <style>
+    /* ── Section Preview Isolation ── */
+    html, body { height: 100vh !important; overflow: hidden !important; }
+    body.locked { overflow: hidden !important; }
+    /* Hide opening overlay */
+    #openingOverlay { display: none !important; }
+    /* Hide floating nav */
+    .floating-nav { display: none !important; }
+    /* Hide music controls */
+    #musicControls { display: none !important; }
+    /* Remove scroll snap from html */
+    html { scroll-snap-type: none !important; }
+    /* Hide all sections, then show only the target */
+    section { display: none !important; }
+    section#<?= htmlspecialchars($_sp) ?> {
+        display: flex !important;
+        min-height: 100vh !important;
+        scroll-snap-align: none !important;
+    }
+    /* For hero section: show openingOverlay as the preview (it IS the sampul) */
+    <?php if ($_sp === 'hero'): ?>
+    #openingOverlay {
+        display: flex !important;
+        position: relative !important;
+        width: 100% !important;
+        min-height: 100vh !important;
+        z-index: 1 !important;
+    }
+    /* Hide section#hero to avoid doubling — overlay is the hero preview */
+    section#hero { display: none !important; }
+    <?php endif; ?>
+    </style>
+    <?php endif; ?>
 </head>
-<body class="<?= (isset($_GET['msg']) || !$isSecActive('hero')) ? '' : 'locked' ?>">
+<body class="<?= ($_spMode || isset($_GET['msg']) || !$isSecActive('hero')) ? '' : 'locked' ?>">
+
 
     <!-- ─── 1. SAMPUL PEMBUKA (OPENING OVERLAY) ─── -->
     <!-- Layar penutup penuh sebelum tombol 'Buka Undangan' diklik -->
