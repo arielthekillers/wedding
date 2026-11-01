@@ -105,45 +105,149 @@ $_previewUrl      = $base . 'preview/' . $slug . '?section_preview=' . urlencode
     <style>
         /* CSS resets or variables utilized by existing pages if they rely on custom components */
         :root {
-            --primary:   #2563eb;
+            --primary:   #f43f5e;
             --secondary: #475569;
-            --grad:      linear-gradient(135deg, #1e293b, #0f172a);
-            --bg:        #f8fafc;
+            --grad:      linear-gradient(135deg, #f43f5e, #f59e0b);
+            --bg:        #fffbfb;
             --card:      #ffffff;
             --text:      #1e293b;
             --muted:     #64748b;
-            --border:    #e2e8f0;
+            --border:    #fed7aa;
             --radius:    8px;
             --shadow:    0 1px 3px rgba(0,0,0,0.05);
-            --shadow-lg: 0 10px 25px -5px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 25px -5px rgba(244,63,94,0.1);
         }
         *, *::before, *::after { box-sizing: border-box; }
         
         /* Retain global class selectors for custom elements in detail forms (e.g. section-card, form-control, btn) */
         .section-card {
-            background: var(--card); border-radius: var(--radius);
-            box-shadow: var(--shadow); border: 1px solid var(--border);
-            margin-bottom: 20px; overflow: hidden;
+            background: var(--card);
+            border-radius: 16px;
+            box-shadow: 0 4px 20px -2px rgba(244,63,94,0.06), 0 2px 6px -1px rgba(0,0,0,0.02);
+            border: 1px solid #ffedd5;
+            margin-bottom: 22px;
+            overflow: hidden;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .section-card:hover {
+            box-shadow: 0 8px 25px -4px rgba(244, 63, 94, 0.12), 0 4px 10px -2px rgba(0, 0, 0, 0.03);
         }
         .section-card-header {
-            padding: 18px 24px 14px;
-            border-bottom: 1px solid var(--border);
-            display: flex; align-items: center; gap: 10px;
+            padding: 16px 20px 14px;
+            background: linear-gradient(135deg, #fff7ed 0%, #fff1f2 50%, #ffe4e6 100%);
+            border-bottom: 1px solid #fecdd3;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            position: relative;
+        }
+        .section-card-header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 3px;
+            background: linear-gradient(90deg, #f43f5e, #fb7185, #f97316, #fbbf24);
         }
         .section-card-header .icon {
-            font-size: 1.2rem;
-            width: 36px; height: 36px;
-            background: #eff6ff; border-radius: 6px;
-            display: flex; align-items: center; justify-content: center;
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #f43f5e, #f97316);
+            color: #ffffff !important;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 14px rgba(244, 63, 94, 0.35);
+            flex-shrink: 0;
         }
-        .section-card-header h2 { margin: 0; font-size: 1rem; font-weight: 700; }
-        .section-card-header p  { margin: 2px 0 0; font-size: 0.8rem; color: var(--muted); }
+        .section-card-header .icon svg {
+            color: #ffffff !important;
+            stroke: #ffffff !important;
+            width: 20px;
+            height: 20px;
+        }
+        .section-card-header h2 {
+            margin: 0;
+            font-size: 0.98rem;
+            font-weight: 700;
+            color: #0f172a;
+            letter-spacing: -0.01em;
+        }
+        .section-card-header p {
+            margin: 3px 0 0;
+            font-size: 0.78rem;
+            color: #64748b;
+            font-weight: 500;
+        }
         .section-card-body { padding: 24px; }
         .section-card-footer {
-            padding: 16px 24px;
-            background: #fafbff;
-            border-top: 1px solid var(--border);
-            display: flex; align-items: center; gap: 12px;
+            position: fixed;
+            bottom: 18px;
+            right: 20px;
+            z-index: 9999;
+            padding: 6px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(254, 215, 170, 0.9);
+            border-radius: 50px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12), 0 4px 14px rgba(244, 63, 94, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin: 0;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .section-card-footer .btn-primary,
+        .section-card-footer button[type="submit"] {
+            border-radius: 40px;
+            padding: 10px 22px;
+            font-size: 0.88rem;
+            background: linear-gradient(135deg, #f43f5e, #f97316);
+            box-shadow: 0 4px 14px rgba(244, 63, 94, 0.35);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .section-card-footer .btn-primary:hover,
+        .section-card-footer button[type="submit"]:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(244, 63, 94, 0.5);
+        }
+
+        /* ── Mobile View: Save button circle icon only ── */
+        @media (max-width: 640px) {
+            .section-card-footer {
+                bottom: 14px;
+                right: 14px;
+                padding: 4px;
+                border-radius: 50%;
+            }
+            .section-card-footer .btn-primary,
+            .section-card-footer button[type="submit"] {
+                width: 48px;
+                height: 48px;
+                padding: 0;
+                border-radius: 50%;
+                font-size: 0;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+            }
+            .section-card-footer .btn-primary span,
+            .section-card-footer button[type="submit"] span {
+                display: none !important;
+            }
+            .section-card-footer .btn-primary svg,
+            .section-card-footer button[type="submit"] svg {
+                margin: 0 !important;
+                margin-right: 0 !important;
+                margin-left: 0 !important;
+                width: 22px;
+                height: 22px;
+                display: block;
+            }
         }
 
         .form-grid { display: grid; gap: 16px; }
@@ -160,44 +264,83 @@ $_previewUrl      = $base . 'preview/' . $slug . '?section_preview=' . urlencode
             width: 100%;
             max-width: 100%;
             padding: 10px 13px;
-            border: 1.5px solid var(--border); border-radius: 6px;
+            border: 1.5px solid #fed7aa; border-radius: 8px;
             font-family: inherit; font-size: 0.9rem; color: var(--text);
-            background: #fafafa;
+            background: #fffcf9;
             transition: border-color 0.2s, box-shadow 0.2s;
         }
         .form-control:focus {
-            outline: none; border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(37,99,235,0.15);
+            outline: none; border-color: #f43f5e;
+            box-shadow: 0 0 0 3px rgba(244,63,94,0.15);
             background: white;
         }
         textarea.form-control { resize: vertical; min-height: 90px; }
         .form-check { display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 0.9rem; }
-        .form-check input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--primary); cursor: pointer; }
+        .form-check input[type="checkbox"] { width: 16px; height: 16px; accent-color: #f43f5e; cursor: pointer; }
 
         .btn {
             display: inline-flex; align-items: center; gap: 6px;
-            padding: 10px 20px; border-radius: 6px;
+            padding: 10px 20px; border-radius: 8px;
             font-family: inherit; font-weight: 600; font-size: 0.88rem;
             cursor: pointer; border: none; text-decoration: none; transition: all 0.2s;
         }
         .btn-primary {
-            background: var(--primary); color: white;
-            box-shadow: 0 2px 4px rgba(37,99,235,0.15);
+            background: linear-gradient(135deg, #f43f5e, #f97316); color: white;
+            box-shadow: 0 3px 10px rgba(244,63,94,0.25);
         }
-        .btn-primary:hover { background: #1d4ed8; }
-        .btn-ghost { background: #f1f5f9; color: var(--muted); }
-        .btn-ghost:hover { background: var(--border); }
+        .btn-primary:hover { opacity: 0.92; transform: translateY(-1px); }
+        .btn-ghost { background: #fff1f2; color: #e11d48; }
+        .btn-ghost:hover { background: #ffe4e6; }
         .btn-danger { background: #fee2e2; color: #dc2626; }
         .btn-danger:hover { background: #fecaca; }
         .btn-sm { padding: 7px 14px; font-size: 0.8rem; }
 
         .alert {
-            padding: 12px 18px; border-radius: 6px;
-            font-size: 0.88rem; font-weight: 600; margin-bottom: 20px;
+            padding: 12px 18px 12px 16px;
+            border-radius: 10px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+            transition: opacity 0.4s ease, transform 0.4s ease, max-height 0.4s ease, margin 0.4s ease, padding 0.4s ease;
+            overflow: hidden;
+            opacity: 1;
+            max-height: 100px;
         }
-        .alert-success { background: #dcfce7; color: #166534; }
-        .alert-error   { background: #fee2e2; color: #991b1b; }
-        .alert-info    { background: #eff6ff; color: #1d4ed8; }
+        .alert.alert-hiding {
+            opacity: 0;
+            transform: translateY(-8px);
+            max-height: 0;
+            margin-top: 0;
+            margin-bottom: 0;
+            padding-top: 0;
+            padding-bottom: 0;
+        }
+        .alert-close-btn {
+            background: transparent;
+            border: none;
+            color: currentColor;
+            opacity: 0.6;
+            cursor: pointer;
+            padding: 2px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            transition: opacity 0.2s, background 0.2s;
+            flex-shrink: 0;
+        }
+        .alert-close-btn:hover {
+            opacity: 1;
+            background: rgba(0, 0, 0, 0.06);
+        }
+        .alert-success { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+        .alert-error   { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+        .alert-info    { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
 
         .section-divider {
             font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
@@ -228,9 +371,9 @@ body{display:flex;flex-direction:column;overflow:hidden;background:#0f172a;}
 :root{--vh:1vh;}
 #app-layout{display:flex;flex-direction:column;height:calc(var(--vh,1vh)*100);overflow:hidden;}
 /* ─ Topbar ─ */
-#app-topbar{flex-shrink:0;background:#0f172a;color:white;padding:0 14px;height:50px;display:flex;align-items:center;justify-content:space-between;gap:10px;border-bottom:1px solid rgba(255,255,255,0.07);z-index:50;}
-.atb-btn{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);color:rgba(255,255,255,0.85);padding:5px 11px;border-radius:7px;font-size:0.72rem;font-weight:600;cursor:pointer;font-family:inherit;text-decoration:none;transition:background 0.2s;white-space:nowrap;}
-.atb-btn:hover{background:rgba(255,255,255,0.16);color:white;}
+#app-topbar{flex-shrink:0;background:white;color:#1e293b;padding:0 14px;height:50px;display:flex;align-items:center;justify-content:space-between;gap:10px;border-bottom:1px solid #e2e8f0;z-index:50;}
+.atb-btn{display:inline-flex;align-items:center;gap:5px;background:#f8fafc;border:1px solid #e2e8f0;color:#475569;padding:5px 11px;border-radius:8px;font-size:0.72rem;font-weight:600;cursor:pointer;font-family:inherit;text-decoration:none;transition:all 0.2s;white-space:nowrap;}
+.atb-btn:hover{background:#eff6ff;color:#2563eb;border-color:#bfdbfe;}
 /* ─ Preview pane ─ */
 #preview-pane{flex:1;overflow:hidden;background:#0f172a;display:flex;justify-content:center;align-items:stretch;min-height:0;padding:0;}
 #phone-wrapper{width:100%;max-width:430px;height:100%;overflow:hidden;border-radius:20px 20px 0 0;box-shadow:0 0 60px rgba(0,0,0,0.55);position:relative;}
@@ -285,7 +428,20 @@ body{display:flex;flex-direction:column;overflow:hidden;background:#0f172a;}
 /* Strip card chrome inside panel */
 #panel-body .section-card{border-radius:0;border:none;box-shadow:none;margin:0;}
 #panel-body .alert{margin:12px 16px 0;}
-#panel-body .section-card-footer{position:sticky;bottom:0;z-index:5;background:white;box-shadow:0 -4px 16px rgba(0,0,0,0.07);}
+#panel-body .section-card-footer {
+    position: sticky;
+    bottom: 12px;
+    z-index: 50;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-top: 1px solid #e2e8f0;
+    box-shadow: 0 -6px 20px rgba(0,0,0,0.12);
+    border-radius: 50px;
+    margin: 10px 14px 14px;
+    padding: 10px 16px;
+    justify-content: center;
+}
 </style>
 
 <script>
@@ -310,8 +466,8 @@ body{display:flex;flex-direction:column;overflow:hidden;background:#0f172a;}
         <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
       </a>
       <div style="min-width:0;overflow:hidden;">
-        <div style="font-weight:700;font-size:0.85rem;color:white;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"><?= htmlspecialchars($wedding['title']) ?></div>
-        <div style="font-size:0.67rem;color:#94a3b8;white-space:nowrap;">Live Preview &middot; <?= htmlspecialchars($tabs[$activeTab]['label'] ?? '') ?></div>
+        <div style="font-weight:700;font-size:0.85rem;color:#0f172a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"><?= htmlspecialchars($wedding['title']) ?></div>
+        <div style="font-size:0.67rem;color:#64748b;white-space:nowrap;">Live Preview &middot; <?= htmlspecialchars($tabs[$activeTab]['label'] ?? '') ?></div>
       </div>
     </div>
     <div style="display:flex;align-items:center;gap:7px;flex-shrink:0;">
@@ -338,7 +494,7 @@ body{display:flex;flex-direction:column;overflow:hidden;background:#0f172a;}
   </div>
 
   <!-- SETTINGS PANEL -->
-  <div id="settings-panel" class="panel-minimized">
+  <div id="settings-panel">
     <div id="panel-handle" onclick="toggleMinimize()" title="Buka / Tutup panel">
       <div class="handle-bar"></div>
     </div>
@@ -359,45 +515,98 @@ body{display:flex;flex-direction:column;overflow:hidden;background:#0f172a;}
 <body class="bg-slate-50 text-slate-800 font-sans min-h-screen">
 
 <!-- ── TOPBAR ── -->
-<header class="bg-slate-900 text-white sticky top-0 z-50 shadow-md">
-    <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
-        <div class="flex items-center gap-2">
-            <h1 class="flex items-center gap-2 text-base font-bold tracking-tight">
-                <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"></path><path d="M12 6a6 6 0 1 0 0 12 6 6 0 0 0 0-12z"></path></svg>
-                <span><?= htmlspecialchars($wedding['title']) ?></span>
+<header class="bg-gradient-to-r from-amber-500/10 via-rose-500/10 to-orange-500/10 bg-white/95 backdrop-blur sticky top-0 z-50 shadow-sm border-b border-rose-100">
+    <div class="max-w-6xl mx-auto px-3 sm:px-4 py-2.5 sm:py-0 sm:h-16 flex flex-wrap sm:flex-nowrap items-center justify-between gap-2">
+        <div class="flex items-center gap-1.5 sm:gap-2 min-w-0 flex-1 sm:flex-none">
+            <h1 class="flex items-center gap-1.5 text-xs sm:text-base font-bold tracking-tight min-w-0">
+                <span class="truncate text-slate-900 font-extrabold"><?= htmlspecialchars($wedding['title']) ?></span>
             </h1>
-            <span class="inline-flex text-[9px] font-bold tracking-wider uppercase px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+            <span class="inline-flex text-[9px] font-extrabold tracking-wider uppercase px-2.5 py-0.5 rounded-full bg-rose-500 text-white shadow-sm shadow-rose-500/30 shrink-0">
                 <?= $wedding['is_enabled'] ? 'Aktif' : 'Nonaktif' ?>
             </span>
         </div>
-        <div class="flex items-center gap-3">
-            <a href="<?= $base ?>preview/<?= $slug ?>" target="_blank" class="inline-flex items-center gap-1 text-xs font-semibold text-slate-300 hover:text-white transition-colors py-1.5 px-3 rounded hover:bg-slate-800 border border-slate-700">
-                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="w-3.5 h-3.5"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
-                Preview
+        <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
+            <a href="<?= $base ?>preview/<?= $slug ?>" target="_blank" title="Preview Undangan" class="inline-flex items-center justify-center p-2 rounded-xl text-rose-600 hover:text-rose-700 hover:bg-rose-100/60 border border-rose-200/80 transition-all">
+                <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
             </a>
-            <a href="<?= $base ?>admin" class="inline-flex items-center gap-1 text-xs font-semibold text-slate-300 hover:text-white transition-colors py-1.5 px-3 rounded hover:bg-slate-800">
-                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="w-3.5 h-3.5"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-                Dashboard
+            <a href="<?= $base ?>admin" title="Kembali ke Dashboard" class="inline-flex items-center justify-center p-2 rounded-xl text-rose-600 hover:text-rose-700 hover:bg-rose-100/60 border border-rose-200/80 transition-all">
+                <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
             </a>
         </div>
     </div>
 </header>
 
 <!-- ── TAB NAVIGATION ── -->
-<div class="bg-white border-b border-slate-200 sticky top-16 z-40 shadow-sm">
-    <nav class="max-w-6xl mx-auto px-4 flex items-stretch overflow-x-auto no-scrollbar">
+<div class="bg-gradient-to-r from-orange-50 via-rose-50/80 to-amber-50 border-b border-rose-200/60 sticky top-16 z-40 shadow-sm">
+    <nav id="main-admin-tabs" class="max-w-6xl mx-auto px-4 py-1.5 flex items-center gap-1.5 overflow-x-auto no-scrollbar">
         <?php foreach ($visibleTabs as $tabKey => $tab): ?>
         <a href="<?= $base ?>admin/detail/<?= $wid ?>/<?= $tabKey ?>"
-           class="inline-flex items-center gap-2 px-5 py-4 text-sm font-semibold border-b-2 transition-all shrink-0 <?= $activeTab === $tabKey ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-500 hover:text-blue-600 hover:border-blue-200' ?>">
+           class="inline-flex items-center gap-2 px-4 py-2.5 text-xs sm:text-sm font-semibold rounded-xl transition-all shrink-0 <?= $activeTab === $tabKey ? 'tab-item-active bg-gradient-to-r from-rose-500 to-amber-500 text-white shadow-md shadow-rose-500/20 font-bold' : 'text-slate-700 hover:text-rose-600 hover:bg-white/80' ?>">
             <?= $tab['icon'] ?>
             <span><?= $tab['label'] ?></span>
             <?php if (!empty($tab['count'])): ?>
-            <span class="inline-flex items-center justify-center text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-blue-50 text-blue-600 ml-1 border border-blue-100"><?= $tab['count'] ?></span>
+            <span class="inline-flex items-center justify-center text-[10px] font-bold px-1.5 py-0.5 rounded-full <?= $activeTab === $tabKey ? 'bg-white/20 text-white' : 'bg-rose-100 text-rose-700' ?> ml-0.5"><?= $tab['count'] ?></span>
             <?php endif; ?>
         </a>
         <?php endforeach; ?>
     </nav>
 </div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Scroll active tab to visible center position on page load
+    const navs = [document.getElementById('panel-tabs'), document.getElementById('main-admin-tabs')];
+    navs.forEach(function(nav) {
+        if (!nav) return;
+        const active = nav.querySelector('.ptab-active, .tab-item-active');
+        if (active) {
+            nav.scrollLeft = active.offsetLeft - (nav.clientWidth / 2) + (active.offsetWidth / 2);
+        }
+    });
+
+    // Clean notification parameters from URL without reloading page
+    if (document.querySelectorAll('.alert').length > 0 && window.history.replaceState) {
+        const url = new URL(window.location.href);
+        const paramsToClean = ['saved', 'saved_story', 'saved_texts', 'deleted', 'uploaded', 'error'];
+        let hasParam = false;
+        paramsToClean.forEach(function(param) {
+            if (url.searchParams.has(param)) {
+                url.searchParams.delete(param);
+                hasParam = true;
+            }
+        });
+        if (hasParam) {
+            window.history.replaceState(null, '', url.pathname + url.search + url.hash);
+        }
+    }
+
+    // Auto-dismiss & Close button for all .alert notifications
+    document.querySelectorAll('.alert').forEach(function(alertEl) {
+        // Append close button if not exists
+        if (!alertEl.querySelector('.alert-close-btn')) {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'alert-close-btn';
+            btn.title = 'Tutup pemberitahuan';
+            btn.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>';
+            btn.onclick = function() { dismissAlert(alertEl); };
+            alertEl.appendChild(btn);
+        }
+
+        // Auto dismiss after 4 seconds
+        setTimeout(function() {
+            dismissAlert(alertEl);
+        }, 4000);
+    });
+
+    function dismissAlert(el) {
+        if (!el || el.classList.contains('alert-hiding')) return;
+        el.classList.add('alert-hiding');
+        setTimeout(function() {
+            if (el && el.parentNode) el.remove();
+        }, 400);
+    }
+});
+</script>
 
 <!-- ── CONTENT START ── -->
 <div class="max-w-4xl mx-auto px-4 py-8">

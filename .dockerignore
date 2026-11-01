@@ -1,0 +1,10 @@
+.git
+.gitignore
+.gitattributes
+*.zip
+scratch_*.php
+test_*.php
+fix_db_paths.php
+reset_password.php
+.env
+

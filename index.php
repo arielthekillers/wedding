@@ -49,19 +49,89 @@ if ($parts[0] === 'logout') {
     exit;
 }
 
-// API: Check slug availability (AJAX)
-if ($parts[0] === 'api' && ($parts[1] ?? '') === 'check-slug') {
+// API: Saweria Webhook Receiver
+if ($parts[0] === 'api' && ($parts[1] ?? '') === 'saweria-webhook') {
     header('Content-Type: application/json');
-    $slug = trim($_GET['slug'] ?? '');
-    $excludeId = (int)($_GET['exclude'] ?? 0);
-    if (empty($slug)) {
-        echo json_encode(['available' => false, 'message' => 'Slug tidak boleh kosong']);
-    } elseif (!preg_match('/^[a-z0-9\-]+$/', $slug)) {
-        echo json_encode(['available' => false, 'message' => 'Hanya huruf kecil, angka, dan tanda minus']);
-    } elseif (Models\Wedding::slugExists($slug, $excludeId)) {
-        echo json_encode(['available' => false, 'message' => 'Slug sudah dipakai']);
+    $rawInput = file_get_contents('php://input');
+    $payload = json_decode($rawInput, true);
+
+    if (!$payload) {
+        $payload = $_POST;
+    }
+
+    // Saweria Webhook Structure:
+    // { "version": "1.0", "id": "...", "donator_name": "...", "donator_email": "...", "amount": 100000, "message": "... [WED:12] ..." }
+    $saweriaId    = $payload['id'] ?? null;
+    $donatorName  = trim($payload['donator_name'] ?? 'Hamba Allah');
+    $donatorEmail = trim($payload['donator_email'] ?? '');
+    $amount       = (float)($payload['amount'] ?? 0);
+    $rawMessage   = trim($payload['message'] ?? '');
+
+    $weddingId = 0;
+    $cleanMessage = $rawMessage;
+
+    // Filter and parse hidden Tag [WED:12] or [WID:12]
+    if (preg_match('/\[(?:WED|WID):(\d+)\]/i', $rawMessage, $matches)) {
+        $weddingId = (int)$matches[1];
+        // Strip the hidden wedding tag from public message display
+        $cleanMessage = trim(preg_replace('/\[(?:WED|WID):\d+\]/i', '', $rawMessage));
+    }
+
+    // Fallback: If tag [WED:id] is missing from message, match by unique nominal amount
+    if ($weddingId === 0 && $amount > 0) {
+        $weddingId = Models\Wedding::findWeddingIdByUniqueAmount($amount);
+    }
+
+    if ($weddingId > 0 && $amount > 0) {
+        $wedding = Models\Wedding::getById($weddingId);
+        // Only record if wedding exists and Saweria gift option is enabled
+        if ($wedding && !empty($wedding['saweria_enabled'])) {
+            Models\Wedding::addSaweriaGift([
+                'wedding_id'    => $weddingId,
+                'saweria_id'    => $saweriaId,
+                'donator_name'  => $donatorName,
+                'donator_email' => $donatorEmail,
+                'amount'        => $amount,
+                'message'       => $cleanMessage
+            ]);
+            echo json_encode(['status' => 'success', 'message' => 'Gift recorded for wedding #' . $weddingId]);
+            exit;
+        }
+    }
+
+    echo json_encode(['status' => 'ignored', 'message' => 'No matching active wedding ID found in message or amount']);
+    exit;
+}
+
+// API: Store Saweria Intent (for Unique Nominal Matching)
+if ($parts[0] === 'api' && ($parts[1] ?? '') === 'saweria-intent') {
+    header('Content-Type: application/json');
+    $rawInput = file_get_contents('php://input');
+    $data = json_decode($rawInput, true) ?? $_POST;
+
+    $weddingId    = (int)($data['wedding_id'] ?? 0);
+    $uniqueAmount = (float)($data['unique_amount'] ?? 0);
+    $donatorName  = trim($data['donator_name'] ?? 'Hamba Allah');
+    $message      = trim($data['message'] ?? '');
+
+    if ($weddingId > 0 && $uniqueAmount > 0) {
+        Models\Wedding::createSaweriaIntent($weddingId, $uniqueAmount, $donatorName, $message);
+        echo json_encode(['status' => 'success', 'message' => 'Intent registered']);
+        exit;
+    }
+    echo json_encode(['status' => 'error', 'message' => 'Invalid parameters']);
+    exit;
+}
+
+// API: Get Saweria Live Gifts for UI Feed
+if ($parts[0] === 'api' && ($parts[1] ?? '') === 'saweria-gifts') {
+    header('Content-Type: application/json');
+    $wid = (int)($_GET['wedding_id'] ?? 0);
+    if ($wid) {
+        $gifts = Models\Wedding::getSaweriaGifts($wid);
+        echo json_encode(['status' => 'success', 'data' => $gifts]);
     } else {
-        echo json_encode(['available' => true, 'message' => 'Slug tersedia']);
+        echo json_encode(['status' => 'error', 'data' => []]);
     }
     exit;
 }
@@ -381,6 +451,27 @@ function handleAdmin($action, $parts) {
                         $currentSettings[$sec]['bg_opacity'] = trim($_POST['bg_opacity'] ?? '0.08');
                         $currentSettings[$sec]['is_active'] = trim($_POST['is_active'] ?? '1');
                         $currentSettings[$sec]['text_color'] = trim($_POST['text_color'] ?? 'dark');
+                        if (isset($_POST['btn_rounded'])) {
+                            $currentSettings[$sec]['btn_rounded'] = trim($_POST['btn_rounded']);
+                        }
+                        if (isset($_POST['btn_color'])) {
+                            $currentSettings[$sec]['btn_color'] = trim($_POST['btn_color']);
+                        }
+                        if (isset($_POST['btn_text_color'])) {
+                            $currentSettings[$sec]['btn_text_color'] = trim($_POST['btn_text_color']);
+                        }
+
+                        // Specific countdown appearance settings
+                        $countdownFields = [
+                            'box_rounded', 'box_bg_style', 'box_num_color',
+                            'show_btn_calendar', 'btn_style',
+                            'countdown_title', 'countdown_subtitle', 'countdown_ended_text'
+                        ];
+                        foreach ($countdownFields as $cf) {
+                            if (isset($_POST[$cf])) {
+                                $currentSettings[$sec][$cf] = trim($_POST[$cf]);
+                            }
+                        }
 
                         // Check for image upload
                         if (isset($_FILES['bg_image']) && $_FILES['bg_image']['error'] !== UPLOAD_ERR_NO_FILE) {
@@ -461,6 +552,7 @@ function handleAdmin($action, $parts) {
                         $fields = ['bank1_owner','bank1_name','bank1_acc','bank2_owner','bank2_name','bank2_acc'];
                         $data = [];
                         foreach ($fields as $f) $data[$f] = trim($_POST[$f] ?? '');
+                        $data['saweria_enabled'] = isset($_POST['saweria_enabled']) ? 1 : 0;
                         Models\Wedding::update($id, $data);
                         header('Location: ' . $detailBase . 'gift?saved=1');
                         exit;
@@ -528,7 +620,7 @@ function handleAdmin($action, $parts) {
                                 'story_outro' => trim($_POST['story_outro'] ?? ''),
                             ];
                             Models\Wedding::update($id, $data);
-                            header('Location: ' . $detailBase . 'story?saved=1');
+                            header('Location: ' . $detailBase . 'story?saved_texts=1');
                             exit;
                         } else {
                             $storyId = (int)($_POST['story_id'] ?? 0);
@@ -541,7 +633,7 @@ function handleAdmin($action, $parts) {
                                 'sort_order' => (int)($_POST['sort_order'] ?? 0),
                             ];
                             $storyId ? Models\Wedding::updateLoveStory($storyId, $data) : Models\Wedding::addLoveStory($data);
-                            header('Location: ' . $detailBase . 'story?saved=1');
+                            header('Location: ' . $detailBase . 'story?saved_story=1');
                             exit;
                         }
                     }

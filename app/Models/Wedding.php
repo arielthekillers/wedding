@@ -4,7 +4,50 @@ namespace Models;
 use PDO;
 
 class Wedding {
+    public static function initDB() {
+        static $initialized = false;
+        if ($initialized) return;
+        $db = getDB();
+        
+        // Add saweria_enabled column to weddings table if missing
+        try {
+            $check = $db->query("SHOW COLUMNS FROM weddings LIKE 'saweria_enabled'");
+            if ($check->rowCount() === 0) {
+                $db->exec("ALTER TABLE weddings ADD COLUMN saweria_enabled TINYINT(1) DEFAULT 0");
+            }
+        } catch (\PDOException $e) {}
+
+        // Create saweria_gifts table for incoming Saweria webhook donations
+        $db->exec("CREATE TABLE IF NOT EXISTS saweria_gifts (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            wedding_id INT NOT NULL,
+            saweria_id VARCHAR(100) NULL,
+            donator_name VARCHAR(150) NOT NULL,
+            donator_email VARCHAR(150) NULL,
+            amount DECIMAL(12,2) NOT NULL DEFAULT 0.00,
+            message TEXT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            KEY (wedding_id)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+
+        // Create saweria_intents table for pending unique nominal matching
+        $db->exec("CREATE TABLE IF NOT EXISTS saweria_intents (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            wedding_id INT NOT NULL,
+            unique_amount DECIMAL(12,2) NOT NULL,
+            donator_name VARCHAR(150) NOT NULL,
+            message TEXT NULL,
+            status VARCHAR(20) DEFAULT 'pending',
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            KEY (unique_amount),
+            KEY (wedding_id)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+
+        $initialized = true;
+    }
+
     public static function getAll($user_id = null) {
+        self::initDB();
         $db = getDB();
         if ($user_id) {
             $stmt = $db->prepare("SELECT * FROM weddings WHERE user_id = ? ORDER BY created_at DESC");
@@ -315,6 +358,59 @@ class Wedding {
             $data['sort_order'] ?? 0,
             $id,
         ]);
+    }
+
+    public static function getById($id) {
+        self::initDB();
+        $db = getDB();
+        $stmt = $db->prepare("SELECT * FROM weddings WHERE id = ?");
+        $stmt->execute([$id]);
+        return $stmt->fetch();
+    }
+
+    // ---- Saweria Gift Methods ----
+    public static function addSaweriaGift($data) {
+        self::initDB();
+        $db = getDB();
+        $stmt = $db->prepare("INSERT INTO saweria_gifts (wedding_id, saweria_id, donator_name, donator_email, amount, message) VALUES (?, ?, ?, ?, ?, ?)");
+        return $stmt->execute([
+            $data['wedding_id'],
+            $data['saweria_id'] ?? null,
+            $data['donator_name'],
+            $data['donator_email'] ?? null,
+            $data['amount'],
+            $data['message'] ?? ''
+        ]);
+    }
+
+    public static function getSaweriaGifts($wedding_id) {
+        self::initDB();
+        $db = getDB();
+        $stmt = $db->prepare("SELECT * FROM saweria_gifts WHERE wedding_id = ? ORDER BY created_at DESC");
+        $stmt->execute([$wedding_id]);
+        return $stmt->fetchAll();
+    }
+
+    public static function createSaweriaIntent($weddingId, $uniqueAmount, $donatorName, $message) {
+        self::initDB();
+        $db = getDB();
+        $stmt = $db->prepare("INSERT INTO saweria_intents (wedding_id, unique_amount, donator_name, message) VALUES (?, ?, ?, ?)");
+        return $stmt->execute([$weddingId, $uniqueAmount, $donatorName, $message]);
+    }
+
+    public static function findWeddingIdByUniqueAmount($amount) {
+        self::initDB();
+        $db = getDB();
+        // Look for matching pending intent created within last 24 hours
+        $stmt = $db->prepare("SELECT wedding_id, id FROM saweria_intents WHERE unique_amount = ? AND status = 'pending' AND created_at >= NOW() - INTERVAL 24 HOUR ORDER BY id DESC LIMIT 1");
+        $stmt->execute([$amount]);
+        $intent = $stmt->fetch();
+        if ($intent) {
+            // Mark intent as matched
+            $db->prepare("UPDATE saweria_intents SET status = 'matched' WHERE id = ?")->execute([$intent['id']]);
+            return (int)$intent['wedding_id'];
+        }
+        return 0;
     }
 
     public static function deleteLoveStory($id) {

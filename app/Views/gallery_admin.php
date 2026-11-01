@@ -3,6 +3,51 @@ $activeTab = 'gallery';
 include __DIR__ . '/partials/wedding_nav.php';
 ?>
 
+<style>
+.gal-grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 12px;
+}
+.gal-overlay {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 7px;
+    opacity: 0; pointer-events: none; transition: opacity 0.22s; background: rgba(0,0,0,0.45);
+}
+.gal-btn {
+    border: none; border-radius: 8px; padding: 6px 13px; font-weight: 700; font-size: 0.78rem;
+    cursor: pointer; display: inline-flex; align-items: center; gap: 4px; transition: transform 0.15s;
+}
+.gal-btn:active { transform: scale(0.95); }
+.gal-btn-view { background: rgba(255,255,255,0.92); color: #1e293b; }
+.gal-btn-del { background: rgba(220,38,38,0.92); color: white; }
+
+@media (max-width: 640px) {
+    .gal-grid-container {
+        grid-template-columns: repeat(3, 1fr) !important;
+        gap: 6px !important;
+    }
+    /* Mobile Touch Optimized: Ikon mini melayang transparan langsung di pojok foto */
+    .gal-overlay {
+        opacity: 1 !important;
+        pointer-events: auto !important;
+        background: transparent !important;
+        flex-direction: row !important;
+        justify-content: flex-end !important;
+        align-items: flex-end !important;
+        padding: 5px !important;
+        gap: 4px !important;
+    }
+    .gal-btn {
+        padding: 6px !important;
+        border-radius: 50% !important;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.3) !important;
+    }
+    .gal-btn span { display: none !important; }
+    .gal-btn svg { margin: 0 !important; width: 13px !important; height: 13px !important; }
+}
+</style>
+
 <?php if (isset($_GET['uploaded'])): ?>
 <div class="alert alert-success"><?= (int)$_GET['uploaded'] ?> foto berhasil diupload &amp; diproses!</div>
 <?php elseif (isset($_GET['deleted'])): ?>
@@ -16,7 +61,7 @@ include __DIR__ . '/partials/wedding_nav.php';
         <div class="icon"><svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="w-4.5 h-4.5 text-blue-600"><polyline points="16 16 12 12 8 16"></polyline><line x1="12" y1="12" x2="12" y2="21"></line><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"></path></svg></div>
         <div>
             <h2>Upload Foto</h2>
-            <p>Seret &amp; lepas atau klik pilih foto. Otomatis dikompresi &amp; dibuat thumbnail.</p>
+            <p>Kelola dan tambahkan foto ke dalam galeri undangan</p>
         </div>
     </div>
     <div class="section-card-body">
@@ -24,17 +69,18 @@ include __DIR__ . '/partials/wedding_nav.php';
             <input type="file" name="photos[]" id="formPhotoInput2" style="display:none" multiple accept="image/*">
 
             <div id="dropZone"
-                 style="border:2.5px dashed #93c5fd;border-radius:14px;padding:36px 20px;text-align:center;
-                        background:#eff6ff;transition:background 0.2s,border-color 0.2s;cursor:pointer;"
-                 ondragenter="this.style.background='#dbeafe';this.style.borderColor='var(--primary)'"
-                 ondragleave="this.style.background='#eff6ff';this.style.borderColor='#93c5fd'"
+                 style="border:2.5px dashed #fed7aa;border-radius:14px;padding:36px 20px;text-align:center;
+                        background:#fff7ed;transition:background 0.2s,border-color 0.2s;cursor:pointer;"
+                 ondragenter="this.style.background='#ffedd5';this.style.borderColor='var(--primary)'"
+                 ondragleave="this.style.background='#fff7ed';this.style.borderColor='#fed7aa'"
                  ondragover="event.preventDefault()"
-                 ondrop="handleDrop(event)">
-                <div class="flex justify-center text-blue-600 mb-2 pointer-events-none"><svg viewBox="0 0 24 24" width="36" height="36" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round" class="w-9 h-9"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg></div>
-                <p style="margin:8px 0 16px;color:#94a3b8;font-size:0.88rem;pointer-events:none;">
-                    Seret foto ke sini <strong>atau</strong>
+                 ondrop="handleDrop(event)"
+                 onclick="document.getElementById('formPhotoInput2').click()">
+                <div class="flex justify-center text-rose-500 mb-2 pointer-events-none"><svg viewBox="0 0 24 24" width="36" height="36" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round" class="w-9 h-9"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg></div>
+                <p style="margin:8px 0 14px;color:#475569;font-size:0.88rem;font-weight:500;pointer-events:none;">
+                    Klik di sini atau seret foto untuk mengunggah
                 </p>
-                <button type="button" class="btn btn-primary btn-sm" onclick="document.getElementById('formPhotoInput2').click()"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="w-3 h-3 mr-1 inline-block"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg> Pilih Foto</button>
+                <button type="button" class="btn btn-primary btn-sm" onclick="event.stopPropagation();document.getElementById('formPhotoInput2').click()"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="w-3 h-3 mr-1 inline-block"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg> Pilih Foto</button>
                 <div id="previewBar" style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:14px;"></div>
                 <p style="margin:10px 0 0;font-size:0.75rem;color:#94a3b8;">
                     Format: JPG, PNG, WebP, GIF &nbsp;•&nbsp; Multi-select didukung &nbsp;•&nbsp; Max 1200px, kualitas 85%
@@ -59,14 +105,14 @@ include __DIR__ . '/partials/wedding_nav.php';
 <div class="section-card">
     <div class="section-card-header" style="justify-content:space-between;">
         <div style="display:flex;align-items:center;gap:10px;">
-            <div class="icon"><svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="w-4.5 h-4.5 text-blue-600"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg></div>
+            <div class="icon"><svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="w-4.5 h-4.5 text-rose-500"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg></div>
             <div>
                 <h2>Foto Tersimpan</h2>
-                <p>Hover foto untuk lihat atau hapus</p>
+                <p>Daftar koleksi foto galeri pernikahan</p>
             </div>
         </div>
-        <span style="background:#ede9fe;color:var(--primary);font-weight:700;font-size:0.82rem;padding:5px 14px;border-radius:20px;">
-            <?= count($galleryItems) ?> foto
+        <span style="background:#ffe4e6;color:#e11d48;font-weight:700;font-size:0.75rem;padding:4px 12px;border-radius:50px;white-space:nowrap;flex-shrink:0;">
+            <?= count($galleryItems) ?> Foto
         </span>
     </div>
     <div class="section-card-body">
@@ -77,7 +123,7 @@ include __DIR__ . '/partials/wedding_nav.php';
         <p style="color:#94a3b8;margin:0;">Belum ada foto. Upload menggunakan area di atas.</p>
     </div>
     <?php else: ?>
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;">
+    <div class="gal-grid-container">
         <?php foreach ($galleryItems as $i => $img):
             $thumb = !empty($img['thumb_url']) ? $img['thumb_url'] : $img['image_url'];
             $full  = $img['image_url'];
@@ -94,14 +140,14 @@ include __DIR__ . '/partials/wedding_nav.php';
             <span style="position:absolute;top:7px;left:7px;background:rgba(0,0,0,0.45);color:white;font-size:0.68rem;font-weight:700;padding:2px 7px;border-radius:20px;pointer-events:none;">
                 #<?= $i+1 ?><?= $sizeKb ? ' · '.$sizeKb : '' ?>
             </span>
-            <div class="gal-overlay" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;opacity:0;pointer-events:none;transition:opacity 0.22s;background:rgba(0,0,0,0.35);">
-                <button onclick="openLightbox(<?= $i ?>)"
-                        style="background:rgba(255,255,255,0.92);color:#1e293b;border:none;border-radius:8px;padding:6px 13px;font-weight:700;font-size:0.78rem;cursor:pointer; display:inline-flex; align-items:center; gap:4px;">
-                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round" class="w-3 h-3"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg> Lihat
+            <div class="gal-overlay">
+                <button onclick="openLightbox(<?= $i ?>)" class="gal-btn gal-btn-view" title="Lihat Foto">
+                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    <span>Lihat</span>
                 </button>
-                <button onclick="confirmDelete(<?= $img['id'] ?>, <?= $i+1 ?>, <?= htmlspecialchars(json_encode($thumb)) ?>)"
-                        style="background:rgba(220,38,38,0.9);color:white;border:none;border-radius:8px;padding:6px 13px;font-weight:700;font-size:0.78rem;cursor:pointer; display:inline-flex; align-items:center; gap:4px;">
-                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="w-3 h-3"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg> Hapus
+                <button onclick="confirmDelete(<?= $img['id'] ?>, <?= $i+1 ?>, <?= htmlspecialchars(json_encode($thumb)) ?>)" class="gal-btn gal-btn-del" title="Hapus Foto">
+                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                    <span>Hapus</span>
                 </button>
             </div>
         </div>
@@ -119,10 +165,16 @@ include __DIR__ . '/partials/wedding_nav.php';
             style="position:fixed;top:16px;right:16px;background:rgba(255,255,255,0.15);border:none;color:white;width:38px;height:38px;border-radius:50%;font-size:1rem;cursor:pointer;">✕</button>
     <button onclick="event.stopPropagation();shiftLb(-1)"
             style="position:fixed;left:16px;top:50%;transform:translateY(-50%);background:rgba(255,255,255,0.15);border:none;color:white;width:50px;height:50px;border-radius:50%;font-size:1.6rem;cursor:pointer;">‹</button>
-    <img id="lbImg" src="" alt="" style="max-width:90vw;max-height:82vh;border-radius:12px;object-fit:contain;box-shadow:0 20px 60px rgba(0,0,0,0.5);" onclick="event.stopPropagation()">
+    <img id="lbImg" src="" alt="" style="max-width:90vw;max-height:75vh;border-radius:12px;object-fit:contain;box-shadow:0 20px 60px rgba(0,0,0,0.5);" onclick="event.stopPropagation()">
     <button onclick="event.stopPropagation();shiftLb(1)"
             style="position:fixed;right:16px;top:50%;transform:translateY(-50%);background:rgba(255,255,255,0.15);border:none;color:white;width:50px;height:50px;border-radius:50%;font-size:1.6rem;cursor:pointer;">›</button>
-    <p id="lbCounter" style="color:rgba(255,255,255,0.5);font-size:0.82rem;margin:0;"></p>
+    <div style="display:flex;align-items:center;gap:16px;" onclick="event.stopPropagation()">
+        <p id="lbCounter" style="color:rgba(255,255,255,0.7);font-size:0.85rem;margin:0;"></p>
+        <button id="lbDelBtn" onclick="deleteFromLb()" style="background:#dc2626;color:white;border:none;border-radius:8px;padding:6px 14px;font-size:0.8rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:5px;">
+            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+            Hapus Foto
+        </button>
+    </div>
 </div>
 
 <!-- ── DELETE MODAL ── -->
@@ -145,14 +197,14 @@ include __DIR__ . '/partials/wedding_nav.php';
 </style>
 
 <script>
-const BASE_URL = '<?= rtrim($GLOBALS['base'], '/') ?>/admin/detail/<?= $id ?>/gallery';
-const lbImages = [<?php echo implode(',', array_map(fn($g) => json_encode($g['image_url']), $galleryItems)); ?>];
+const lbItemsData = [<?php echo implode(',', array_map(fn($g) => json_encode(['id' => $g['id'], 'thumb' => !empty($g['thumb_url']) ? $g['thumb_url'] : $g['image_url'], 'full' => $g['image_url']]), $galleryItems)); ?>];
 let lbIdx = 0, pendingDelId = null;
 
 function openLightbox(i) {
+    if (!lbItemsData.length) return;
     lbIdx = i;
-    document.getElementById('lbImg').src = lbImages[i];
-    document.getElementById('lbCounter').textContent = (i+1) + ' / ' + lbImages.length;
+    document.getElementById('lbImg').src = lbItemsData[i].full;
+    document.getElementById('lbCounter').textContent = (i+1) + ' / ' + lbItemsData.length;
     const lb = document.getElementById('lightbox');
     lb.style.display = 'flex'; document.body.style.overflow = 'hidden';
 }
@@ -161,10 +213,16 @@ function closeLightbox() {
     document.body.style.overflow = '';
 }
 function shiftLb(d) {
-    if (!lbImages.length) return;
-    lbIdx = (lbIdx + d + lbImages.length) % lbImages.length;
-    document.getElementById('lbImg').src = lbImages[lbIdx];
-    document.getElementById('lbCounter').textContent = (lbIdx+1) + ' / ' + lbImages.length;
+    if (!lbItemsData.length) return;
+    lbIdx = (lbIdx + d + lbItemsData.length) % lbItemsData.length;
+    document.getElementById('lbImg').src = lbItemsData[lbIdx].full;
+    document.getElementById('lbCounter').textContent = (lbIdx+1) + ' / ' + lbItemsData.length;
+}
+function deleteFromLb() {
+    if (!lbItemsData.length || !lbItemsData[lbIdx]) return;
+    const item = lbItemsData[lbIdx];
+    closeLightbox();
+    confirmDelete(item.id, lbIdx + 1, item.thumb);
 }
 document.addEventListener('keydown', e => {
     if (document.getElementById('lightbox').style.display==='flex') {

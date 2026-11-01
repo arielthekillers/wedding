@@ -224,32 +224,32 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                     <div>
                         <label class="block text-xs font-bold text-slate-500 mb-2 uppercase tracking-wide">Nama Pemilik Rekening</label>
-                        <input type="text" name="bank1_owner" placeholder="Contoh: SYIFA AULIA FADHILLAH" value="<?= $wedding['bank1_owner'] ?? '' ?>" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-blue-600 bg-slate-50 focus:bg-white transition-colors">
+                        <input type="text" name="bank1_owner" placeholder="Nama Pemilik Rekening 1" value="<?= $wedding['bank1_owner'] ?? '' ?>" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-blue-600 bg-slate-50 focus:bg-white transition-colors">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-500 mb-2 uppercase tracking-wide">Nama Bank</label>
-                        <input type="text" name="bank1_name" placeholder="Contoh: Bank Mandiri" value="<?= $wedding['bank1_name'] ?? '' ?>" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-blue-600 bg-slate-50 focus:bg-white transition-colors">
+                        <input type="text" name="bank1_name" placeholder="Contoh: BCA / Mandiri / dst" value="<?= $wedding['bank1_name'] ?? '' ?>" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-blue-600 bg-slate-50 focus:bg-white transition-colors">
                     </div>
                 </div>
                 <div class="form-group mb-6">
                     <label class="block text-xs font-bold text-slate-500 mb-2 uppercase tracking-wide">Nomor Rekening</label>
-                    <input type="text" name="bank1_acc" placeholder="Contoh: 1480020167113" value="<?= $wedding['bank1_acc'] ?? '' ?>" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-blue-600 bg-slate-50 focus:bg-white transition-colors">
+                    <input type="text" name="bank1_acc" placeholder="Contoh: 1234567890" value="<?= $wedding['bank1_acc'] ?? '' ?>" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-blue-600 bg-slate-50 focus:bg-white transition-colors">
                 </div>
 
                 <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wide mb-3 border-l-2 border-blue-600 pl-2">Rekening Pengantin Kedua</h4>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                     <div>
                         <label class="block text-xs font-bold text-slate-500 mb-2 uppercase tracking-wide">Nama Pemilik Rekening</label>
-                        <input type="text" name="bank2_owner" placeholder="Contoh: ABDUL ROCHIM MUIZ" value="<?= $wedding['bank2_owner'] ?? '' ?>" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-blue-600 bg-slate-50 focus:bg-white transition-colors">
+                        <input type="text" name="bank2_owner" placeholder="Nama Pemilik Rekening 2" value="<?= $wedding['bank2_owner'] ?? '' ?>" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-blue-600 bg-slate-50 focus:bg-white transition-colors">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-500 mb-2 uppercase tracking-wide">Nama Bank</label>
-                        <input type="text" name="bank2_name" placeholder="Contoh: Bank Mandiri" value="<?= $wedding['bank2_name'] ?? '' ?>" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-blue-600 bg-slate-50 focus:bg-white transition-colors">
+                        <input type="text" name="bank2_name" placeholder="Contoh: BCA / Mandiri / dst" value="<?= $wedding['bank2_name'] ?? '' ?>" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-blue-600 bg-slate-50 focus:bg-white transition-colors">
                     </div>
                 </div>
                 <div class="form-group">
                     <label class="block text-xs font-bold text-slate-500 mb-2 uppercase tracking-wide">Nomor Rekening</label>
-                    <input type="text" name="bank2_acc" placeholder="Contoh: 1480021027993" value="<?= $wedding['bank2_acc'] ?? '' ?>" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-blue-600 bg-slate-50 focus:bg-white transition-colors">
+                    <input type="text" name="bank2_acc" placeholder="Contoh: 0987654321" value="<?= $wedding['bank2_acc'] ?? '' ?>" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-blue-600 bg-slate-50 focus:bg-white transition-colors">
                 </div>
             </div>
 

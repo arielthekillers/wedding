@@ -107,7 +107,7 @@ if ($_spMode) {
             filter: grayscale(50%);
         }
         .section-inner {
-            max-width: 900px;
+            max-width: 1000px;
             width: 100%;
             margin: auto;
             position: relative;
@@ -1017,6 +1017,114 @@ if ($_spMode) {
                 }
             }
         }
+
+        // ── Dynamic Button Settings ──
+        $heroBtnColor = !empty($secSettings['hero']['btn_color']) ? $secSettings['hero']['btn_color'] : '';
+        $heroBtnRounded = isset($secSettings['hero']['btn_rounded']) ? $secSettings['hero']['btn_rounded'] : '1';
+        $heroBtnTextColor = !empty($secSettings['hero']['btn_text_color']) ? $secSettings['hero']['btn_text_color'] : 'light';
+
+        $btnSectionMap = [
+            'hero'      => '.btn-open',
+            'countdown' => '#countdown-section .btn-reminder',
+            'events'    => '#events .btn-map-bottom, #events .btn-map',
+            'gifts'     => '#gifts .btn-copy',
+            'guestbook' => '#guestbook .btn-submit',
+        ];
+
+        // Global / Hero defaults for all button elements
+        if ($heroBtnRounded === '0') {
+            echo ".btn-open, .btn-reminder, .btn-map-bottom, .btn-map, .btn-copy, .btn-submit { border-radius: 4px !important; }\n";
+        } elseif ($heroBtnRounded === '1') {
+            echo ".btn-open, .btn-reminder, .btn-map-bottom, .btn-map, .btn-copy, .btn-submit { border-radius: 50px !important; }\n";
+        }
+
+        // Text and icon color for primary buttons (always applied based on hero settings)
+        $hText = ($heroBtnTextColor === 'dark') ? '#1e293b' : '#ffffff';
+        echo ".btn-open, .btn-open span { color: {$hText} !important; }\n";
+        echo ".btn-open svg, .btn-open svg path, .btn-open svg polyline { stroke: {$hText} !important; color: {$hText} !important; }\n";
+        echo ".btn-submit, .btn-submit span { color: {$hText} !important; }\n";
+        echo ".btn-submit svg, .btn-submit svg * { stroke: {$hText} !important; color: {$hText} !important; }\n";
+
+        if (!empty($heroBtnColor)) {
+            echo ".btn-open { background: {$heroBtnColor} !important; border-color: {$heroBtnColor} !important; }\n";
+            echo ".btn-submit { background: {$heroBtnColor} !important; }\n";
+            echo ".btn-reminder, .btn-map-bottom, .btn-copy { border-color: {$heroBtnColor} !important; color: {$heroBtnColor} !important; }\n";
+            echo ".btn-reminder svg, .btn-reminder svg * { color: {$heroBtnColor} !important; stroke: {$heroBtnColor} !important; }\n";
+            echo ".btn-reminder:hover, .btn-map-bottom:hover, .btn-copy:hover { background: {$heroBtnColor} !important; color: {$hText} !important; border-color: {$heroBtnColor} !important; }\n";
+            echo ".btn-reminder:hover svg, .btn-reminder:hover svg *, .btn-map-bottom:hover svg, .btn-map-bottom:hover svg *, .btn-copy:hover svg, .btn-copy:hover svg * { color: {$hText} !important; stroke: {$hText} !important; }\n";
+
+            if (preg_match('/^#([a-f0-9]{2})([a-f0-9]{2})([a-f0-9]{2})$/i', $heroBtnColor, $hm)) {
+                $r = hexdec($hm[1]);
+                $g = hexdec($hm[2]);
+                $b = hexdec($hm[3]);
+                echo "@keyframes pulse-gold {
+                    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba({$r}, {$g}, {$b}, 0.7); }
+                    70% { transform: scale(1.05); box-shadow: 0 0 0 15px rgba({$r}, {$g}, {$b}, 0); }
+                    100% { transform: scale(1); box-shadow: 0 0 0 0 rgba({$r}, {$g}, {$b}, 0); }
+                }\n";
+            }
+        }
+
+        // Section-specific overrides
+        foreach ($btnSectionMap as $sKey => $sSelector) {
+            if ($sKey === 'hero') continue;
+            if (empty($secSettings[$sKey])) continue;
+            $sCfg = $secSettings[$sKey];
+
+            if (isset($sCfg['btn_rounded']) && $sCfg['btn_rounded'] !== '') {
+                $rad = ($sCfg['btn_rounded'] === '0') ? '4px' : '50px';
+                echo "{$sSelector} { border-radius: {$rad} !important; }\n";
+            }
+
+            if (!empty($sCfg['btn_color'])) {
+                $c = $sCfg['btn_color'];
+                $tc = (!empty($sCfg['btn_text_color']) && $sCfg['btn_text_color'] === 'dark') ? '#1e293b' : '#ffffff';
+                if ($sKey === 'guestbook') {
+                    echo "{$sSelector} { background: {$c} !important; color: {$tc} !important; }\n";
+                    echo "{$sSelector} svg { stroke: {$tc} !important; color: {$tc} !important; }\n";
+                } else {
+                    echo "{$sSelector} { border-color: {$c} !important; color: {$c} !important; }\n";
+                    echo "{$sSelector} svg { color: {$c} !important; stroke: {$c} !important; }\n";
+                    echo "{$sSelector}:hover { background: {$c} !important; color: {$tc} !important; border-color: {$c} !important; }\n";
+                    echo "{$sSelector}:hover svg { color: {$tc} !important; stroke: {$tc} !important; }\n";
+                }
+            }
+        }
+
+        // ── Dynamic Countdown Appearance ──
+        $cdBoxRounded = $secSettings['countdown']['box_rounded'] ?? '1';
+        $cdBoxBgStyle = $secSettings['countdown']['box_bg_style'] ?? 'glass';
+        $cdBoxNumColor = $secSettings['countdown']['box_num_color'] ?? '';
+        $cdBtnStyle = $secSettings['countdown']['btn_style'] ?? 'outline';
+
+        if ($cdBoxRounded === '0') {
+            echo "#countdown-section .countdown-item { border-radius: 4px !important; }\n";
+        } elseif ($cdBoxRounded === '1') {
+            echo "#countdown-section .countdown-item { border-radius: 18px !important; }\n";
+        }
+
+        if ($cdBoxBgStyle === 'white') {
+            echo "#countdown-section .countdown-item { background: #ffffff !important; border: 1px solid #f1f5f9 !important; box-shadow: 0 8px 24px rgba(0,0,0,0.06) !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }\n";
+        } elseif ($cdBoxBgStyle === 'dark') {
+            echo "#countdown-section .countdown-item { background: rgba(15, 23, 42, 0.85) !important; border: 1px solid rgba(255, 255, 255, 0.12) !important; box-shadow: 0 8px 24px rgba(0,0,0,0.2) !important; backdrop-filter: blur(15px) !important; -webkit-backdrop-filter: blur(15px) !important; }\n";
+            echo "#countdown-section .countdown-item label { color: #94a3b8 !important; }\n";
+            if (empty($cdBoxNumColor)) {
+                echo "#countdown-section .countdown-item span { color: #ffffff !important; }\n";
+            }
+        } elseif ($cdBoxBgStyle === 'trans') {
+            echo "#countdown-section .countdown-item { background: transparent !important; border: none !important; box-shadow: none !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }\n";
+        }
+
+        if (!empty($cdBoxNumColor)) {
+            echo "#countdown-section .countdown-item span { color: {$cdBoxNumColor} !important; }\n";
+        }
+
+        if ($cdBtnStyle === 'solid') {
+            $cdBtnCol = !empty($secSettings['countdown']['btn_color']) ? $secSettings['countdown']['btn_color'] : (!empty($heroBtnColor) ? $heroBtnColor : 'var(--gold)');
+            $cdBtnTxt = (!empty($secSettings['countdown']['btn_text_color']) && $secSettings['countdown']['btn_text_color'] === 'dark') ? '#1e293b' : '#ffffff';
+            echo "#countdown-section .btn-reminder { background: {$cdBtnCol} !important; color: {$cdBtnTxt} !important; border-color: {$cdBtnCol} !important; }\n";
+            echo "#countdown-section .btn-reminder svg { color: {$cdBtnTxt} !important; stroke: {$cdBtnTxt} !important; }\n";
+        }
         ?>
     </style>
     <?php if ($_spMode): ?>
@@ -1157,11 +1265,17 @@ if ($_spMode) {
         if (empty($countdownDateText)) {
             $countdownDateText = $wedding['akad_date'];
         }
+
+        $cdCfg = $secSettings['countdown'] ?? [];
+        $cdTitle = !empty($cdCfg['countdown_title']) ? $cdCfg['countdown_title'] : 'Menuju Hari Bahagia';
+        $cdSubtitle = !empty($cdCfg['countdown_subtitle']) ? $cdCfg['countdown_subtitle'] : 'Menghitung hari menuju ikatan suci';
+        $cdEndedText = !empty($cdCfg['countdown_ended_text']) ? $cdCfg['countdown_ended_text'] : 'HARI BAHAGIA TELAH TIBA! 🌸';
+        $showBtnCalendar = ($cdCfg['show_btn_calendar'] ?? '1') !== '0';
     ?>
     <section id="countdown-section" class="<?= $countdownTextClass ?>" data-reveal="up" style="scroll-snap-align: start; padding: 60px 20px; text-align: center; position: relative; --section-bg: url('https://images.unsplash.com/photo-1519225421980-715cb0215aed?auto=format&fit=crop&q=80&w=1000');">
         <div class="section-inner" style="max-width: 800px; margin: 0 auto; position: relative; z-index: 2;">
-            <h3 style="margin-bottom: 8px; font-family: 'Playfair Display', serif; font-size: 2rem; color: var(--gold);">Menuju Hari Bahagia</h3>
-            <p style="font-size: 1.1rem; font-weight: 600; color: var(--dark); margin-bottom: 25px; letter-spacing: 1px;">Menghitung hari menuju ikatan suci</p>
+            <h3 id="cdTitleText" style="margin-bottom: 8px; font-family: 'Playfair Display', serif; font-size: 2rem; color: var(--gold);"><?= htmlspecialchars($cdTitle) ?></h3>
+            <p id="cdSubtitleText" style="font-size: 1.1rem; font-weight: 600; color: var(--dark); margin-bottom: 25px; letter-spacing: 1px;"><?= htmlspecialchars($cdSubtitle) ?></p>
             <div id="countdown" class="countdown-container" style="margin-top: 0;">
                 <div class="countdown-item">
                     <span id="days">00</span>
@@ -1182,8 +1296,8 @@ if ($_spMode) {
             </div>
             
             <!-- Tombol Pengingat Google Kalender -->
-            <?php if ($gcalUrl !== '#'): ?>
-            <div style="margin-top: 25px;" data-reveal="up" data-reveal-delay="200">
+            <div style="margin-top: 25px; <?= !$showBtnCalendar ? 'display:none;' : '' ?>" data-reveal="up" data-reveal-delay="200" id="gcalBtnWrapper">
+                <?php if ($gcalUrl !== '#'): ?>
                 <a href="<?= $gcalUrl ?>" target="_blank" class="btn-reminder">
                     <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
@@ -1199,8 +1313,8 @@ if ($_spMode) {
                     </svg>
                     Ingatkan di Google Calendar
                 </a>
+                <?php endif; ?>
             </div>
-            <?php endif; ?>
         </div>
     </section>
     <?php endif; ?>
@@ -1464,7 +1578,155 @@ if ($_spMode) {
                     </button>
                 </div>
                 <?php endif; ?>
+
+                <?php if (!empty($wedding['saweria_enabled'])): ?>
+                <!-- ── SAWERIA ANGPAO CARD ── -->
+                <div class="gift-card" data-reveal="up" data-reveal-delay="300" style="background: linear-gradient(135deg, #fff7ed 0%, #fff1f2 100%); border: 2px solid #fed7aa; color: var(--dark) !important;">
+                    <span class="bank-badge" style="background: #ea580c; color: white;">Saweria Instant</span>
+                    <span class="acc-number" style="color: #9a3412 !important; font-size: 1.1rem; margin-top: 6px;">Angpao Digital Berpesan</span>
+                    <p class="acc-owner" style="color: #7c2d12 !important; font-size: 0.8rem; margin: 4px 0 12px;">QRIS, GoPay, OVO, Dana, ShopeePay &amp; Transfer Bank</p>
+                    <button onclick="openSaweriaModal()" class="btn-copy" style="background: linear-gradient(135deg, #f43f5e, #f97316); color: white; border: none; font-weight: 700; width: 100%; justify-content: center; box-shadow: 0 4px 14px rgba(244,63,94,0.3); cursor: pointer;">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" class="inline-block mr-1"><path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4"></path><path d="M4 6v12c0 1.1.9 2 2 2h14v-4"></path><path d="M18 12a2 2 0 0 0-2 2c0 1.1.9 2 2 2h4v-4h-4z"></path></svg>
+                        Kirim Angpao &amp; Ucapan
+                    </button>
+                </div>
+                <?php endif; ?>
             </div>
+
+            <?php if (!empty($wedding['saweria_enabled'])): ?>
+            <!-- ── LIVE SAWERIA FEED MARQUEE ── -->
+            <div id="saweriaFeedSection" style="margin-top: 36px; width: 100%; display: none;">
+                <h4 style="font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; color: #f43f5e; font-weight: 700; margin-bottom: 12px;">💝 Feed Angpao &amp; Ucapan Live</h4>
+                <div id="saweriaMarqueeBox" style="background: #ffffff; border: 1.5px solid #fecdd3; border-radius: 14px; padding: 14px 18px; box-shadow: 0 4px 15px rgba(244,63,94,0.08); overflow: hidden;">
+                    <div id="saweriaMarqueeList" style="display: flex; flex-direction: column; gap: 10px;"></div>
+                </div>
+            </div>
+
+            <!-- ── SAWERIA PAYWALL MODAL ── -->
+            <div id="saweriaModal" style="display: none; position: fixed; inset: 0; z-index: 10000; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(5px); align-items: center; justify-content: center; padding: 20px;">
+                <div style="background: white; border-radius: 20px; padding: 26px 22px; width: 100%; max-width: 440px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); text-align: left; animation: slideUp 0.25s ease;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                        <h4 style="margin: 0; font-size: 1.1rem; font-weight: 800; color: #0f172a; display: flex; align-items: center; gap: 8px;">
+                            <span>🎁</span> Kirim Angpao &amp; Ucapan
+                        </h4>
+                        <button type="button" onclick="closeSaweriaModal()" style="background: #f1f5f9; border: none; border-radius: 50%; width: 32px; height: 32px; font-weight: bold; cursor: pointer;">✕</button>
+                    </div>
+
+                    <form id="saweriaSubmitForm" onsubmit="handleSaweriaRedirect(event)">
+                        <div style="margin-bottom: 12px;">
+                            <label style="font-size: 0.8rem; font-weight: 700; color: #475569; display: block; margin-bottom: 4px;">Nama Anda / Pengirim</label>
+                            <input type="text" id="saweriaNameInput" required placeholder="Contoh: Budi &amp; Keluarga" style="width: 100%; padding: 10px 12px; border: 1.5px solid #fed7aa; border-radius: 8px; font-size: 0.9rem; outline: none;">
+                        </div>
+                        <div style="margin-bottom: 12px;">
+                            <label style="font-size: 0.8rem; font-weight: 700; color: #475569; display: block; margin-bottom: 4px;">Pilih Nominal Angpao</label>
+                            <select id="saweriaBaseNominal" onchange="updateUniqueNominalDisplay()" style="width: 100%; padding: 10px 12px; border: 1.5px solid #fed7aa; border-radius: 8px; font-size: 0.9rem; outline: none; background: white;">
+                                <option value="50000">Rp 50.000</option>
+                                <option value="100000" selected>Rp 100.000</option>
+                                <option value="200000">Rp 200.000</option>
+                                <option value="500000">Rp 500.000</option>
+                            </select>
+                        </div>
+                        <div style="margin-bottom: 12px; background: #fef2f2; border: 1.5px dashed #fca5a5; padding: 10px 12px; border-radius: 10px; text-align: center;">
+                            <span style="font-size: 0.75rem; color: #991b1b; font-weight: 600; display: block;">Nominal Unik Verifikasi Anda:</span>
+                            <strong id="saweriaUniqueDisplay" style="font-size: 1.25rem; color: #dc2626; letter-spacing: 0.5px;">Rp 100.000</strong>
+                            <small style="font-size: 0.72rem; color: #b91c1c; display: block; margin-top: 2px;">💡 Tambahan 3-digit kode acak untuk verifikasi otomatis jika pesan terhapus.</small>
+                        </div>
+                        <div style="margin-bottom: 14px;">
+                            <label style="font-size: 0.8rem; font-weight: 700; color: #475569; display: block; margin-bottom: 4px;">Pesan Ucapan &amp; Doa</label>
+                            <textarea id="saweriaMsgInput" rows="3" placeholder="Tuliskan doa restu spesial untuk pengantin..." style="width: 100%; padding: 10px 12px; border: 1.5px solid #fed7aa; border-radius: 8px; font-size: 0.88rem; outline: none; resize: vertical;"></textarea>
+                        </div>
+                        <div style="background: #fff7ed; border: 1px solid #fed7aa; padding: 10px 12px; border-radius: 8px; font-size: 0.78rem; color: #9a3412; margin-bottom: 16px; line-height: 1.4;">
+                            📋 <strong>Catatan:</strong> Pesan &amp; Kode <code>[WED:<?= $wedding['id'] ?>]</code> akan tersalin. Harap isi nominal unik di atas &amp; paste pesan saat membayar.
+                        </div>
+                        <button type="submit" style="width: 100%; padding: 12px; border-radius: 12px; border: none; background: linear-gradient(135deg, #ea580c, #f43f5e); color: white; font-weight: 700; font-size: 0.95rem; cursor: pointer; box-shadow: 0 4px 14px rgba(234, 88, 12, 0.35);">
+                            Lanjut ke Pembayaran Saweria 🚀
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <script>
+            let currentUniqueCode = Math.floor(100 + Math.random() * 899);
+
+            function updateUniqueNominalDisplay() {
+                const baseVal = parseInt(document.getElementById('saweriaBaseNominal').value) || 100000;
+                const totalVal = baseVal + currentUniqueCode;
+                document.getElementById('saweriaUniqueDisplay').innerText = 'Rp ' + totalVal.toLocaleString('id-ID');
+            }
+
+            function openSaweriaModal() {
+                currentUniqueCode = Math.floor(100 + Math.random() * 899);
+                updateUniqueNominalDisplay();
+                document.getElementById('saweriaModal').style.display = 'flex';
+            }
+            function closeSaweriaModal() {
+                document.getElementById('saweriaModal').style.display = 'none';
+            }
+            function handleSaweriaRedirect(e) {
+                e.preventDefault();
+                const name = document.getElementById('saweriaNameInput').value.trim();
+                const userMsg = document.getElementById('saweriaMsgInput').value.trim();
+                const baseVal = parseInt(document.getElementById('saweriaBaseNominal').value) || 100000;
+                const totalUniqueAmount = baseVal + currentUniqueCode;
+
+                // Store intent on server for fallback lookup by nominal
+                fetch('<?= $base ?>api/saweria-intent', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        wedding_id: <?= (int)$wedding['id'] ?>,
+                        unique_amount: totalUniqueAmount,
+                        donator_name: name || 'Hamba Allah',
+                        message: userMsg
+                    })
+                }).catch(() => {});
+
+                // Construct message with donator name and hidden tag [WED:id]
+                const fullMsgText = (name ? name + ': ' : '') + (userMsg || 'Selamat bahagia!') + ' [WED:<?= $wedding['id'] ?>]';
+                
+                // Copy full message with tag to user clipboard automatically
+                if (navigator.clipboard) {
+                    navigator.clipboard.writeText(fullMsgText);
+                }
+
+                alert('📋 Pesan & Kode Undangan telah tersalin!\n\nMohon masukkan NOMINAL UNIK: Rp ' + totalUniqueAmount.toLocaleString('id-ID') + ' dan PASTE (Tempel) pesan pada halaman Saweria saat melakukan pembayaran.');
+
+                const targetUrl = 'https://saweria.co/palovite';
+                closeSaweriaModal();
+                window.open(targetUrl, '_blank');
+            }
+
+            // Fetch live Saweria gifts for this wedding via API
+            function fetchSaweriaGifts() {
+                fetch('<?= $base ?>api/saweria-gifts?wedding_id=<?= $wedding['id'] ?>')
+                    .then(res => res.json())
+                    .then(res => {
+                        if (res.status === 'success' && res.data.length > 0) {
+                            const container = document.getElementById('saweriaFeedSection');
+                            const list = document.getElementById('saweriaMarqueeList');
+                            if (container && list) {
+                                container.style.display = 'block';
+                                list.innerHTML = res.data.map(g => `
+                                    <div style="background: #fffcf9; border: 1px solid #ffedd5; padding: 10px 14px; border-radius: 10px; text-align: left; font-size: 0.85rem;">
+                                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                                            <strong style="color: #9a3412;">${g.donator_name}</strong>
+                                            <span style="font-weight: 800; color: #166534; background: #dcfce7; font-size: 0.75rem; padding: 2px 8px; border-radius: 50px;">Rp ${Number(g.amount).toLocaleString('id-ID')}</span>
+                                        </div>
+                                        <p style="margin: 0; color: #475569; font-style: italic;">"${g.message || 'Semoga samawa!'}"</p>
+                                    </div>
+                                `).join('');
+                            }
+                        }
+                    })
+                    .catch(() => {});
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+                fetchSaweriaGifts();
+                setInterval(fetchSaweriaGifts, 10000); // Polling live feed every 10s
+            });
+            </script>
+            <?php endif; ?>
         </div>
     </section>
     <?php endif; ?>
@@ -2011,7 +2273,8 @@ if ($_spMode) {
                     if (minsEl) minsEl.textContent = "00";
                     if (secsEl) secsEl.textContent = "00";
                     if (countdownContainer && !document.getElementById('happyMessage')) {
-                        countdownContainer.insertAdjacentHTML('afterend', '<div id="happyMessage" style="margin-top:20px; font-weight:700; letter-spacing:2px; font-size:1.1rem; text-shadow: 1px 1px 5px rgba(0,0,0,0.5);">HARI BAHAGIA TELAH TIBA! 🌸</div>');
+                        const endedMsg = <?= json_encode(!empty($secSettings['countdown']['countdown_ended_text']) ? $secSettings['countdown']['countdown_ended_text'] : 'HARI BAHAGIA TELAH TIBA! 🌸', JSON_UNESCAPED_UNICODE) ?>;
+                        countdownContainer.insertAdjacentHTML('afterend', '<div id="happyMessage" style="margin-top:20px; font-weight:700; letter-spacing:2px; font-size:1.1rem; text-shadow: 1px 1px 5px rgba(0,0,0,0.5);">' + endedMsg + '</div>');
                     }
                     return;
                 }
