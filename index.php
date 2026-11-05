@@ -460,6 +460,9 @@ function handleAdmin($action, $parts) {
                         if (isset($_POST['btn_text_color'])) {
                             $currentSettings[$sec]['btn_text_color'] = trim($_POST['btn_text_color']);
                         }
+                        if (isset($_POST['content_position'])) {
+                            $currentSettings[$sec]['content_position'] = trim($_POST['content_position']);
+                        }
 
                         // Specific countdown appearance settings
                         $countdownFields = [

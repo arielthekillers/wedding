@@ -53,6 +53,7 @@ $cdBtnStyle        = $cfg['btn_style'] ?? 'outline';
 $cdTitleValue      = $cfg['countdown_title'] ?? '';
 $cdSubtitleValue   = $cfg['countdown_subtitle'] ?? '';
 $cdEndedTextValue  = $cfg['countdown_ended_text'] ?? '';
+$contentPosition   = $cfg['content_position'] ?? 'center';
 ?>
 <style>
 /* ── Compact form styles ── */
@@ -252,15 +253,34 @@ $cdEndedTextValue  = $cfg['countdown_ended_text'] ?? '';
       </div>
       <div class="tc-group">
         <label>
-          <input type="radio" name="text_color" value="dark"  <?= $textColor === 'dark'  ? 'checked' : '' ?>>
+          <input type="radio" name="text_color" value="dark"  <?= $textColor === 'dark'  ? 'checked' : '' ?> onchange="if(typeof updateLiveHeroPos === 'function') updateLiveHeroPos();">
           <span class="tc-pill">Dark</span>
         </label>
         <label>
-          <input type="radio" name="text_color" value="light" <?= $textColor === 'light' ? 'checked' : '' ?>>
+          <input type="radio" name="text_color" value="light" <?= $textColor === 'light' ? 'checked' : '' ?> onchange="if(typeof updateLiveHeroPos === 'function') updateLiveHeroPos();">
           <span class="tc-pill">Light</span>
         </label>
       </div>
     </div>
+
+    <?php if ($activeSec === 'hero'): ?>
+    <div class="cf-row">
+      <div>
+        <span class="cf-label">Posisi Teks / Konten</span>
+        <span class="cf-sub">Tengah atau di bawah agar foto terlihat jelas</span>
+      </div>
+      <div class="tc-group">
+        <label>
+          <input type="radio" name="content_position" value="center" <?= ($contentPosition ?? 'center') === 'center' ? 'checked' : '' ?> onchange="updateLiveHeroPos('center')">
+          <span class="tc-pill">Tengah</span>
+        </label>
+        <label>
+          <input type="radio" name="content_position" value="bottom" <?= ($contentPosition ?? 'center') === 'bottom' ? 'checked' : '' ?> onchange="updateLiveHeroPos('bottom')">
+          <span class="tc-pill">Bawah</span>
+        </label>
+      </div>
+    </div>
+    <?php endif; ?>
 
     <?php if ($hasButtonSec): ?>
     <!-- ── Tombol ── -->
@@ -1012,6 +1032,61 @@ function updateLiveCdPreview() {
     } catch(e) {}
 }
 
+function updateLiveHeroPos(pos) {
+    try {
+        const frame = document.getElementById('previewFrame');
+        if (!frame || !frame.contentDocument) return;
+        const doc = frame.contentDocument;
+        let dynamicStyle = doc.getElementById('dynamic-hero-pos-style');
+        if (!dynamicStyle) {
+            dynamicStyle = doc.createElement('style');
+            dynamicStyle.id = 'dynamic-hero-pos-style';
+            doc.head.appendChild(dynamicStyle);
+        }
+
+        const selectedPos = pos || document.querySelector('input[name="content_position"]:checked')?.value || 'center';
+        if (selectedPos === 'bottom') {
+            const isLightHeroText = document.querySelector('input[name="text_color"]:checked')?.value !== 'dark';
+            const botGradient = isLightHeroText 
+                ? 'linear-gradient(to top, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.55) 60%, rgba(0,0,0,0.2) 85%, transparent 100%)' 
+                : 'linear-gradient(to top, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.65) 60%, rgba(255,255,255,0.2) 85%, transparent 100%)';
+
+            dynamicStyle.textContent = `
+                #openingOverlay, .hero { 
+                    justify-content: flex-end !important; 
+                    padding-bottom: 0 !important; 
+                    padding-left: 0 !important;
+                    padding-right: 0 !important;
+                }
+                #openingOverlay .overlay-content, .hero > div { 
+                    margin-bottom: 0 !important; 
+                    width: 100% !important; 
+                    max-width: 100% !important; 
+                    padding: 50px 20px max(24px, env(safe-area-inset-bottom, 24px)) !important; 
+                    background: ${botGradient} !important; 
+                    border-radius: 0 !important; 
+                    box-sizing: border-box !important;
+                }
+                #openingOverlay .overlay-content p { 
+                    margin-bottom: 10px !important; 
+                    font-size: 0.95rem !important; 
+                    letter-spacing: 2.5px !important; 
+                }
+                #openingOverlay .overlay-content h1 { 
+                    font-size: clamp(2.2rem, 9vw, 3.8rem) !important; 
+                    line-height: 1.15 !important; 
+                }
+                #openingOverlay .btn-open { 
+                    margin: 20px auto 0 !important; 
+                    padding: 12px 34px !important; 
+                }
+            `;
+        } else {
+            dynamicStyle.textContent = '';
+        }
+    } catch(e) {}
+}
+
 // Init swatch state on load + scroll active tab into view
 document.addEventListener('DOMContentLoaded', function() {
     const val = document.getElementById('bg_color')?.value;
@@ -1033,6 +1108,7 @@ document.addEventListener('DOMContentLoaded', function() {
             setTimeout(function() {
                 updateLiveBtnPreview();
                 updateLiveCdPreview();
+                updateLiveHeroPos();
             }, 100);
         });
     }

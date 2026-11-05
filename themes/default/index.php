@@ -1023,6 +1023,44 @@ if ($_spMode) {
         $heroBtnRounded = isset($secSettings['hero']['btn_rounded']) ? $secSettings['hero']['btn_rounded'] : '1';
         $heroBtnTextColor = !empty($secSettings['hero']['btn_text_color']) ? $secSettings['hero']['btn_text_color'] : 'light';
 
+        // ── Hero / Sampul Content Position (Tengah vs Bawah) ──
+        $heroContentPos = $secSettings['hero']['content_position'] ?? 'center';
+        if ($heroContentPos === 'bottom') {
+            $isLightHeroText = ($secSettings['hero']['text_color'] ?? 'light') === 'light';
+            $botGradient = $isLightHeroText 
+                ? 'linear-gradient(to top, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.55) 60%, rgba(0,0,0,0.2) 85%, transparent 100%)' 
+                : 'linear-gradient(to top, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.65) 60%, rgba(255,255,255,0.2) 85%, transparent 100%)';
+
+            echo "#openingOverlay, .hero { 
+                justify-content: flex-end !important; 
+                padding-bottom: 0 !important; 
+                padding-left: 0 !important;
+                padding-right: 0 !important;
+            }\n";
+            echo "#openingOverlay .overlay-content, .hero > div { 
+                margin-bottom: 0 !important; 
+                width: 100% !important; 
+                max-width: 100% !important; 
+                padding: 50px 20px max(24px, env(safe-area-inset-bottom, 24px)) !important; 
+                background: {$botGradient} !important; 
+                border-radius: 0 !important; 
+                box-sizing: border-box !important;
+            }\n";
+            echo "#openingOverlay .overlay-content p { 
+                margin-bottom: 10px !important; 
+                font-size: 0.95rem !important; 
+                letter-spacing: 2.5px !important; 
+            }\n";
+            echo "#openingOverlay .overlay-content h1 { 
+                font-size: clamp(2.2rem, 9vw, 3.8rem) !important; 
+                line-height: 1.15 !important; 
+            }\n";
+            echo "#openingOverlay .btn-open { 
+                margin: 20px auto 0 !important; 
+                padding: 12px 34px !important; 
+            }\n";
+        }
+
         $btnSectionMap = [
             'hero'      => '.btn-open',
             'countdown' => '#countdown-section .btn-reminder',
