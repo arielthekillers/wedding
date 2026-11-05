@@ -22,10 +22,20 @@ if (file_exists($envFile)) {
     }
 }
 
-define('DB_HOST', getenv('DB_HOST') ?: 'localhost');
-define('DB_USER', getenv('DB_USER') ?: 'root');
-define('DB_PASS', getenv('DB_PASS') !== false ? getenv('DB_PASS') : '');
-define('DB_NAME', getenv('DB_NAME') ?: 'wedding_db');
+// Helper to fetch env from $_ENV, $_SERVER, or getenv()
+$getEnvVar = function($key, $default = null) {
+    if (isset($_ENV[$key]) && $_ENV[$key] !== '') return $_ENV[$key];
+    if (isset($_SERVER[$key]) && $_SERVER[$key] !== '') return $_SERVER[$key];
+    $val = getenv($key);
+    if ($val !== false && $val !== '') return $val;
+    return $default;
+};
+
+define('DB_HOST', $getEnvVar('DB_HOST', 'localhost'));
+define('DB_PORT', $getEnvVar('DB_PORT', '3306'));
+define('DB_USER', $getEnvVar('DB_USER', 'root'));
+define('DB_PASS', isset($_ENV['DB_PASS']) ? $_ENV['DB_PASS'] : (isset($_SERVER['DB_PASS']) ? $_SERVER['DB_PASS'] : (getenv('DB_PASS') !== false ? getenv('DB_PASS') : '')));
+define('DB_NAME', $getEnvVar('DB_NAME', 'wedding_db'));
 
 // Autoload simple classes
 spl_autoload_register(function ($class) {
@@ -38,7 +48,7 @@ spl_autoload_register(function ($class) {
 function getDB() {
     static $pdo;
     if (!$pdo) {
-        $dsn = "mysql:host=" . DB_HOST . ";dbname=" . DB_NAME . ";charset=utf8mb4";
+        $dsn = "mysql:host=" . DB_HOST . ";port=" . DB_PORT . ";dbname=" . DB_NAME . ";charset=utf8mb4";
         $options = [
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
