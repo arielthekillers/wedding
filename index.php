@@ -622,7 +622,14 @@ function handleAdmin($action, $parts) {
                 case 'story':
                     if (isset($_GET['action']) && $_GET['action'] === 'delete') {
                         $storyId = (int)($_GET['story_id'] ?? 0);
-                        if ($storyId) Models\Wedding::deleteLoveStory($storyId);
+                        if ($storyId) {
+                            $oldStory = Models\Wedding::getLoveStory($storyId);
+                            if ($oldStory && !empty($oldStory['image_url'])) {
+                                $thumbUrl = str_replace('/full/', '/thumb/', $oldStory['image_url']);
+                                Helpers\ImageHelper::deleteFiles($oldStory['image_url'], $thumbUrl);
+                            }
+                            Models\Wedding::deleteLoveStory($storyId);
+                        }
                         header('Location: ' . $detailBase . 'story?deleted=1');
                         exit;
                     }
@@ -642,9 +649,36 @@ function handleAdmin($action, $parts) {
                                 'title'      => trim($_POST['title'] ?? ''),
                                 'story_date' => $_POST['story_date'] ?? date('Y-m-d'),
                                 'content'    => trim($_POST['content'] ?? ''),
-                                'image_url'  => trim($_POST['image_url'] ?? ''),
                                 'sort_order' => (int)($_POST['sort_order'] ?? 0),
                             ];
+
+                            // Retain existing image if editing
+                            $existingStory = $storyId ? Models\Wedding::getLoveStory($storyId) : null;
+                            $imageUrl = $existingStory['image_url'] ?? '';
+
+                            // Remove image if requested
+                            if (!empty($_POST['remove_image']) && $_POST['remove_image'] === '1') {
+                                if (!empty($imageUrl)) {
+                                    $thumbUrl = str_replace('/full/', '/thumb/', $imageUrl);
+                                    Helpers\ImageHelper::deleteFiles($imageUrl, $thumbUrl);
+                                    $imageUrl = '';
+                                }
+                            }
+
+                            // Handle photo upload
+                            $uploadDir = __DIR__ . '/uploads/story/' . $id;
+                            if (isset($_FILES['story_image']) && $_FILES['story_image']['error'] !== UPLOAD_ERR_NO_FILE) {
+                                $res = Helpers\ImageHelper::processUpload($_FILES['story_image'], $uploadDir);
+                                if (!isset($res['error'])) {
+                                    if (!empty($imageUrl)) {
+                                        $thumbUrl = str_replace('/full/', '/thumb/', $imageUrl);
+                                        Helpers\ImageHelper::deleteFiles($imageUrl, $thumbUrl);
+                                    }
+                                    $imageUrl = $res['full'];
+                                }
+                            }
+
+                            $data['image_url'] = $imageUrl;
                             $storyId ? Models\Wedding::updateLoveStory($storyId, $data) : Models\Wedding::addLoveStory($data);
                             header('Location: ' . $detailBase . 'story?saved_story=1');
                             exit;

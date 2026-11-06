@@ -118,8 +118,9 @@ include __DIR__ . '/partials/wedding_nav.php';
             <div class="modal-title" id="modalTitle">Tambah Cerita Baru</div>
             <button class="modal-close" onclick="closeModal()">✕</button>
         </div>
-        <form method="POST" id="storyForm">
+        <form method="POST" id="storyForm" enctype="multipart/form-data">
             <input type="hidden" name="story_id" id="storyId" value="">
+            <input type="hidden" name="remove_image" id="removeImage" value="0">
             <div class="form-group">
                 <label class="form-label">Judul Momen *</label>
                 <input type="text" name="title" id="fieldTitle" class="form-control" placeholder="Contoh: Pertama Kali Bertemu" required>
@@ -139,8 +140,22 @@ include __DIR__ . '/partials/wedding_nav.php';
                 <textarea name="content" id="fieldContent" class="form-control" placeholder="Ceritakan momen spesial ini..." required></textarea>
             </div>
             <div class="form-group" style="margin-top:14px;">
-                <label class="form-label">URL Foto <small>(opsional)</small></label>
-                <input type="url" name="image_url" id="fieldImage" class="form-control" placeholder="https://...">
+                <label class="form-label">Foto Momen <small>(opsional)</small></label>
+                
+                <!-- Container Preview Foto -->
+                <div id="storyPhotoPreviewContainer" style="display:none; align-items:center; gap:14px; margin-bottom:12px; padding:12px; background:#f8fafc; border-radius:12px; border:1px solid #e2e8f0;">
+                    <img id="storyPhotoPreview" src="" alt="Preview" style="width:72px; height:72px; object-fit:cover; border-radius:10px; border:2px solid #e2e8f0; flex-shrink:0;">
+                    <div style="flex:1; min-width:0;">
+                        <div id="storyPhotoInfo" style="font-size:0.82rem; font-weight:600; color:#334155; margin-bottom:4px; word-break:break-all;">Foto tersimpan</div>
+                        <button type="button" onclick="removeStoryPhoto()" class="btn btn-ghost btn-sm" style="color:#ef4444; background:#fee2e2; border-radius:6px; padding:4px 10px; font-size:0.75rem; font-weight:600; display:inline-flex; align-items:center; gap:4px;">
+                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                            Hapus Foto
+                        </button>
+                    </div>
+                </div>
+
+                <input type="file" name="story_image" id="fieldStoryImage" class="form-control" accept="image/*" onchange="previewStoryImage(this)">
+                <small style="color:#94a3b8; font-size:0.75rem; margin-top:4px; display:block;">Pilih file foto dari perangkat (JPG, PNG, WebP). Otomatis dioptimalkan.</small>
             </div>
             <div style="margin-top:20px;">
                 <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;padding:12px;">
@@ -155,21 +170,58 @@ include __DIR__ . '/partials/wedding_nav.php';
 function openModal() {
     document.getElementById('modalTitle').textContent = 'Tambah Cerita Baru';
     document.getElementById('storyId').value = '';
-    ['fieldTitle','fieldDate','fieldContent','fieldImage'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('removeImage').value = '0';
+    ['fieldTitle','fieldDate','fieldContent'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('fieldStoryImage').value = '';
     document.getElementById('fieldSort').value = '0';
+    document.getElementById('storyPhotoPreviewContainer').style.display = 'none';
+    document.getElementById('storyPhotoPreview').src = '';
     document.getElementById('modalOverlay').classList.add('active');
     document.body.style.overflow = 'hidden';
 }
 function openEditModal(id, title, date, content, image, sort) {
     document.getElementById('modalTitle').textContent = 'Edit Cerita';
     document.getElementById('storyId').value = id;
+    document.getElementById('removeImage').value = '0';
     document.getElementById('fieldTitle').value = title;
     document.getElementById('fieldDate').value = date;
     document.getElementById('fieldContent').value = content;
-    document.getElementById('fieldImage').value = image || '';
     document.getElementById('fieldSort').value = sort;
+    document.getElementById('fieldStoryImage').value = '';
+
+    const previewContainer = document.getElementById('storyPhotoPreviewContainer');
+    const previewImg = document.getElementById('storyPhotoPreview');
+    const photoInfo = document.getElementById('storyPhotoInfo');
+
+    if (image && image.trim() !== '') {
+        previewImg.src = image;
+        photoInfo.textContent = 'Foto saat ini (Pilih file di bawah jika ingin mengganti)';
+        previewContainer.style.display = 'flex';
+    } else {
+        previewImg.src = '';
+        previewContainer.style.display = 'none';
+    }
+
     document.getElementById('modalOverlay').classList.add('active');
     document.body.style.overflow = 'hidden';
+}
+function previewStoryImage(input) {
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('storyPhotoPreview').src = e.target.result;
+            document.getElementById('storyPhotoInfo').textContent = 'Foto baru yang dipilih: ' + input.files[0].name;
+            document.getElementById('storyPhotoPreviewContainer').style.display = 'flex';
+            document.getElementById('removeImage').value = '0';
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+function removeStoryPhoto() {
+    document.getElementById('removeImage').value = '1';
+    document.getElementById('fieldStoryImage').value = '';
+    document.getElementById('storyPhotoPreviewContainer').style.display = 'none';
+    document.getElementById('storyPhotoPreview').src = '';
 }
 function closeModal() {
     document.getElementById('modalOverlay').classList.remove('active');
