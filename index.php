@@ -577,6 +577,16 @@ function handleAdmin($action, $parts) {
                         exit;
                     }
 
+                    if (isset($_GET['action']) && $_GET['action'] === 'delete_all') {
+                        $items = Models\Wedding::getGallery($id);
+                        foreach ($items as $item) {
+                            $row = Models\Wedding::deleteGalleryImage((int)$item['id']);
+                            if ($row) Helpers\ImageHelper::deleteFiles($row['image_url'], $row['thumb_url']);
+                        }
+                        header('Location: ' . $detailBase . 'gallery?deleted_all=1');
+                        exit;
+                    }
+
                     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['photos'])) {
                         $files = $_FILES['photos'];
                         $count = count($files['name']);

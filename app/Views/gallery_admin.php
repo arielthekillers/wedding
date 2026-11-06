@@ -52,6 +52,8 @@ include __DIR__ . '/partials/wedding_nav.php';
 <div class="alert alert-success"><?= (int)$_GET['uploaded'] ?> foto berhasil diupload &amp; diproses!</div>
 <?php elseif (isset($_GET['deleted'])): ?>
 <div class="alert alert-info">Foto berhasil dihapus.</div>
+<?php elseif (isset($_GET['deleted_all'])): ?>
+<div class="alert alert-info">Semua foto galeri berhasil dihapus.</div>
 <?php elseif (isset($_GET['error'])): ?>
 <div class="alert alert-error">Gagal mengupload foto. Pastikan format file didukung (JPG, PNG, WebP, GIF).</div>
 <?php endif; ?>
@@ -111,9 +113,17 @@ include __DIR__ . '/partials/wedding_nav.php';
                 <p>Daftar koleksi foto galeri pernikahan</p>
             </div>
         </div>
-        <span style="background:#ffe4e6;color:#e11d48;font-weight:700;font-size:0.75rem;padding:4px 12px;border-radius:50px;white-space:nowrap;flex-shrink:0;">
-            <?= count($galleryItems) ?> Foto
-        </span>
+        <div style="display:flex;align-items:center;gap:8px;">
+            <?php if (!empty($galleryItems)): ?>
+            <button type="button" onclick="confirmDeleteAll()" class="btn btn-sm" style="background:#fee2e2;color:#dc2626;border:none;border-radius:8px;padding:5px 12px;font-size:0.75rem;font-weight:600;display:inline-flex;align-items:center;gap:4px;cursor:pointer;">
+                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                Hapus Semua
+            </button>
+            <?php endif; ?>
+            <span style="background:#ffe4e6;color:#e11d48;font-weight:700;font-size:0.75rem;padding:4px 12px;border-radius:50px;white-space:nowrap;flex-shrink:0;">
+                <?= count($galleryItems) ?> Foto
+            </span>
+        </div>
     </div>
     <div class="section-card-body">
 
@@ -182,7 +192,7 @@ include __DIR__ . '/partials/wedding_nav.php';
      style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(15,23,42,0.55);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:20px;">
     <div style="background:white;border-radius:20px;padding:32px 36px;max-width:400px;width:100%;text-align:center;box-shadow:0 25px 60px rgba(0,0,0,0.2);animation:popIn 0.22s ease;">
         <div class="flex justify-center text-rose-500 mb-3"><svg viewBox="0 0 24 24" width="48" height="48" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="w-12 h-12"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></div>
-        <img id="delPrevImg" src="" style="width:90px;height:90px;border-radius:10px;object-fit:cover;border:3px solid #fee2e2;margin:0 auto 16px;display:block;">
+        <img id="delPrevImg" src="" onerror="this.style.display='none'" style="width:90px;height:90px;border-radius:10px;object-fit:cover;border:3px solid #fee2e2;margin:0 auto 16px;display:block;">
         <h3 style="margin:0 0 8px;font-size:1.1rem;">Hapus Foto Ini?</h3>
         <p style="margin:0 0 24px;color:#94a3b8;font-size:0.85rem;">File akan dihapus permanen dari server beserta thumbnail. <strong>Tidak dapat dibatalkan.</strong></p>
         <div style="display:flex;gap:10px;justify-content:center;">
@@ -234,8 +244,11 @@ document.addEventListener('keydown', e => {
 
 function confirmDelete(id, num, thumb) {
     pendingDelId = id;
-    document.getElementById('delPrewImg') && (document.getElementById('delPrewImg').src = thumb);
-    document.getElementById('delPrevImg').src = thumb;
+    const prev = document.getElementById('delPrevImg');
+    if (prev) {
+        prev.style.display = 'block';
+        prev.src = thumb;
+    }
     const m = document.getElementById('delModal');
     m.style.display = 'flex'; document.body.style.overflow = 'hidden';
 }
@@ -245,7 +258,14 @@ function closeDelModal() {
     document.body.style.overflow = '';
 }
 function executeDelete() {
-    if (pendingDelId) window.location.href = BASE_URL + '?action=delete&img_id=' + pendingDelId;
+    if (pendingDelId) {
+        window.location.href = window.location.pathname + '?action=delete&img_id=' + pendingDelId;
+    }
+}
+function confirmDeleteAll() {
+    if (confirm('Apakah Anda yakin ingin menghapus SEMUA foto galeri? Tindakan ini tidak dapat dibatalkan.')) {
+        window.location.href = window.location.pathname + '?action=delete_all';
+    }
 }
 
 // Upload drag & drop and file pick accumulation
