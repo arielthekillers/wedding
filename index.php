@@ -419,10 +419,30 @@ function handleAdmin($action, $parts) {
                         }
                         unset($data['delete_og_image']);
 
-                        // Handle upload of custom OG image
-                        if (isset($_FILES['og_image']) && $_FILES['og_image']['error'] !== UPLOAD_ERR_NO_FILE) {
+                        // Handle upload of custom OG image (Cropped Base64 or Direct File)
+                        if (!empty($_POST['og_image_data']) && strpos($_POST['og_image_data'], 'data:image') === 0) {
                             $uploadDir = __DIR__ . '/uploads/og/' . $id;
-                            $res = Helpers\ImageHelper::processOgUpload($_FILES['og_image'], $uploadDir);
+                            $fullDir = $uploadDir . '/full';
+                            if (!is_dir($fullDir)) {
+                                mkdir($fullDir, 0755, true);
+                            }
+                            $rawBase64 = preg_replace('#^data:image/\w+;base64,#i', '', $_POST['og_image_data']);
+                            $binaryData = base64_decode($rawBase64);
+                            if ($binaryData !== false) {
+                                if (!empty($wedding['og_image'])) {
+                                    Helpers\ImageHelper::deleteFiles($wedding['og_image'], '');
+                                }
+                                $filename = 'og_' . bin2hex(random_bytes(10)) . '.jpg';
+                                $fullPath = $fullDir . '/' . $filename;
+                                file_put_contents($fullPath, $binaryData);
+
+                                $appRoot  = rtrim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_FILENAME'])), '/');
+                                $base     = isset($GLOBALS['base']) ? rtrim($GLOBALS['base'], '/') : '';
+                                $data['og_image'] = $base . '/' . ltrim(str_replace('\\', '/', substr($fullPath, strlen($appRoot))), '/');
+                            }
+                        } elseif (isset($_FILES['og_image']) && $_FILES['og_image']['error'] !== UPLOAD_ERR_NO_FILE) {
+                            $uploadDir = __DIR__ . '/uploads/og/' . $id;
+                            $res = Helpers\ImageHelper::processUpload($_FILES['og_image'], $uploadDir);
                             if (!isset($res['error'])) {
                                 if (!empty($wedding['og_image'])) {
                                     Helpers\ImageHelper::deleteFiles($wedding['og_image'], '');
@@ -430,6 +450,7 @@ function handleAdmin($action, $parts) {
                                 $data['og_image'] = $res['full'];
                             }
                         }
+                        unset($data['og_image_data']);
 
                         Models\Wedding::update($id, $data);
                         header('Location: ' . $detailBase . 'settings?saved=1');

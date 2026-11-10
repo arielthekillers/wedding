@@ -66,6 +66,20 @@ if (preg_match('#^https?://#i', $rawOgImage)) {
     }
     $ogImgUrl = $ogProtocol . $ogHost . '/' . ltrim($cleanPath, '/');
 }
+
+// Determine image dimensions (portrait by default)
+$ogWidth = 1000;
+$ogHeight = 1250;
+if (preg_match('#(uploads/.+)$#', $rawOgImage, $m)) {
+    $localFile = dirname($_SERVER['SCRIPT_FILENAME']) . '/' . str_replace('/', DIRECTORY_SEPARATOR, $m[1]);
+    if (file_exists($localFile)) {
+        $imgSize = @getimagesize($localFile);
+        if ($imgSize && !empty($imgSize[0]) && !empty($imgSize[1])) {
+            $ogWidth = $imgSize[0];
+            $ogHeight = $imgSize[1];
+        }
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en" class="<?= (isset($_GET['msg']) || !$isSecActive('hero')) ? '' : 'locked' ?>">
@@ -75,7 +89,7 @@ if (preg_match('#^https?://#i', $rawOgImage)) {
     <title><?= htmlspecialchars($ogPageTitle) ?></title>
     <meta name="description" content="<?= htmlspecialchars($ogMetaDesc) ?>">
 
-    <!-- Open Graph / Facebook / WhatsApp (Large Landscape Preview) -->
+    <!-- Open Graph / Facebook / WhatsApp (Portrait Card Preview) -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="<?= htmlspecialchars($ogFullUrl) ?>">
     <meta property="og:title" content="<?= htmlspecialchars($ogPageTitle) ?>">
@@ -83,11 +97,11 @@ if (preg_match('#^https?://#i', $rawOgImage)) {
     <meta property="og:image" content="<?= htmlspecialchars($ogImgUrl) ?>">
     <meta property="og:image:secure_url" content="<?= htmlspecialchars($ogImgUrl) ?>">
     <meta property="og:image:type" content="image/jpeg">
-    <meta property="og:image:width" content="1200">
-    <meta property="og:image:height" content="630">
+    <meta property="og:image:width" content="<?= $ogWidth ?>">
+    <meta property="og:image:height" content="<?= $ogHeight ?>">
     <meta property="og:site_name" content="<?= htmlspecialchars($ogBride . ' & ' . $ogGroom) ?>">
 
-    <!-- Twitter Card (Large Image) -->
+    <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:url" content="<?= htmlspecialchars($ogFullUrl) ?>">
     <meta name="twitter:title" content="<?= htmlspecialchars($ogPageTitle) ?>">
