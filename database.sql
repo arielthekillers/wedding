@@ -161,6 +161,7 @@ CREATE TABLE `weddings` (
   `music_url` varchar(500) DEFAULT NULL,
   `bride_image` varchar(500) DEFAULT NULL,
   `groom_image` varchar(500) DEFAULT NULL,
+  `og_image` varchar(500) DEFAULT NULL,
   `section_settings` text DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `slug` (`slug`),

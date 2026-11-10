@@ -17,6 +17,14 @@ class Wedding {
             }
         } catch (\PDOException $e) {}
 
+        // Add og_image column to weddings table if missing
+        try {
+            $check = $db->query("SHOW COLUMNS FROM weddings LIKE 'og_image'");
+            if ($check->rowCount() === 0) {
+                $db->exec("ALTER TABLE weddings ADD COLUMN og_image VARCHAR(500) DEFAULT NULL");
+            }
+        } catch (\PDOException $e) {}
+
         // Create saweria_gifts table for incoming Saweria webhook donations
         $db->exec("CREATE TABLE IF NOT EXISTS saweria_gifts (
             id INT AUTO_INCREMENT PRIMARY KEY,
@@ -60,6 +68,7 @@ class Wedding {
     }
 
     public static function getBySlug($slug) {
+        self::initDB();
         $db = getDB();
         $stmt = $db->prepare("SELECT * FROM weddings WHERE slug = ?");
         $stmt->execute([$slug]);
@@ -67,6 +76,7 @@ class Wedding {
     }
 
     public static function create($data) {
+        self::initDB();
         $db = getDB();
         $fields = array_keys($data);
         $placeholders = array_map(function($f) { return ":$f"; }, $fields);
@@ -77,6 +87,7 @@ class Wedding {
     }
 
     public static function update($id, $data) {
+        self::initDB();
         $db = getDB();
         $sets = [];
         foreach ($data as $key => $val) {

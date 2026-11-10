@@ -89,6 +89,74 @@ class ImageHelper {
     }
 
     /**
+     * Process and crop an Open Graph (landscape 1200x630) image specifically for WhatsApp / social preview.
+     */
+    public static function processOgUpload(
+        array  $file,
+        string $uploadDir,
+        int    $targetW = 1200,
+        int    $targetH = 630,
+        int    $quality = 82
+    ): array {
+        if ($file['error'] !== UPLOAD_ERR_OK) {
+            return ['error' => 'Upload error code: ' . $file['error']];
+        }
+
+        $allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+        $mime    = mime_content_type($file['tmp_name']);
+        if (!in_array($mime, $allowed)) {
+            return ['error' => 'File type not allowed: ' . $mime];
+        }
+
+        $fullDir = $uploadDir . '/full';
+        if (!is_dir($fullDir)) {
+            mkdir($fullDir, 0755, true);
+        }
+
+        $uid      = bin2hex(random_bytes(10));
+        $filename = 'og_' . $uid . '.jpg';
+        $fullPath = $fullDir . '/' . $filename;
+
+        $src = self::loadImage($file['tmp_name'], $mime);
+        if (!$src) {
+            return ['error' => 'Could not read image. GD extension may be missing.'];
+        }
+
+        $srcW = imagesx($src);
+        $srcH = imagesy($src);
+
+        // Center-crop to target 1200:630 ratio (approx 1.904:1)
+        $targetRatio = $targetW / $targetH;
+        $srcRatio    = $srcW / $srcH;
+
+        if ($srcRatio > $targetRatio) {
+            $cropH = $srcH;
+            $cropW = (int)round($srcH * $targetRatio);
+            $cropX = (int)round(($srcW - $cropW) / 2);
+            $cropY = 0;
+        } else {
+            $cropW = $srcW;
+            $cropH = (int)round($srcW / $targetRatio);
+            $cropX = 0;
+            $cropY = (int)round(($srcH - $cropH) / 2);
+        }
+
+        $dst = imagecreatetruecolor($targetW, $targetH);
+        self::preserveTransparency($dst, $mime);
+        imagecopyresampled($dst, $src, 0, 0, $cropX, $cropY, $targetW, $targetH, $cropW, $cropH);
+
+        imagejpeg($dst, $fullPath, $quality);
+        imagedestroy($dst);
+        imagedestroy($src);
+
+        $appRoot  = rtrim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_FILENAME'])), '/');
+        $base     = isset($GLOBALS['base']) ? rtrim($GLOBALS['base'], '/') : '';
+        $relFull  = $base . '/' . ltrim(str_replace('\\', '/', substr($fullPath, strlen($appRoot))), '/');
+
+        return ['full' => $relFull];
+    }
+
+    /**
      * Delete full + thumb files for a given relative URL pair.
      */
     public static function deleteFiles(string $fullUrl, string $thumbUrl): void {

@@ -407,10 +407,32 @@ function handleAdmin($action, $parts) {
                         }
                         if (Models\Wedding::slugExists($data['slug'], $id)) {
                             header('Location: ' . $detailBase . 'settings?error=' . urlencode('Slug sudah dipakai.'));
-                        } else {
-                            Models\Wedding::update($id, $data);
-                            header('Location: ' . $detailBase . 'settings?saved=1');
+                            exit;
                         }
+
+                        // Handle deletion of custom OG image
+                        if (!empty($_POST['delete_og_image'])) {
+                            if (!empty($wedding['og_image'])) {
+                                Helpers\ImageHelper::deleteFiles($wedding['og_image'], '');
+                            }
+                            $data['og_image'] = null;
+                        }
+                        unset($data['delete_og_image']);
+
+                        // Handle upload of custom OG image
+                        if (isset($_FILES['og_image']) && $_FILES['og_image']['error'] !== UPLOAD_ERR_NO_FILE) {
+                            $uploadDir = __DIR__ . '/uploads/og/' . $id;
+                            $res = Helpers\ImageHelper::processOgUpload($_FILES['og_image'], $uploadDir);
+                            if (!isset($res['error'])) {
+                                if (!empty($wedding['og_image'])) {
+                                    Helpers\ImageHelper::deleteFiles($wedding['og_image'], '');
+                                }
+                                $data['og_image'] = $res['full'];
+                            }
+                        }
+
+                        Models\Wedding::update($id, $data);
+                        header('Location: ' . $detailBase . 'settings?saved=1');
                         exit;
                     }
                     $all_users = ($_SESSION['role'] === 'admin') ? Models\User::getAll() : [];

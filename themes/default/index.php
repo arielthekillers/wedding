@@ -18,13 +18,81 @@ if ($_spMode && !in_array($_sp, $_spAllowed)) $_spMode = false;
 if ($_spMode) {
     $isSecActive = function($key) { return true; };
 }
+
+// ── Open Graph / Social Media Sharing Meta ──
+$ogProtocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+    || (isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == 443)
+    || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https')
+    ? 'https://' : 'http://';
+$ogHost = $_SERVER['HTTP_HOST'] ?? 'localhost';
+$ogFullUrl = $ogProtocol . $ogHost . $_SERVER['REQUEST_URI'];
+
+$ogBride = $wedding['bride_nickname'] ?: $wedding['bride_name'] ?: 'Mempelai Wanita';
+$ogGroom = $wedding['groom_nickname'] ?: $wedding['groom_name'] ?: 'Mempelai Pria';
+$ogPageTitle = "The Wedding of " . $ogBride . " & " . $ogGroom;
+
+// Wedding date info for description
+$ogEventDate = !empty($wedding['akad_date']) ? $wedding['akad_date'] : (!empty($wedding['start_date']) ? date('l, d F Y', strtotime($wedding['start_date'])) : '');
+$toGuest = isset($_GET['to']) ? trim($_GET['to']) : '';
+if ($toGuest) {
+    $ogMetaDesc = "Undangan Pernikahan spesial untuk {$toGuest} - " . $ogPageTitle . ($ogEventDate ? " (" . $ogEventDate . ")" : "") . ". Buka undangan untuk informasi acara dan lokasi.";
+} else {
+    $ogMetaDesc = "Undangan Pernikahan " . $ogBride . " & " . $ogGroom . ($ogEventDate ? " - " . $ogEventDate . ")" : "") . ". Buka undangan untuk informasi lengkap acara dan lokasi.";
+}
+
+// Image resolution: 1) uploaded og_image -> 2) hero bg_image -> 3) bride_image -> 4) default landscape
+$rawOgImage = '';
+if (!empty($wedding['og_image'])) {
+    $rawOgImage = $wedding['og_image'];
+} elseif (!empty($secSettings['hero']['bg_image'])) {
+    $rawOgImage = $secSettings['hero']['bg_image'];
+} elseif (!empty($wedding['bride_image'])) {
+    $rawOgImage = $wedding['bride_image'];
+} else {
+    $rawOgImage = 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&q=80&w=1200';
+}
+
+if (preg_match('#^https?://#i', $rawOgImage)) {
+    $ogImgUrl = $rawOgImage;
+} else {
+    $basePath = isset($GLOBALS['base']) ? trim($GLOBALS['base'], '/') : '';
+    if (preg_match('#(uploads/.+)$#', $rawOgImage, $m)) {
+        $cleanPath = $basePath ? $basePath . '/' . $m[1] : $m[1];
+    } else {
+        $cleanPath = ltrim($rawOgImage, '/');
+        if ($basePath && strpos($cleanPath, $basePath . '/') !== 0 && !preg_match('#^' . preg_quote($basePath, '#') . '#', $cleanPath)) {
+            $cleanPath = $basePath . '/' . $cleanPath;
+        }
+    }
+    $ogImgUrl = $ogProtocol . $ogHost . '/' . ltrim($cleanPath, '/');
+}
 ?>
 <!DOCTYPE html>
 <html lang="en" class="<?= (isset($_GET['msg']) || !$isSecActive('hero')) ? '' : 'locked' ?>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Wedding of <?= $wedding['bride_nickname'] ?> & <?= $wedding['groom_nickname'] ?></title>
+    <title><?= htmlspecialchars($ogPageTitle) ?></title>
+    <meta name="description" content="<?= htmlspecialchars($ogMetaDesc) ?>">
+
+    <!-- Open Graph / Facebook / WhatsApp (Large Landscape Preview) -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="<?= htmlspecialchars($ogFullUrl) ?>">
+    <meta property="og:title" content="<?= htmlspecialchars($ogPageTitle) ?>">
+    <meta property="og:description" content="<?= htmlspecialchars($ogMetaDesc) ?>">
+    <meta property="og:image" content="<?= htmlspecialchars($ogImgUrl) ?>">
+    <meta property="og:image:secure_url" content="<?= htmlspecialchars($ogImgUrl) ?>">
+    <meta property="og:image:type" content="image/jpeg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:site_name" content="<?= htmlspecialchars($ogBride . ' & ' . $ogGroom) ?>">
+
+    <!-- Twitter Card (Large Image) -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="<?= htmlspecialchars($ogFullUrl) ?>">
+    <meta name="twitter:title" content="<?= htmlspecialchars($ogPageTitle) ?>">
+    <meta name="twitter:description" content="<?= htmlspecialchars($ogMetaDesc) ?>">
+    <meta name="twitter:image" content="<?= htmlspecialchars($ogImgUrl) ?>">
     <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Amiri:wght@400;700&family=Montserrat:wght@300;400;600&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
     <style>
         * {
